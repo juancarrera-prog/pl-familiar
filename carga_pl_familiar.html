@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Cargar Movimiento</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: #2a2a3a;
+    --accent-green: #00e5a0;
+    --accent-red: #ff4d6d;
+    --accent-yellow: #ffd166;
+    --text: #f0f0f8;
+    --text-muted: #6b6b8a;
+    --radius: 18px;
+    --radius-sm: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 0%, rgba(0,229,160,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 20% 100%, rgba(255,77,109,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 0 100px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 56px 24px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .header-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 100px;
+  }
+
+  /* TYPE SELECTOR */
+  .type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 20px;
+    margin-bottom: 24px;
+  }
+
+  .type-btn {
+    padding: 18px 16px;
+    border-radius: var(--radius);
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.3px;
+  }
+
+  .type-btn .icon { font-size: 28px; }
+
+  .type-btn.gasto.active {
+    border-color: var(--accent-red);
+    background: rgba(255,77,109,0.08);
+    color: var(--accent-red);
+  }
+
+  .type-btn.ingreso.active {
+    border-color: var(--accent-green);
+    background: rgba(0,229,160,0.08);
+    color: var(--accent-green);
+  }
+
+  /* FORM SECTIONS */
+  .section {
+    padding: 0 20px;
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+  }
+
+  .section.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    padding-left: 4px;
+  }
+
+  /* CATEGORIES */
+  .cats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .cats-grid::-webkit-scrollbar { width: 3px; }
+  .cats-grid::-webkit-scrollbar-track { background: transparent; }
+  .cats-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .cat-btn {
+    padding: 12px 10px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .cat-btn.active {
+    border-color: var(--accent-yellow);
+    background: rgba(255,209,102,0.08);
+    color: var(--accent-yellow);
+  }
+
+  /* PAYMENT TYPE */
+  .payment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .payment-btn {
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .payment-btn.active {
+    border-color: var(--accent-yellow);
+    background: rgba(255,209,102,0.08);
+    color: var(--accent-yellow);
+  }
+
+  /* INPUTS */
+  .input-field {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .input-field:focus { border-color: var(--accent-yellow); }
+  .input-field::placeholder { color: var(--text-muted); }
+
+  select.input-field {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+    cursor: pointer;
+  }
+
+  /* AMOUNT */
+  .amount-wrapper {
+    position: relative;
+  }
+
+  .amount-prefix {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .amount-input {
+    padding-left: 36px;
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  /* CUOTAS */
+  .cuotas-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* RESUMEN */
+  .resumen-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .resumen-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .resumen-row .label { color: var(--text-muted); }
+  .resumen-row .value { font-weight: 600; }
+
+  .resumen-divider {
+    height: 1px;
+    background: var(--border);
+  }
+
+  .resumen-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .resumen-total .label {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+  }
+
+  .resumen-total .value {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .resumen-total .value.gasto { color: var(--accent-red); }
+  .resumen-total .value.ingreso { color: var(--accent-green); }
+
+  /* CUOTAS PREVIEW */
+  .cuotas-preview {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .cuota-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* SUBMIT BUTTON */
+  .submit-area {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px 32px;
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+    z-index: 10;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 18px;
+    border-radius: var(--radius);
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .submit-btn.gasto {
+    background: var(--accent-red);
+    color: white;
+  }
+
+  .submit-btn.ingreso {
+    background: var(--accent-green);
+    color: #0a0a0f;
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .submit-btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  /* SUCCESS STATE */
+  .success-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .success-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .success-icon {
+    font-size: 72px;
+    animation: bounce 0.5s ease;
+  }
+
+  @keyframes bounce {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .success-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+  }
+
+  .success-sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: center;
+    padding: 0 40px;
+    line-height: 1.5;
+  }
+
+  .success-new-btn {
+    margin-top: 16px;
+    padding: 14px 32px;
+    border-radius: var(--radius);
+    border: 2px solid var(--accent-green);
+    background: transparent;
+    color: var(--accent-green);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .success-new-btn:active { transform: scale(0.97); }
+
+  /* LOADING SPINNER */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  .submit-btn.ingreso .spinner { border-top-color: #0a0a0f; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 10px 20px;
+    font-size: 13px;
+    color: var(--accent-red);
+    z-index: 200;
+    transition: transform 0.3s;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="header-title">Nuevo movimiento</div>
+    <div class="header-date" id="headerDate"></div>
+  </div>
+
+  <!-- TIPO -->
+  <div class="type-selector">
+    <button class="type-btn gasto active" onclick="setTipo('gasto')">
+      <span class="icon">💸</span>
+      GASTO
+    </button>
+    <button class="type-btn ingreso" onclick="setTipo('ingreso')">
+      <span class="icon">💰</span>
+      INGRESO
+    </button>
+  </div>
+
+  <!-- CATEGORÍA -->
+  <div class="section visible" id="secCat">
+    <div class="section-label">Categoría</div>
+    <div class="cats-grid" id="catsGrid"></div>
+  </div>
+
+  <!-- MONTO -->
+  <div class="section visible" id="secMonto">
+    <div class="section-label">Monto total</div>
+    <div class="amount-wrapper">
+      <span class="amount-prefix">$</span>
+      <input type="number" class="input-field amount-input" id="montoInput" placeholder="0" inputmode="numeric" oninput="updateResumen()">
+    </div>
+  </div>
+
+  <!-- PAGO -->
+  <div class="section visible" id="secPago">
+    <div class="section-label">Forma de pago</div>
+    <div class="payment-grid">
+      <button class="payment-btn active" onclick="setPago('debito')">💳 Débito</button>
+      <button class="payment-btn" onclick="setPago('credito')">🏦 Crédito</button>
+    </div>
+  </div>
+
+  <!-- CUOTAS (solo crédito) -->
+  <div class="section" id="secCuotas">
+    <div class="section-label">Cuotas</div>
+    <div class="cuotas-row">
+      <div>
+        <div class="section-label" style="margin-bottom:8px">Primer mes</div>
+        <select class="input-field" id="mesInicio" onchange="updateResumen()">
+        </select>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:8px">Cantidad</div>
+        <select class="input-field" id="cantCuotas" onchange="updateResumen()">
+          <option value="1">1 cuota</option>
+          <option value="2">2 cuotas</option>
+          <option value="3" selected>3 cuotas</option>
+          <option value="4">4 cuotas</option>
+          <option value="6">6 cuotas</option>
+          <option value="9">9 cuotas</option>
+          <option value="12">12 cuotas</option>
+          <option value="18">18 cuotas</option>
+          <option value="24">24 cuotas</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- MES ÚNICO (débito) -->
+  <div class="section visible" id="secMesDebito">
+    <div class="section-label">Mes</div>
+    <select class="input-field" id="mesDebito" onchange="updateResumen()"></select>
+  </div>
+
+  <!-- COMENTARIO -->
+  <div class="section visible" id="secComentario">
+    <div class="section-label">Comentario <span style="color:var(--text-muted);font-size:10px;text-transform:none;letter-spacing:0">(opcional)</span></div>
+    <input type="text" class="input-field" id="comentarioInput" placeholder="Ej: Remera Levis Juani" oninput="updateResumen()">
+  </div>
+
+  <!-- RESUMEN -->
+  <div class="section visible" id="secResumen">
+    <div class="section-label">Resumen</div>
+    <div class="resumen-card" id="resumenCard">
+      <div class="resumen-row">
+        <span class="label">Tipo</span>
+        <span class="value" id="rTipo">—</span>
+      </div>
+      <div class="resumen-row">
+        <span class="label">Categoría</span>
+        <span class="value" id="rCat">—</span>
+      </div>
+      <div class="resumen-row" id="rPagoRow">
+        <span class="label">Pago</span>
+        <span class="value" id="rPago">—</span>
+      </div>
+      <div class="resumen-row" id="rCuotasRow" style="display:none">
+        <span class="label">Cuotas</span>
+        <span class="value" id="rCuotas">—</span>
+      </div>
+      <div class="resumen-row">
+        <span class="label">Comentario</span>
+        <span class="value" id="rComentario" style="max-width:200px;text-align:right;font-size:12px">—</span>
+      </div>
+      <div class="resumen-divider"></div>
+      <div class="resumen-total">
+        <span class="label">Total</span>
+        <span class="value gasto" id="rTotal">$0</span>
+      </div>
+      <!-- cuotas preview -->
+      <div id="cuotasPreview" style="display:none">
+        <div class="cuotas-preview" id="cuotasChips"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SUBMIT -->
+<div class="submit-area">
+  <button class="submit-btn gasto" id="submitBtn" onclick="guardar()">
+    <span id="submitText">Guardar gasto</span>
+    <div class="spinner" id="submitSpinner"></div>
+  </button>
+</div>
+
+<!-- SUCCESS -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-icon" id="successIcon">✅</div>
+  <div class="success-title" id="successTitle">¡Guardado!</div>
+  <div class="success-sub" id="successSub"></div>
+  <button class="success-new-btn" onclick="resetForm()">+ Nuevo movimiento</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzn7QrAjQOGphuHYWy1TXwl7grI2uOj1qWCHHTa3LqcT9fI7ttp5vAVs6Mc17QoT__r/exec';
+
+const CATS_GASTO = [
+  'Comida + Supermercado','Agua Poybe (Cimes)','Dover','Maternal Renu',
+  'Expensas','Ocio','Regalos','Renata 👶🏻💕','Cosas para el hogar🏠🔧',
+  'Queso y Milo🐩🐩','Farmacia','Municipalidad','ARBA (pagar MANUAL)',
+  'Nafta Virtus','Nafta Sandero','Mecánico Auto','Mecánico Virtus',
+  'Seguro Auto','Seguro Virtus','Patente Auto','Patente Virtus',
+  'Maq Pasto (nafta,aceite)','GYM Nati','GAS💨','LUZ 💡',
+  'Peajes','Mary Limpieza','Mary ART + aportes 🧹','Peluquería/Barbería',
+  'Cable + Internet 📺','Apple (fin de mes)','Spotify',
+  'Pileta y mundo limp 🧼','Caja de psicólogos','ColPsi matrícula',
+  'Osde diferencia 🏥','OTROS','Vacaciones 🏝️','Inversiones','Dólares'
+];
+
+const CATS_INGRESO = ['Sueldo Juani','Sueldo Nati','Extras'];
+
+const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const MESES_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+let state = {
+  tipo: 'gasto',
+  cat: null,
+  pago: 'debito',
+  monto: 0,
+  mesDebito: null,
+  mesInicio: null,
+  cuotas: 3,
+  comentario: ''
+};
+
+// Init
+function init() {
+  // Fecha header
+  const now = new Date();
+  document.getElementById('headerDate').textContent = now.toLocaleDateString('es-AR', { day:'numeric', month:'short', year:'numeric' });
+
+  // Poblar meses
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  // Meses disponibles: desde ene 25 hasta dic 26
+  const mesesOptions = [];
+  for (let y = 2025; y <= 2026; y++) {
+    for (let m = 0; m < 12; m++) {
+      const label = MESES[m] + ' ' + String(y).slice(-2);
+      const fullLabel = MESES_FULL[m] + ' ' + y;
+      mesesOptions.push({ value: label, label: fullLabel });
+    }
+  }
+
+  const selDebito = document.getElementById('mesDebito');
+  const selInicio = document.getElementById('mesInicio');
+
+  mesesOptions.forEach(opt => {
+    const o1 = new Option(opt.label, opt.value);
+    const o2 = new Option(opt.label, opt.value);
+    selDebito.add(o1);
+    selInicio.add(o2);
+  });
+
+  // Default: mes actual
+  const defaultMes = MESES[currentMonth] + ' ' + String(currentYear).slice(-2);
+  selDebito.value = defaultMes;
+  selInicio.value = defaultMes;
+  state.mesDebito = defaultMes;
+  state.mesInicio = defaultMes;
+
+  renderCats();
+  updateResumen();
+}
+
+function renderCats() {
+  const grid = document.getElementById('catsGrid');
+  grid.innerHTML = '';
+  const cats = state.tipo === 'gasto' ? CATS_GASTO : CATS_INGRESO;
+  cats.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (state.cat === c ? ' active' : '');
+    btn.textContent = c;
+    btn.onclick = () => { state.cat = c; renderCats(); updateResumen(); };
+    grid.appendChild(btn);
+  });
+}
+
+function setTipo(t) {
+  state.tipo = t;
+  state.cat = null;
+
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.type-btn.' + t).classList.add('active');
+
+  // Actualizar colores submit
+  document.getElementById('submitBtn').className = 'submit-btn ' + t;
+  document.getElementById('submitText').textContent = t === 'gasto' ? 'Guardar gasto' : 'Guardar ingreso';
+  document.getElementById('rTotal').className = 'value ' + t;
+
+  // Ingresos: ocultar pago/cuotas, mostrar mes
+  if (t === 'ingreso') {
+    document.getElementById('secPago').classList.remove('visible');
+    document.getElementById('secCuotas').classList.remove('visible');
+    document.getElementById('secMesDebito').classList.add('visible');
+  } else {
+    document.getElementById('secPago').classList.add('visible');
+    setPago(state.pago);
+  }
+
+  renderCats();
+  updateResumen();
+}
+
+function setPago(p) {
+  state.pago = p;
+  document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('active'));
+  event.target.closest('.payment-btn').classList.add('active');
+
+  if (p === 'credito') {
+    document.getElementById('secCuotas').classList.add('visible');
+    document.getElementById('secMesDebito').classList.remove('visible');
+  } else {
+    document.getElementById('secCuotas').classList.remove('visible');
+    document.getElementById('secMesDebito').classList.add('visible');
+  }
+  updateResumen();
+}
+
+function updateResumen() {
+  state.monto = parseFloat(document.getElementById('montoInput').value) || 0;
+  state.mesDebito = document.getElementById('mesDebito').value;
+  state.mesInicio = document.getElementById('mesInicio').value;
+  state.cuotas = parseInt(document.getElementById('cantCuotas').value) || 1;
+  state.comentario = document.getElementById('comentarioInput').value.trim();
+
+  document.getElementById('rTipo').textContent = state.tipo === 'gasto' ? '💸 Gasto' : '💰 Ingreso';
+  document.getElementById('rCat').textContent = state.cat || '—';
+  document.getElementById('rComentario').textContent = state.comentario || '—';
+
+  const total = state.monto;
+  document.getElementById('rTotal').textContent = total > 0 ? '$' + Math.round(total).toLocaleString('es-AR') : '$0';
+
+  if (state.tipo === 'gasto') {
+    document.getElementById('rPagoRow').style.display = '';
+    document.getElementById('rPago').textContent = state.pago === 'debito' ? '💳 Débito' : '🏦 Crédito';
+
+    if (state.pago === 'credito' && state.cuotas > 1) {
+      document.getElementById('rCuotasRow').style.display = '';
+      document.getElementById('rCuotas').textContent = state.cuotas + ' cuotas de $' + Math.round(total / state.cuotas).toLocaleString('es-AR');
+      document.getElementById('cuotasPreview').style.display = '';
+      renderCuotasChips();
+    } else {
+      document.getElementById('rCuotasRow').style.display = 'none';
+      document.getElementById('cuotasPreview').style.display = 'none';
+    }
+  } else {
+    document.getElementById('rPagoRow').style.display = 'none';
+    document.getElementById('rCuotasRow').style.display = 'none';
+    document.getElementById('cuotasPreview').style.display = 'none';
+  }
+}
+
+function renderCuotasChips() {
+  const chips = document.getElementById('cuotasChips');
+  chips.innerHTML = '';
+  const cuotaVal = Math.round(state.monto / state.cuotas);
+  const [mes, anio] = state.mesInicio.split(' ');
+  const mesIdx = MESES.indexOf(mes);
+
+  for (let i = 0; i < state.cuotas; i++) {
+    let idx = (mesIdx + i) % 12;
+    let y = parseInt('20' + anio) + Math.floor((mesIdx + i) / 12);
+    const chip = document.createElement('div');
+    chip.className = 'cuota-chip';
+    chip.textContent = MESES_FULL[idx].slice(0,3) + ' ' + String(y).slice(-2) + ' · $' + cuotaVal.toLocaleString('es-AR');
+    chips.appendChild(chip);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function guardar() {
+  // Validaciones
+  if (!state.cat) { showToast('⚠️ Elegí una categoría'); return; }
+  if (!state.monto || state.monto <= 0) { showToast('⚠️ Ingresá un monto'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  const text = document.getElementById('submitText');
+  const spinner = document.getElementById('submitSpinner');
+
+  btn.disabled = true;
+  text.style.display = 'none';
+  spinner.style.display = 'block';
+
+  // Armar payload
+  const payload = {
+    action: 'cargarMovimiento',
+    tipo: state.tipo,
+    categoria: state.cat,
+    monto: state.monto,
+    comentario: state.comentario,
+    pago: state.tipo === 'ingreso' ? 'debito' : state.pago,
+    mes: state.pago === 'credito' && state.tipo === 'gasto' ? null : (state.tipo === 'ingreso' ? state.mesDebito : state.mesDebito),
+    mesInicio: state.pago === 'credito' && state.tipo === 'gasto' ? state.mesInicio : null,
+    cuotas: state.pago === 'credito' && state.tipo === 'gasto' ? state.cuotas : 1
+  };
+
+  try {
+    const res = await fetch(API_URL + '?data=' + encodeURIComponent(JSON.stringify(payload)));
+    const data = await res.json();
+
+    if (data.success) {
+      // Success
+      document.getElementById('successIcon').textContent = state.tipo === 'gasto' ? '✅' : '🎉';
+      document.getElementById('successTitle').textContent = state.tipo === 'gasto' ? '¡Gasto guardado!' : '¡Ingreso guardado!';
+
+      let subMsg = state.cat;
+      if (state.comentario) subMsg += ' — ' + state.comentario;
+      if (state.pago === 'credito' && state.cuotas > 1) {
+        subMsg += '\n' + state.cuotas + ' cuotas de $' + Math.round(state.monto / state.cuotas).toLocaleString('es-AR');
+      }
+      subMsg += '\n$' + Math.round(state.monto).toLocaleString('es-AR');
+      document.getElementById('successSub').textContent = subMsg;
+
+      document.getElementById('successOverlay').classList.add('show');
+    } else {
+      throw new Error(data.error || 'Error desconocido');
+    }
+  } catch(e) {
+    showToast('❌ Error: ' + e.message);
+    btn.disabled = false;
+    text.style.display = 'block';
+    spinner.style.display = 'none';
+  }
+}
+
+function resetForm() {
+  document.getElementById('successOverlay').classList.remove('show');
+  document.getElementById('montoInput').value = '';
+  document.getElementById('comentarioInput').value = '';
+  state.cat = null;
+  state.monto = 0;
+  state.comentario = '';
+
+  const btn = document.getElementById('submitBtn');
+  const text = document.getElementById('submitText');
+  const spinner = document.getElementById('submitSpinner');
+  btn.disabled = false;
+  text.style.display = 'block';
+  spinner.style.display = 'none';
+
+  renderCats();
+  updateResumen();
+  window.scrollTo(0, 0);
+}
+
+init();
+</script>
+</body>
+</html>
