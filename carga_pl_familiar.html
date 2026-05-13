@@ -525,8 +525,8 @@
   <div class="section visible" id="secPago">
     <div class="section-label">Forma de pago</div>
     <div class="payment-grid">
-      <button class="payment-btn active" onclick="setPago('debito')">💳 Débito</button>
-      <button class="payment-btn" onclick="setPago('credito')">🏦 Crédito</button>
+      <button class="payment-btn active" onclick="setPago('debito', this)">💳 Débito</button>
+      <button class="payment-btn" onclick="setPago('credito', this)">🏦 Crédito</button>
     </div>
   </div>
 
@@ -630,16 +630,24 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbzn7QrAjQOGphuHYWy1TXwl
 
 const CATS_GASTO = [
   'Comida + Supermercado','Agua Poybe (Cimes)','Dover','Maternal Renu',
-  'Expensas','Ocio','Regalos','Renata 👶🏻💕','Cosas para el hogar🏠🔧',
+  'Expensas',' Ocio ','Regalos','Renata 👶🏻💕','Cosas para el hogar🏠🔧',
   'Queso y Milo🐩🐩','Farmacia','Municipalidad','ARBA (pagar MANUAL)',
   'Nafta Virtus','Nafta Sandero','Mecánico Auto','Mecánico Virtus',
   'Seguro Auto','Seguro Virtus','Patente Auto','Patente Virtus',
-  'Maq Pasto (nafta,aceite)','GYM Nati','GAS💨','LUZ 💡',
+  'Maq Pasto (nafta,aceite)','GYM Nati','GAS💨','LUZ 💡 ',
   'Peajes','Mary Limpieza','Mary ART + aportes 🧹','Peluquería/Barbería',
-  'Cable + Internet 📺','Apple (fin de mes)','Spotify',
-  'Pileta y mundo limp 🧼','Caja de psicólogos','ColPsi matrícula',
+  'Cable + Internet 📺emision dia 28 mes','Apple (fin de mes)','Spotify',
+  'Pileta y mundo limp 🧼','Caja de psicólogos ','ColPsi matrícula',
   'Osde diferencia 🏥','OTROS','Vacaciones 🏝️','Inversiones','Dólares'
 ];
+
+// Mapa de nombres bonitos para mostrar en la app → nombre exacto del Sheet
+const CATS_DISPLAY = {
+  ' Ocio ': 'Ocio',
+  'LUZ 💡 ': 'LUZ 💡',
+  'Cable + Internet 📺emision dia 28 mes': 'Cable + Internet 📺',
+  'Caja de psicólogos ': 'Caja de psicólogos',
+};
 
 const CATS_INGRESO = ['Sueldo Juani','Sueldo Nati','Extras'];
 
@@ -703,9 +711,10 @@ function renderCats() {
   grid.innerHTML = '';
   const cats = state.tipo === 'gasto' ? CATS_GASTO : CATS_INGRESO;
   cats.forEach(c => {
+    const displayName = CATS_DISPLAY[c] || c;
     const btn = document.createElement('button');
     btn.className = 'cat-btn' + (state.cat === c ? ' active' : '');
-    btn.textContent = c;
+    btn.textContent = displayName;
     btn.onclick = () => { state.cat = c; renderCats(); updateResumen(); };
     grid.appendChild(btn);
   });
@@ -737,10 +746,20 @@ function setTipo(t) {
   updateResumen();
 }
 
-function setPago(p) {
+function setPago(p, btnEl) {
   state.pago = p;
   document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('active'));
-  event.target.closest('.payment-btn').classList.add('active');
+  if (btnEl) {
+    btnEl.classList.add('active');
+  } else {
+    // Activar el botón correcto por defecto
+    document.querySelectorAll('.payment-btn').forEach(b => {
+      if ((p === 'debito' && b.textContent.includes('Débito')) ||
+          (p === 'credito' && b.textContent.includes('Crédito'))) {
+        b.classList.add('active');
+      }
+    });
+  }
 
   if (p === 'credito') {
     document.getElementById('secCuotas').classList.add('visible');
@@ -760,7 +779,7 @@ function updateResumen() {
   state.comentario = document.getElementById('comentarioInput').value.trim();
 
   document.getElementById('rTipo').textContent = state.tipo === 'gasto' ? '💸 Gasto' : '💰 Ingreso';
-  document.getElementById('rCat').textContent = state.cat || '—';
+  document.getElementById('rCat').textContent = state.cat ? (CATS_DISPLAY[state.cat] || state.cat) : '—';
   document.getElementById('rComentario').textContent = state.comentario || '—';
 
   const total = state.monto;
