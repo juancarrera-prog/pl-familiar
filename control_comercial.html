@@ -52,7 +52,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: linear-
 .kpi.inv .kpi-accent { background: var(--red); }
 .kpi.presup .kpi-accent { background: #4444ff; }
 .kpi.vs .kpi-accent { background: var(--yellow); }
-.kpi.fte .kpi-accent { background: var(--green); }
+.kpi.dif .kpi-accent { background: var(--green); }
 .kpi.cmb .kpi-accent { background: #aa44ff; }
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; margin-top: 32px; }
 .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text); }
@@ -110,9 +110,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 
   <div class="header">
     <div class="header-left">
-      <div class="logo-mark">
-        <img src="Captura de pantalla 2026-05-13 103522.png" alt="Ignis">
-      </div>
+      <div class="logo-mark"><img src="Captura de pantalla 2026-05-13 103522.png" alt="Ignis"></div>
       <div class="header-title">
         <h1>Control Comercial</h1>
         <p>Ignis Media Agency · Dashboard de gestión</p>
@@ -144,7 +142,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <div class="kpi inv"><div class="kpi-label">Inversión del Período</div><div class="kpi-value" id="kpiInv">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent"></div></div>
     <div class="kpi presup"><div class="kpi-label">Presupuesto del Período</div><div class="kpi-value" id="kpiPresup">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent"></div></div>
     <div class="kpi vs"><div class="kpi-label">Vs Presupuesto</div><div class="kpi-value" id="kpiVs">—</div><div class="kpi-sub">desvío del período</div><div class="kpi-accent"></div></div>
-    <div class="kpi fte">   <div class="kpi-label">Dif. Vs Presupuesto</div>   <div class="kpi-value" id="kpiFte">—</div>   <div class="kpi-sub">inversión vs presupuesto</div>   <div class="kpi-accent"></div> </div>
+    <div class="kpi dif"><div class="kpi-label">Dif. Vs Presupuesto</div><div class="kpi-value" id="kpiDif">—</div><div class="kpi-sub">inversión vs presupuesto</div><div class="kpi-accent"></div></div>
     <div class="kpi cmb"><div class="kpi-label">CMB Total</div><div class="kpi-value" id="kpiCmb">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent"></div></div>
   </div>
 
@@ -270,20 +268,23 @@ function filtrarDirector(dir, btn) {
 }
 
 function renderKPIs(clientes) {
-  let totalInv = 0, totalPresup = 0, totalFte = 0, totalCmb = 0;
+  let totalInv = 0, totalPresup = 0, totalCmb = 0;
   clientes.forEach(r => {
     totalInv    += parseFloat(r.inv)    || 0;
     totalPresup += parseFloat(r.presup) || 0;
-    totalFte    += parseFloat(r.fteAct) || 0;
     totalCmb    += parseFloat(r.cmb)    || 0;
   });
+
   const avgVs = totalPresup > 0 ? ((totalInv - totalPresup) / totalPresup) * 100 : 0;
+  const difPresup = totalInv - totalPresup;
+
   document.getElementById('kpiInv').textContent    = '$' + totalInv.toFixed(1);
   document.getElementById('kpiPresup').textContent = '$' + totalPresup.toFixed(1);
   document.getElementById('kpiVs').textContent     = (avgVs > 0 ? '+' : '') + avgVs.toFixed(1) + '%';
-  document.getElementById('const difPresup = totalInv - totalPresup; document.getElementById('kpiFte').textContent = (difPresup >= 0 ? '+$' : '-$') + Math.abs(difPresup).toFixed(1); document.getElementById('kpiFte').style.color = difPresup >= 0 ? '#00c853' : '#ff4455';
+  document.getElementById('kpiVs').style.color     = avgVs < -10 ? '#ff4455' : avgVs < 0 ? '#f5c400' : '#00c853';
+  document.getElementById('kpiDif').textContent    = (difPresup >= 0 ? '+$' : '-$') + Math.abs(difPresup).toFixed(1);
+  document.getElementById('kpiDif').style.color    = difPresup >= 0 ? '#00c853' : '#ff4455';
   document.getElementById('kpiCmb').textContent    = '$' + totalCmb.toFixed(1);
-  document.getElementById('kpiVs').style.color = avgVs < -10 ? '#ff4455' : avgVs < 0 ? '#f5c400' : '#00c853';
 
   const alertas = clientes.filter(r => {
     const v = parseFloat(String(r.vs || '').replace('%','').replace(',','.'));
