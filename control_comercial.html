@@ -790,7 +790,7 @@ function renderKPIs(clientes) {
     if (!isNaN(vs)) { sumVs += vs; countVs++; }
   });
 
-  const avgVs = countVs > 0 ? sumVs / countVs : 0;
+  const avgVs = totalPresup > 0 ? ((totalInv - totalPresup) / totalPresup) * 100 : 0;
 
   document.getElementById('kpiInv').textContent    = '$' + totalInv.toFixed(1);
   document.getElementById('kpiPresup').textContent = '$' + totalPresup.toFixed(1);
