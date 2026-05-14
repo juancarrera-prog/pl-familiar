@@ -281,7 +281,7 @@ function renderKPIs(clientes) {
   document.getElementById('kpiInv').textContent    = '$' + totalInv.toFixed(1);
   document.getElementById('kpiPresup').textContent = '$' + totalPresup.toFixed(1);
   document.getElementById('kpiVs').textContent     = (avgVs > 0 ? '+' : '') + avgVs.toFixed(1) + '%';
-  document.getElementById('kpiFte').textContent    = totalFte.toFixed(2);
+  document.getElementById('const difPresup = totalInv - totalPresup; document.getElementById('kpiFte').textContent = (difPresup >= 0 ? '+$' : '-$') + Math.abs(difPresup).toFixed(1); document.getElementById('kpiFte').style.color = difPresup >= 0 ? '#00c853' : '#ff4455';
   document.getElementById('kpiCmb').textContent    = '$' + totalCmb.toFixed(1);
   document.getElementById('kpiVs').style.color = avgVs < -10 ? '#ff4455' : avgVs < 0 ? '#f5c400' : '#00c853';
 
