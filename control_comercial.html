@@ -7,26 +7,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0e0e0e;
-  --surface: #161616;
-  --surface2: #1f1f1f;
-  --border: #2a2a2a;
-  --red: #e8001c;
-  --red-soft: rgba(232,0,28,0.12);
-  --yellow: #f5c400;
-  --yellow-soft: rgba(245,196,0,0.12);
-  --green: #00c853;
-  --green-soft: rgba(0,200,83,0.10);
-  --text: #f0f0f0;
-  --text-muted: #606060;
-  --radius: 14px;
-  --radius-sm: 8px;
+  --bg: #0e0e0e; --surface: #161616; --surface2: #1f1f1f; --border: #2a2a2a;
+  --red: #e8001c; --red-soft: rgba(232,0,28,0.12);
+  --yellow: #f5c400; --yellow-soft: rgba(245,196,0,0.12);
+  --green: #00c853; --green-soft: rgba(0,200,83,0.10);
+  --purple: #aa44ff; --purple-soft: rgba(170,68,255,0.10);
+  --blue: #4488ff; --blue-soft: rgba(68,136,255,0.10);
+  --text: #f0f0f0; --text-muted: #606060; --radius: 14px; --radius-sm: 8px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; font-size: 15px; min-height: 100vh; overflow-x: hidden; }
-body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(232,0,28,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(232,0,28,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(232,0,28,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,0,28,0.03) 1px,transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
 .wrap { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px 60px; }
-.header { display: flex; align-items: center; justify-content: space-between; padding: 28px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
+
+/* HEADER */
+.header { display: flex; align-items: center; justify-content: space-between; padding: 28px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 0; gap: 16px; flex-wrap: wrap; }
 .header-left { display: flex; align-items: center; gap: 20px; }
 .logo-mark { width: 42px; height: 42px; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: #000; display: flex; align-items: center; justify-content: center; }
 .logo-mark img { width: 42px; height: 42px; object-fit: contain; }
@@ -36,12 +31,25 @@ body::before { content: ''; position: fixed; inset: 0; background-image: linear-
 .period-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 7px 14px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
 .period-badge span { color: var(--text); font-weight: 500; }
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+/* PAGE TABS */
+.page-tabs { display: flex; gap: 2px; margin: 20px 0 28px; border-bottom: 1px solid var(--border); }
+.page-tab { padding: 12px 24px; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px; margin-bottom: -1px; white-space: nowrap; }
+.page-tab:hover { color: var(--text); }
+.page-tab.active { color: var(--text); border-bottom-color: var(--red); font-weight: 600; }
+.page-tab .tab-badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: var(--red-soft); color: var(--red); border-radius: 50%; font-size: 10px; font-weight: 700; margin-left: 7px; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* SHARED COMPONENTS */
 .director-filter { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
 .filter-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; margin-right: 4px; }
 .dir-btn { padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
 .dir-btn:hover { border-color: var(--text-muted); color: var(--text); }
 .dir-btn.active { background: var(--red); border-color: var(--red); color: white; font-weight: 600; }
+
 .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
 .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden; transition: border-color 0.2s; }
 .kpi:hover { border-color: var(--red); }
@@ -49,30 +57,29 @@ body::before { content: ''; position: fixed; inset: 0; background-image: linear-
 .kpi-value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
 .kpi-sub { font-size: 11px; color: var(--text-muted); }
 .kpi-accent { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
-.kpi.inv .kpi-accent { background: var(--red); }
-.kpi.presup .kpi-accent { background: #4444ff; }
-.kpi.vs .kpi-accent { background: var(--yellow); }
-.kpi.dif .kpi-accent { background: var(--green); }
-.kpi.cmb .kpi-accent { background: #aa44ff; }
+
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; margin-top: 32px; }
 .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text); }
 .section-sub { font-size: 11px; color: var(--text-muted); }
+
 .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
 table { width: 100%; border-collapse: collapse; }
 thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
 th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); white-space: nowrap; }
 th.num { text-align: right; }
-td { padding: 12px 14px; border-bottom: 1px solid rgba(42,42,42,0.6); font-size: 14px; vertical-align: middle; }
+td { padding: 12px 14px; border-bottom: 1px solid rgba(42,42,42,0.6); font-size: 13px; vertical-align: middle; }
 td.num { text-align: right; font-variant-numeric: tabular-nums; }
 tr:last-child td { border-bottom: none; }
 tbody tr { transition: background 0.15s; }
 tbody tr:hover td { background: rgba(255,255,255,0.02); }
 .client-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
 .client-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 100px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 600; white-space: nowrap; }
 .badge.red { background: var(--red-soft); color: #ff4455; }
 .badge.yellow { background: var(--yellow-soft); color: var(--yellow); }
 .badge.green { background: var(--green-soft); color: var(--green); }
+.badge.purple { background: var(--purple-soft); color: var(--purple); }
+.badge.blue { background: var(--blue-soft); color: var(--blue); }
 .badge.neutral { background: var(--surface2); color: var(--text-muted); }
 .progress-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
 .progress-bg { width: 80px; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; flex-shrink: 0; }
@@ -91,7 +98,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 .alert-panel.visible { display: block; }
 .alert-panel-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--red); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
 .alert-items { display: flex; flex-wrap: wrap; gap: 8px; }
-.alert-item { background: var(--red-soft); border: 1px solid rgba(232,0,28,0.2); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 14px; color: #ff4455; }
+.alert-item { background: var(--red-soft); border: 1px solid rgba(232,0,28,0.2); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 13px; color: #ff4455; }
 .alert-item strong { color: white; }
 .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
 .mini-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
@@ -102,12 +109,80 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 .dir-row-clients { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 .slack-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .slack-btn:hover { border-color: var(--green); color: var(--green); }
-@media (max-width: 768px) { .bottom-grid { grid-template-columns: 1fr; } .kpis { grid-template-columns: repeat(2, 1fr); } table { font-size: 12px; } th, td { padding: 8px 10px; } .progress-bg { width: 50px; } }
+
+/* ── RENTABILIDAD PAGE ── */
+.rent-section { margin-bottom: 32px; }
+.rent-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.rent-tab { padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.rent-tab:hover { border-color: var(--text-muted); color: var(--text); }
+.rent-tab.active { background: var(--purple); border-color: var(--purple); color: white; font-weight: 600; }
+
+.cm-bar-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.cm-bar-bg { width: 60px; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.cm-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+/* Tabla Costo Compañía maestra */
+.costo-cia-wrap { overflow-x: auto; }
+.costo-cia-wrap table th { min-width: 110px; }
+.costo-cia-wrap table td { min-width: 110px; }
+.puesto-col { min-width: 200px !important; font-weight: 500; }
+.costo-cell { font-variant-numeric: tabular-nums; font-size: 12px; color: #aaa; text-align: right; padding: 10px 14px; }
+.costo-cell.vigente { color: var(--yellow); font-weight: 600; }
+.costo-cell.editable { cursor: pointer; transition: background 0.15s; }
+.costo-cell.editable:hover { background: rgba(255,255,255,0.04); }
+.fte-inline-input { background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); font-family:'Poppins',sans-serif; font-size:12px; width:62px; text-align:right; outline:none; padding:2px 4px; }
+.fte-inline-input:focus { border-bottom-color:var(--purple); }
+.fte-inline-input::placeholder { color:#404040; }
+.cell-input { background: transparent; border: none; border-bottom: 1px solid var(--red); color: var(--text); font-family: 'Poppins', sans-serif; font-size: 12px; width: 100%; text-align: right; outline: none; padding: 2px 0; }
+.mes-header { text-align: right; white-space: nowrap; }
+.mes-header.vigente-col { color: var(--yellow) !important; }
+
+/* Detalle por cliente */
+.cliente-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.cli-btn { padding: 7px 16px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+.cli-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.cli-btn.active { border-color: transparent; color: white; font-weight: 600; }
+
+/* Ranking visual */
+.ranking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.rank-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.rank-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 14px; }
+.rank-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.rank-item:last-child { border-bottom: none; }
+.rank-num { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--text-muted); min-width: 26px; }
+.rank-name { flex: 1; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.rank-val { font-size: 13px; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* Chart wrapper */
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; font-size: 11px; color: var(--text-muted); }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* Info banner vigencia */
+.vigencia-banner { display: flex; align-items: center; gap: 12px; background: rgba(245,196,0,0.07); border: 1px solid rgba(245,196,0,0.2); border-radius: var(--radius-sm); padding: 10px 16px; margin-bottom: 20px; font-size: 12px; color: var(--yellow); }
+.vigencia-banner strong { color: #ffe066; }
+
+/* Botones acción */
+.btn-action { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.btn-action:hover { border-color: var(--red); color: var(--red); }
+.btn-action.primary { background: var(--red); border-color: var(--red); color: white; }
+.btn-action.primary:hover { opacity: 0.85; }
+
+@media (max-width: 768px) {
+  .bottom-grid, .ranking-grid { grid-template-columns: 1fr; }
+  .kpis { grid-template-columns: repeat(2,1fr); }
+  table { font-size: 12px; }
+  th,td { padding: 8px 10px; }
+  .progress-bg { width: 50px; }
+  .page-tab { padding: 10px 14px; font-size: 12px; }
+}
 </style>
 </head>
 <body>
 <div class="wrap">
 
+  <!-- HEADER -->
   <div class="header">
     <div class="header-left">
       <div class="logo-mark"><img src="Captura de pantalla 2026-05-13 103522.png" alt="Ignis"></div>
@@ -125,109 +200,325 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
   </div>
 
-  <div class="director-filter">
-    <span class="filter-label">Director</span>
-    <button class="dir-btn active" onclick="filtrarDirector('todos', this)">Todos</button>
-    <button class="dir-btn" onclick="filtrarDirector('mechi', this)">🔴 Mechi · Bagó</button>
-    <button class="dir-btn" onclick="filtrarDirector('dani', this)">🔵 Dani · BP / LP / Pfizer</button>
-    <button class="dir-btn" onclick="filtrarDirector('jp', this)">🟢 JP · McCain / Escorial / UA</button>
+  <!-- PAGE TABS -->
+  <div class="page-tabs">
+    <button class="page-tab active" onclick="switchPage('comercial', this)">📊 Control Comercial</button>
+    <button class="page-tab" onclick="switchPage('rentabilidad', this)">💰 Rentabilidad de Equipo <span class="tab-badge" id="alertBadge" style="display:none">!</span></button>
   </div>
 
-  <div class="alert-panel" id="alertPanel">
-    <div class="alert-panel-title">⚠️ Clientes con desvío mayor al -10%</div>
-    <div class="alert-items" id="alertItems"></div>
-  </div>
+  <!-- ══════════════════════════════════════════ -->
+  <!-- PAGE 1: CONTROL COMERCIAL                 -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="page active" id="page-comercial">
 
-  <div class="kpis">
-    <div class="kpi inv"><div class="kpi-label">Inversión del Período</div><div class="kpi-value" id="kpiInv">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent"></div></div>
-    <div class="kpi presup"><div class="kpi-label">Presupuesto del Período</div><div class="kpi-value" id="kpiPresup">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent"></div></div>
-    <div class="kpi vs"><div class="kpi-label">Vs Presupuesto</div><div class="kpi-value" id="kpiVs">—</div><div class="kpi-sub">desvío del período</div><div class="kpi-accent"></div></div>
-    <div class="kpi dif"><div class="kpi-label">Dif. Vs Presupuesto</div><div class="kpi-value" id="kpiDif">—</div><div class="kpi-sub">inversión vs presupuesto</div><div class="kpi-accent"></div></div>
-    <div class="kpi cmb"><div class="kpi-label">CMB Total</div><div class="kpi-value" id="kpiCmb">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent"></div></div>
-  </div>
-
-  <div class="section-header">
-    <div><div class="section-title">Clientes</div><div class="section-sub">Inversión, presupuesto y recursos por cliente</div></div>
-  </div>
-  <div class="table-card">
-    <table>
-      <thead><tr>
-        <th>Cliente</th><th>Director</th>
-        <th class="num">Inv. Período</th><th class="num">Presup. Período</th>
-        <th>Vs Presup.</th><th>Consumido Anual</th>
-        <th class="num">Presup. Anual</th><th class="num">CMB $</th><th class="num">CMB %</th>
-        <th class="num">FTE Ant.</th><th class="num">FTE Act.</th>
-        <th>Vs Mes</th><th class="num">FTE Total</th>
-      </tr></thead>
-      <tbody id="tbodyClientes"><tr class="loading-row"><td colspan="13">Cargando datos...</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="section-header" id="bagoSection">
-    <div><div class="section-title">Unidades de Negocio · Bagó</div><div class="section-sub">Detalle por marca</div></div>
-  </div>
-  <div class="table-card" id="bagoCard">
-    <table>
-      <thead><tr>
-        <th>Marca</th>
-        <th class="num">Inv. Período</th><th class="num">Presup. Período</th>
-        <th>Vs Presup.</th><th>Consumido Anual</th>
-        <th class="num">Presup. Anual</th><th class="num">SOI Bagó</th>
-        <th class="num">FTE Ant.</th><th class="num">FTE Act.</th>
-        <th>Vs Mes</th><th class="num">FTE Total</th>
-      </tr></thead>
-      <tbody id="tbodyBago"><tr class="loading-row"><td colspan="11">Cargando datos...</td></tr></tbody>
-    </table>
-  </div>
-
-  <div class="bottom-grid">
-    <div class="mini-card">
-      <div class="mini-card-title">Directores · Big Seven</div>
-      <div class="dir-row"><div><div class="dir-row-name">🔴 Mercedes Silva (Mechi)</div><div class="dir-row-clients">Bagó (cuenta total + marcas)</div></div></div>
-      <div class="dir-row"><div><div class="dir-row-name">🔵 Daniela Kravanja (Dani)</div><div class="dir-row-clients">Banco Patagonia · La Paulina · Pfizer</div></div></div>
-      <div class="dir-row"><div><div class="dir-row-name">🟢 Juan Pablo Echeverría (JP)</div><div class="dir-row-clients">McCain · Escorial · Universal Assistance</div></div></div>
+    <div class="director-filter">
+      <span class="filter-label">Director</span>
+      <button class="dir-btn active" onclick="filtrarDirector('todos', this)">Todos</button>
+      <button class="dir-btn" onclick="filtrarDirector('mechi', this)">🔴 Mechi · Bagó</button>
+      <button class="dir-btn" onclick="filtrarDirector('dani', this)">🔵 Dani · BP / LP / Pfizer</button>
+      <button class="dir-btn" onclick="filtrarDirector('jp', this)">🟢 JP · McCain / Escorial / UA</button>
     </div>
-    <div class="mini-card">
-      <div class="mini-card-title">Umbrales de Alerta</div>
-      <div class="dir-row"><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--red);font-size:18px">●</span><div><div class="dir-row-name">Desvío crítico</div><div class="dir-row-clients">Vs Presup. menor a -10%</div></div></div><div class="badge red">Alerta</div></div>
-      <div class="dir-row"><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--yellow);font-size:18px">●</span><div><div class="dir-row-name">Desvío moderado</div><div class="dir-row-clients">Vs Presup. entre -5% y -10%</div></div></div><div class="badge yellow">Atención</div></div>
-      <div class="dir-row"><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--green);font-size:18px">●</span><div><div class="dir-row-name">En objetivo</div><div class="dir-row-clients">Vs Presup. mayor a -5%</div></div></div><div class="badge green">OK</div></div>
+
+    <div class="alert-panel" id="alertPanel">
+      <div class="alert-panel-title">⚠️ Clientes con desvío mayor al -10%</div>
+      <div class="alert-items" id="alertItems"></div>
     </div>
-  </div>
 
-</div>
+    <div class="kpis">
+      <div class="kpi" style="--a:var(--red)"><div class="kpi-label">Inversión del Período</div><div class="kpi-value" id="kpiInv">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:var(--red)"></div></div>
+      <div class="kpi"><div class="kpi-label">Presupuesto del Período</div><div class="kpi-value" id="kpiPresup">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:#4444ff"></div></div>
+      <div class="kpi"><div class="kpi-label">Vs Presupuesto</div><div class="kpi-value" id="kpiVs">—</div><div class="kpi-sub">desvío del período</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+      <div class="kpi"><div class="kpi-label">Dif. Vs Presupuesto</div><div class="kpi-value" id="kpiDif">—</div><div class="kpi-sub">inversión vs presupuesto</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+      <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" id="kpiCmb">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
+    </div>
 
+    <div class="section-header">
+      <div><div class="section-title">Clientes</div><div class="section-sub">Inversión, presupuesto y recursos por cliente</div></div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th>Cliente</th><th>Director</th>
+          <th class="num">Inv. Período</th><th class="num">Presup. Período</th>
+          <th>Vs Presup.</th><th>Consumido Anual</th>
+          <th class="num">Presup. Anual</th><th class="num">CMB $</th><th class="num">CMB %</th>
+          <th class="num">FTE Ant.</th><th class="num">FTE Act.</th>
+          <th>Vs Mes</th><th class="num">FTE Total</th>
+        </tr></thead>
+        <tbody id="tbodyClientes"><tr class="loading-row"><td colspan="13">Cargando datos...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="section-header" id="bagoSection">
+      <div><div class="section-title">Unidades de Negocio · Bagó</div><div class="section-sub">Detalle por marca</div></div>
+    </div>
+    <div class="table-card" id="bagoCard">
+      <table>
+        <thead><tr>
+          <th>Marca</th>
+          <th class="num">Inv. Período</th><th class="num">Presup. Período</th>
+          <th>Vs Presup.</th><th>Consumido Anual</th>
+          <th class="num">Presup. Anual</th><th class="num">SOI Bagó</th>
+          <th class="num">FTE Ant.</th><th class="num">FTE Act.</th>
+          <th>Vs Mes</th><th class="num">FTE Total</th>
+        </tr></thead>
+        <tbody id="tbodyBago"><tr class="loading-row"><td colspan="11">Cargando datos...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="bottom-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Directores · Big Seven</div>
+        <div class="dir-row"><div><div class="dir-row-name">🔴 Mercedes Silva (Mechi)</div><div class="dir-row-clients">Bagó (cuenta total + marcas)</div></div></div>
+        <div class="dir-row"><div><div class="dir-row-name">🔵 Daniela Kravanja (Dani)</div><div class="dir-row-clients">Banco Patagonia · La Paulina · Pfizer</div></div></div>
+        <div class="dir-row"><div><div class="dir-row-name">🟢 Juan Pablo Echeverría (JP)</div><div class="dir-row-clients">McCain · Escorial · Universal Assistance</div></div></div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Umbrales de Alerta</div>
+        <div class="dir-row"><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--red);font-size:18px">●</span><div><div class="dir-row-name">Desvío crítico</div><div class="dir-row-clients">Vs Presup. menor a -10%</div></div></div><div class="badge red">Alerta</div></div>
+        <div class="dir-row"><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--yellow);font-size:18px">●</span><div><div class="dir-row-name">Desvío moderado</div><div class="dir-row-clients">Vs Presup. entre -5% y -10%</div></div></div><div class="badge yellow">Atención</div></div>
+        <div class="dir-row"><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--green);font-size:18px">●</span><div><div class="dir-row-name">En objetivo</div><div class="dir-row-clients">Vs Presup. mayor a -5%</div></div></div><div class="badge green">OK</div></div>
+      </div>
+    </div>
+
+  </div><!-- /page-comercial -->
+
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- PAGE 2: RENTABILIDAD DE EQUIPO            -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="page" id="page-rentabilidad">
+
+    <!-- Sub-tabs -->
+    <div class="rent-tabs">
+      <button class="rent-tab active" onclick="switchRentTab('consolidado', this)">📊 Consolidado por Cliente</button>
+      <button class="rent-tab" onclick="switchRentTab('detalle', this)">🔍 Detalle por Cliente</button>
+      <button class="rent-tab" onclick="switchRentTab('costos', this)">💼 Tabla Costo Compañía</button>
+    </div>
+
+    <!-- ── SUB-TAB: CONSOLIDADO ── -->
+    <div id="rent-consolidado" class="rent-section">
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <span class="filter-label">Mes de análisis</span>
+        <div id="mesSelectorRent" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+
+      <div class="kpis" id="kpisRent"></div>
+
+      <div class="ranking-grid">
+        <div class="rank-card">
+          <div class="rank-card-title">Ranking · CM $ (mayor a menor)</div>
+          <div id="rankingCM"></div>
+        </div>
+        <div class="rank-card">
+          <div class="rank-card-title">Ranking · CM % (mayor a menor)</div>
+          <div id="rankingPct"></div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-sq" style="background:#4488ff"></span>Ingresos Netos</span>
+          <span class="legend-item"><span class="legend-sq" style="background:#f5c400"></span>Costo Equipo</span>
+          <span class="legend-item"><span class="legend-sq" style="background:#00c853"></span>CM $</span>
+        </div>
+        <div style="position:relative;width:100%;height:270px">
+          <canvas id="chartRent" role="img" aria-label="Gráfico comparativo ingresos, costo equipo y CM por cliente"></canvas>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div><div class="section-title">Tabla Consolidada · Rentabilidad</div><div class="section-sub">Ingresos Netos = Venta Facturable + Honorarios + Fees − Compra Indirecta</div></div>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead><tr>
+            <th>Cliente</th>
+            <th class="num">Ingresos Netos</th>
+            <th class="num">Costo Equipo</th>
+            <th class="num">CM $</th>
+            <th class="num">CM %</th>
+            <th class="num">FTE</th>
+            <th>Semáforo</th>
+          </tr></thead>
+          <tbody id="tbodyConsolidado"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── SUB-TAB: DETALLE ── -->
+    <div id="rent-detalle" class="rent-section" style="display:none">
+      <div class="cliente-selector" id="clienteSelector"></div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <span class="filter-label">Mes</span>
+        <div id="mesSelectorDetalle" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+        <div class="vigencia-banner" style="flex:1;min-width:240px;margin-bottom:0">
+          <span>⚡</span>
+          <span>Costo Cía. aplicado: columna <strong id="vigenciaMes">—</strong></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px">
+          <span style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;white-space:nowrap">Ingresos Netos (miles $)</span>
+          <input type="number" id="ingresosEditable" placeholder="0" min="0" step="100"
+            style="background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'Poppins',sans-serif;font-size:14px;width:100px;text-align:right;outline:none;padding:2px 4px"
+            onchange="saveIngresos(clienteDetalleActivo, MES_ACTIVO, this.value)"
+            onfocus="this.style.borderBottomColor='var(--red)'" onblur="this.style.borderBottomColor='var(--border)'">
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">
+        Editá el FTE de cada puesto directamente en la tabla. Cero o vacío = no asignado a este cliente.
+      </div>
+      <div class="table-card">
+        <table>
+          <thead><tr>
+            <th>Puesto</th>
+            <th class="num">FTE</th>
+            <th class="num">Costo Cía.</th>
+            <th class="num">Costo Mensual</th>
+            <th class="num">% del total</th>
+          </tr></thead>
+          <tbody id="tbodyDetalle"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── SUB-TAB: TABLA COSTO CIA ── -->
+    <div id="rent-costos" class="rent-section" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="section-title" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px">Tabla Maestra · Costo Compañía</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Actualizá los valores cuando RRHH te pase el nuevo print · Hacé click en cualquier celda para editar</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-action" onclick="agregarMes()">+ Nuevo mes RRHH</button>
+          <button class="btn-action primary" onclick="guardarCostos()">✓ Guardar y recalcular</button>
+        </div>
+      </div>
+      <div class="vigencia-banner">
+        <span>⚡</span>
+        <span>Columna activa: <strong id="colVigenteLabel">—</strong> · Es la última con datos cargados y se usa para el cálculo actual</span>
+      </div>
+      <div class="table-card costo-cia-wrap">
+        <table id="tablaCostoCia">
+          <thead id="headCostoCia"></thead>
+          <tbody id="bodyCostoCia"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /page-rentabilidad -->
+
+</div><!-- /wrap -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+/* ═══════════════════════════════════════════════════════════
+   DATOS & CONFIGURACIÓN
+═══════════════════════════════════════════════════════════ */
 const API_URL = 'https://script.google.com/macros/s/AKfycbz51P15rgzWahNRVuiHWN-yBjRLZkUTszhyxPAyL66JQobldusabaswCNg5bkTjm9PiWg/exec';
 const WEBHOOK_URL = '';
 
 const DIRECTORES = {
-  'Bagó':                { dir: 'mechi', color: '#e8001c', nombre: 'Mechi' },
-  'Banco Patagonia':     { dir: 'dani',  color: '#4444ff', nombre: 'Dani' },
-  'La Paulina':          { dir: 'dani',  color: '#4444ff', nombre: 'Dani' },
-  'Pfizer':              { dir: 'dani',  color: '#4444ff', nombre: 'Dani' },
-  'McCain':              { dir: 'jp',    color: '#00c853', nombre: 'JP' },
-  'Escorial':            { dir: 'jp',    color: '#00c853', nombre: 'JP' },
-  'Universal Assistance':{ dir: 'jp',    color: '#00c853', nombre: 'JP' },
+  'Bagó':                 { dir:'mechi', color:'#e8001c', nombre:'Mechi' },
+  'Banco Patagonia':      { dir:'dani',  color:'#4444ff', nombre:'Dani' },
+  'La Paulina':           { dir:'dani',  color:'#4444ff', nombre:'Dani' },
+  'Pfizer':               { dir:'dani',  color:'#4444ff', nombre:'Dani' },
+  'McCain':               { dir:'jp',    color:'#00c853', nombre:'JP' },
+  'Escorial':             { dir:'jp',    color:'#00c853', nombre:'JP' },
+  'Universal Assistance': { dir:'jp',    color:'#00c853', nombre:'JP' },
 };
 
+// ── TABLA MAESTRA COSTO COMPAÑÍA ──
+// Solo Diciembre (base para Enero 2026) y Febrero (aumento vigente).
+// Cuando RRHH pase nuevos datos, agregás una columna nueva con "+ Nuevo mes de RRHH".
+let TABLA_COSTOS = {
+  'Accounts Director':           { 'Diciembre':4887312, 'Febrero':5278296 },
+  'Branding Coordinator':        { 'Diciembre':4124492, 'Febrero':4454451 },
+  'SR Media Planner':            { 'Diciembre':2587003, 'Febrero':2793963 },
+  'JR Media Planner':            { 'Diciembre':2134601, 'Febrero':2305369 },
+  'SR Branding Analyst':         { 'Diciembre':1698083, 'Febrero':1833930 },
+  'JR Branding Analyst':         { 'Diciembre':0,       'Febrero':0 },
+  'Consumer Ins. Director':      { 'Diciembre':4563356, 'Febrero':4928425 },
+  'Research Manager':            { 'Diciembre':4012863, 'Febrero':4017989 },
+  'SR Consumer Ins. Analyst':    { 'Diciembre':3074065, 'Febrero':3401586 },
+  'JR Consumer Ins. Analyst':    { 'Diciembre':1477305, 'Febrero':1595489 },
+  'Performance MKT Manager':     { 'Diciembre':4631260, 'Febrero':5001761 },
+  'Performance MKT Coordinator': { 'Diciembre':3844153, 'Febrero':4151686 },
+  'Performance MKT Specialist':  { 'Diciembre':3051127, 'Febrero':3295217 },
+  'Digital MKT Analyst':         { 'Diciembre':2433049, 'Febrero':2632804 },
+  'Digital Project Lead':        { 'Diciembre':3686485, 'Febrero':3981404 },
+  'Digital Strategy Lead':       { 'Diciembre':3757134, 'Febrero':4071937 },
+  'Social Media Specialist':     { 'Diciembre':2814292, 'Febrero':3039435 },
+  'Social Media Analyst':        { 'Diciembre':2009939, 'Febrero':2309131 },
+  'Head of Creative':            { 'Diciembre':3865907, 'Febrero':4192190 },
+  'Creative':                    { 'Diciembre':2649037, 'Febrero':2860959 },
+  'Multimedia Designer':         { 'Diciembre':1973331, 'Febrero':2131201 },
+  'SR Data Analyst':             { 'Diciembre':2727999, 'Febrero':2946239 },
+  'JR Data Analyst':             { 'Diciembre':1591619, 'Febrero':1721726 },
+};
+
+// ── FTE POR CLIENTE / MES ──
+// Estructura: { cliente: { mes: { puesto: fte, ... }, ... } }
+// Enero usa costos de Diciembre. A partir de Febrero usa los de Febrero.
+// Cargás los FTE en "Detalle por Cliente" → el mes activo se selecciona con el selector de mes.
+let CLIENTES_FTE = {
+  'Bagó':                 { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'Banco Patagonia':      { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'La Paulina':           { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'Pfizer':               { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'McCain':               { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'Escorial':             { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+  'Universal Assistance': { 'Enero':{}, 'Febrero':{}, 'Marzo':{}, 'Abril':{}, 'Mayo':{}, 'Junio':{}, 'Julio':{}, 'Agosto':{}, 'Septiembre':{}, 'Octubre':{}, 'Noviembre':{}, 'Diciembre':{} },
+};
+
+// Ingresos netos por cliente / mes (en miles) — cargás vos mensualmente
+let INGRESOS = {
+  'Bagó':                 { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'Banco Patagonia':      { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'La Paulina':           { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'Pfizer':               { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'McCain':               { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'Escorial':             { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+  'Universal Assistance': { 'Enero':0,'Febrero':0,'Marzo':0,'Abril':0,'Mayo':0,'Junio':0,'Julio':0,'Agosto':0,'Septiembre':0,'Octubre':0,'Noviembre':0,'Diciembre':0 },
+};
+
+// Lógica de costos: para un mes dado, ¿qué columna de TABLA_COSTOS usar?
+// Enero 2026 → Diciembre. Febrero en adelante → columna del mes RRHH más reciente anterior o igual.
+const MESES_2026 = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+// columna RRHH asignada a cada mes de 2026 (se actualiza al agregar nuevas columnas RRHH)
+let MAPA_MES_COSTO = {
+  'Enero':'Diciembre', 'Febrero':'Febrero', 'Marzo':'Febrero', 'Abril':'Febrero',
+  'Mayo':'Febrero', 'Junio':'Febrero', 'Julio':'Febrero', 'Agosto':'Febrero',
+  'Septiembre':'Febrero', 'Octubre':'Febrero', 'Noviembre':'Febrero', 'Diciembre':'Febrero',
+};
+
+let MES_ACTIVO = 'Enero'; // mes de análisis seleccionado actualmente
+let MES_VIGENTE = 'Febrero'; // última columna RRHH con datos cargados
 let DATA = null;
 let directorActivo = 'todos';
+let clienteDetalleActivo = 'Bagó';
+let chartRentInstance = null;
 
+/* ═══════════════════════════════════════════════════════════
+   UTILIDADES
+═══════════════════════════════════════════════════════════ */
 function fmt(v) {
-  if (v === null || v === undefined || v === '') return '<span style="color:#cccccc">—</span>';
+  if (v === null || v === undefined || v === '') return '<span style="color:#404040">—</span>';
   const n = parseFloat(v);
-  if (isNaN(n)) return '<span style="color:#cccccc">—</span>';
-  return '<span style="color:#cccccc">$' + n.toLocaleString('es-AR', {minimumFractionDigits:1, maximumFractionDigits:1}) + '</span>';
+  if (isNaN(n)) return '<span style="color:#404040">—</span>';
+  return '<span style="color:#ccc">$' + n.toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) + '</span>';
 }
-
 function fmtFte(v) {
-  if (!v && v !== 0) return '<span style="color:#cccccc">—</span>';
+  if (!v && v !== 0) return '<span style="color:#404040">—</span>';
   const n = parseFloat(v);
-  if (isNaN(n) || n === 0) return '<span style="color:#cccccc">—</span>';
-  return '<span style="color:#cccccc">' + n.toFixed(2) + '</span>';
+  if (isNaN(n) || n === 0) return '<span style="color:#404040">—</span>';
+  return '<span style="color:#ccc">' + n.toFixed(2) + '</span>';
 }
-
 function fmtVsMes(v) {
   if (!v && v !== 0) return '<span class="fte-delta flat">—</span>';
   const n = parseFloat(String(v).replace('%','').replace(',','.'));
@@ -236,7 +527,6 @@ function fmtVsMes(v) {
   if (n > 0) return '<span class="fte-delta up">▲ +' + n.toFixed(1) + '%</span>';
   return '<span class="fte-delta down">▼ ' + n.toFixed(1) + '%</span>';
 }
-
 function getVsBadge(raw) {
   if (!raw && raw !== 0) return '<span class="badge neutral">—</span>';
   const v = parseFloat(String(raw).replace('%','').replace(',','.'));
@@ -244,10 +534,8 @@ function getVsBadge(raw) {
   const label = (v > 0 ? '+' : '') + v.toFixed(0) + '%';
   if (v < -10) return `<span class="badge red">▼ ${label}</span>`;
   if (v < -5)  return `<span class="badge yellow">▼ ${label}</span>`;
-  if (v >= 0)  return `<span class="badge green">▲ ${label}</span>`;
-  return `<span class="badge green">${label}</span>`;
+  return `<span class="badge green">▲ ${label}</span>`;
 }
-
 function getProgressBar(raw) {
   if (!raw && raw !== 0) return '<span style="color:var(--text-muted)">—</span>';
   const v = parseFloat(String(raw).replace('%','').replace(',','.'));
@@ -256,7 +544,42 @@ function getProgressBar(raw) {
   const cls = pct >= 90 ? 'high' : pct >= 60 ? 'mid' : 'low';
   return `<div class="progress-wrap"><div class="progress-bg"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div><span class="progress-pct">${v.toFixed(0)}%</span></div>`;
 }
+function getSemaforo(pct) {
+  if (pct >= 40) return '<span class="badge green">Excelente</span>';
+  if (pct >= 20) return '<span class="badge purple">Bueno</span>';
+  if (pct >= 5)  return '<span class="badge yellow">Ajustado</span>';
+  return '<span class="badge red">Crítico</span>';
+}
+function fmtCosto(v) {
+  const n = parseFloat(v);
+  if (!n) return '—';
+  if (n >= 1000000) return '$' + (n/1000000).toFixed(2) + 'M';
+  return '$' + (n/1000).toFixed(0) + 'k';
+}
 
+/* ═══════════════════════════════════════════════════════════
+   NAVEGACIÓN ENTRE PÁGINAS
+═══════════════════════════════════════════════════════════ */
+function switchPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  btn.classList.add('active');
+  if (page === 'rentabilidad') renderRentabilidadCompleto();
+}
+function switchRentTab(tab, btn) {
+  document.querySelectorAll('.rent-section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.rent-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('rent-' + tab).style.display = 'block';
+  btn.classList.add('active');
+  if (tab === 'costos') renderTablaCostoCia();
+  if (tab === 'detalle') { renderDetalle(clienteDetalleActivo); }
+  if (tab === 'consolidado') { const rows = calcRentabilidad(MES_ACTIVO); renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows); setTimeout(() => renderChart(rows), 50); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTROL COMERCIAL (página 1) — lógica original
+═══════════════════════════════════════════════════════════ */
 function filtrarDirector(dir, btn) {
   directorActivo = dir;
   document.querySelectorAll('.dir-btn').forEach(b => b.classList.remove('active'));
@@ -267,112 +590,84 @@ function filtrarDirector(dir, btn) {
   if (DATA) renderTablas(DATA);
 }
 
-function renderKPIs(clientes) {
-  let totalInv = 0, totalPresup = 0, totalCmb = 0;
-  clientes.forEach(r => {
-    totalInv    += parseFloat(r.inv)    || 0;
-    totalPresup += parseFloat(r.presup) || 0;
-    totalCmb    += parseFloat(r.cmb)    || 0;
-  });
-
-  const avgVs = totalPresup > 0 ? ((totalInv - totalPresup) / totalPresup) * 100 : 0;
-  const difPresup = totalInv - totalPresup;
-
-  document.getElementById('kpiInv').textContent    = '$' + totalInv.toFixed(1);
-  document.getElementById('kpiPresup').textContent = '$' + totalPresup.toFixed(1);
-  document.getElementById('kpiVs').textContent     = (avgVs > 0 ? '+' : '') + avgVs.toFixed(1) + '%';
+function renderKPIsComercial(clientes) {
+  let tInv=0, tPresup=0, tCmb=0;
+  clientes.forEach(r => { tInv += parseFloat(r.inv)||0; tPresup += parseFloat(r.presup)||0; tCmb += parseFloat(r.cmb)||0; });
+  const avgVs = tPresup > 0 ? ((tInv - tPresup)/tPresup)*100 : 0;
+  const dif = tInv - tPresup;
+  document.getElementById('kpiInv').textContent    = '$' + tInv.toFixed(1);
+  document.getElementById('kpiPresup').textContent = '$' + tPresup.toFixed(1);
+  document.getElementById('kpiVs').textContent     = (avgVs>0?'+':'') + avgVs.toFixed(1) + '%';
   document.getElementById('kpiVs').style.color     = avgVs < -10 ? '#ff4455' : avgVs < 0 ? '#f5c400' : '#00c853';
-  document.getElementById('kpiDif').textContent    = (difPresup >= 0 ? '+$' : '-$') + Math.abs(difPresup).toFixed(1);
-  document.getElementById('kpiDif').style.color    = difPresup >= 0 ? '#00c853' : '#ff4455';
-  document.getElementById('kpiCmb').textContent    = '$' + totalCmb.toFixed(1);
+  document.getElementById('kpiDif').textContent    = (dif>=0?'+$':'-$') + Math.abs(dif).toFixed(1);
+  document.getElementById('kpiDif').style.color    = dif >= 0 ? '#00c853' : '#ff4455';
+  document.getElementById('kpiCmb').textContent    = '$' + tCmb.toFixed(1);
 
-  const alertas = clientes.filter(r => {
-    const v = parseFloat(String(r.vs || '').replace('%','').replace(',','.'));
-    return !isNaN(v) && v < -10;
-  });
+  const alertas = clientes.filter(r => { const v=parseFloat(String(r.vs||'').replace('%','').replace(',','.')); return !isNaN(v)&&v<-10; });
   const panel = document.getElementById('alertPanel');
+  const badge = document.getElementById('alertBadge');
   if (alertas.length > 0) {
     panel.classList.add('visible');
+    badge.style.display = 'inline-flex';
     document.getElementById('alertItems').innerHTML = alertas.map(r => {
       const v = parseFloat(String(r.vs).replace('%','').replace(',','.'));
       return `<div class="alert-item"><strong>${r.nombre}</strong>: Vs Presup. ${v.toFixed(1)}% · Inv $${parseFloat(r.inv||0).toFixed(1)} vs Presup $${parseFloat(r.presup||0).toFixed(1)}</div>`;
     }).join('');
-  } else {
-    panel.classList.remove('visible');
-  }
+  } else { panel.classList.remove('visible'); badge.style.display='none'; }
 }
 
 function renderTablas(data) {
   const clientes = data.clientes || [];
-  const bago = data.bago || [];
-  const clientesFilt = directorActivo === 'todos' ? clientes : clientes.filter(r => DIRECTORES[r.nombre]?.dir === directorActivo);
-  renderKPIs(clientesFilt);
+  const bago     = data.bago || [];
+  const filt     = directorActivo === 'todos' ? clientes : clientes.filter(r => DIRECTORES[r.nombre]?.dir === directorActivo);
+  renderKPIsComercial(filt);
 
   const tbody = document.getElementById('tbodyClientes');
-  if (clientesFilt.length === 0) {
+  if (!filt.length) {
     tbody.innerHTML = '<tr class="loading-row"><td colspan="13" style="color:var(--text-muted)">Sin datos para este director</td></tr>';
   } else {
-    let html = clientesFilt.map(r => {
+    let html = filt.map(r => {
       const d = DIRECTORES[r.nombre] || {};
       return `<tr>
         <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
-        <td style="color:var(--text-muted);font-size:12px">${d.nombre || '—'}</td>
-        <td class="num">${fmt(r.inv)}</td>
-        <td class="num">${fmt(r.presup)}</td>
-        <td>${getVsBadge(r.vs)}</td>
-        <td>${getProgressBar(r.consumidoAnual)}</td>
-        <td class="num">${fmt(r.presupAnual)}</td>
-        <td class="num">${fmt(r.cmb)}</td>
-        <td class="num" style="color:#cccccc">${r.cmbPct || '—'}</td>
-        <td class="num">${fmtFte(r.fteAnt)}</td>
-        <td class="num">${fmtFte(r.fteAct)}</td>
-        <td>${fmtVsMes(r.vsMes)}</td>
-        <td class="num">${fmtFte(r.fteTotal)}</td>
+        <td style="color:var(--text-muted);font-size:12px">${d.nombre||'—'}</td>
+        <td class="num">${fmt(r.inv)}</td><td class="num">${fmt(r.presup)}</td>
+        <td>${getVsBadge(r.vs)}</td><td>${getProgressBar(r.consumidoAnual)}</td>
+        <td class="num">${fmt(r.presupAnual)}</td><td class="num">${fmt(r.cmb)}</td>
+        <td class="num" style="color:#ccc">${r.cmbPct||'—'}</td>
+        <td class="num">${fmtFte(r.fteAnt)}</td><td class="num">${fmtFte(r.fteAct)}</td>
+        <td>${fmtVsMes(r.vsMes)}</td><td class="num">${fmtFte(r.fteTotal)}</td>
       </tr>`;
     }).join('');
-    let tInv=0, tPresup=0, tFte=0;
-    clientesFilt.forEach(r => { tInv += parseFloat(r.inv||0); tPresup += parseFloat(r.presup||0); tFte += parseFloat(r.fteAct||0); });
-    html += `<tr class="total-row"><td colspan="2">TOTAL</td><td class="num"><span style="color:#cccccc">$${tInv.toFixed(1)}</span></td><td class="num"><span style="color:#cccccc">$${tPresup.toFixed(1)}</span></td><td colspan="5"></td><td></td><td class="num"><span style="color:#cccccc">${tFte.toFixed(2)}</span></td><td colspan="2"></td></tr>`;
+    let tI=0,tP=0,tF=0;
+    filt.forEach(r => { tI+=parseFloat(r.inv||0); tP+=parseFloat(r.presup||0); tF+=parseFloat(r.fteAct||0); });
+    html += `<tr class="total-row"><td colspan="2">TOTAL</td><td class="num"><span style="color:#ccc">$${tI.toFixed(1)}</span></td><td class="num"><span style="color:#ccc">$${tP.toFixed(1)}</span></td><td colspan="5"></td><td></td><td class="num"><span style="color:#ccc">${tF.toFixed(2)}</span></td><td colspan="2"></td></tr>`;
     tbody.innerHTML = html;
   }
 
-  const tbodyBago = document.getElementById('tbodyBago');
-  if (bago.length === 0) {
-    tbodyBago.innerHTML = '<tr class="loading-row"><td colspan="11" style="color:var(--text-muted)">Sin datos</td></tr>';
-  } else {
-    tbodyBago.innerHTML = bago.map(r => `<tr>
-      <td><div class="client-name"><div class="client-dot" style="background:#e8001c"></div>${r.nombre}</div></td>
-      <td class="num">${fmt(r.inv)}</td>
-      <td class="num">${fmt(r.presup)}</td>
-      <td>${getVsBadge(r.vs)}</td>
-      <td>${getProgressBar(r.consumidoAnual)}</td>
-      <td class="num">${fmt(r.presupAnual)}</td>
-      <td class="num" style="color:#cccccc">${r.soi || '—'}</td>
-      <td class="num">${fmtFte(r.fteAnt)}</td>
-      <td class="num">${fmtFte(r.fteAct)}</td>
-      <td>${fmtVsMes(r.vsMes)}</td>
-      <td class="num">${fmtFte(r.fteTotal)}</td>
-    </tr>`).join('');
-  }
+  const tbB = document.getElementById('tbodyBago');
+  tbB.innerHTML = bago.length ? bago.map(r => `<tr>
+    <td><div class="client-name"><div class="client-dot" style="background:#e8001c"></div>${r.nombre}</div></td>
+    <td class="num">${fmt(r.inv)}</td><td class="num">${fmt(r.presup)}</td>
+    <td>${getVsBadge(r.vs)}</td><td>${getProgressBar(r.consumidoAnual)}</td>
+    <td class="num">${fmt(r.presupAnual)}</td>
+    <td class="num" style="color:#ccc">${r.soi||'—'}</td>
+    <td class="num">${fmtFte(r.fteAnt)}</td><td class="num">${fmtFte(r.fteAct)}</td>
+    <td>${fmtVsMes(r.vsMes)}</td><td class="num">${fmtFte(r.fteTotal)}</td>
+  </tr>`).join('') : '<tr class="loading-row"><td colspan="11" style="color:var(--text-muted)">Sin datos</td></tr>';
 }
 
 async function enviarAlertas() {
   if (!DATA) return;
-  const alertas = (DATA.clientes || []).filter(r => {
-    const v = parseFloat(String(r.vs || '').replace('%','').replace(',','.'));
-    return !isNaN(v) && v < -10;
-  });
-  if (alertas.length === 0) { alert('✅ No hay clientes con desvío mayor al -10%'); return; }
+  const alertas = (DATA.clientes||[]).filter(r => { const v=parseFloat(String(r.vs||'').replace('%','').replace(',','.')); return !isNaN(v)&&v<-10; });
+  if (!alertas.length) { alert('✅ No hay clientes con desvío mayor al -10%'); return; }
   const msg = '🚨 *Alerta Comercial — Control de Presupuesto*\n\n' +
-    alertas.map(r => {
-      const v = parseFloat(String(r.vs).replace('%','').replace(',','.'));
-      const d = DIRECTORES[r.nombre];
-      return `*${r.nombre}* (${d?.nombre || '—'}): Vs Presupuesto en *${v.toFixed(1)}%* · Inv $${parseFloat(r.inv||0).toFixed(1)} | Presup $${parseFloat(r.presup||0).toFixed(1)}`;
-    }).join('\n') + '\n\n_Revisá el Control Comercial para más detalle._';
+    alertas.map(r => { const v=parseFloat(String(r.vs).replace('%','').replace(',','.')); const d=DIRECTORES[r.nombre]; return `*${r.nombre}* (${d?.nombre||'—'}): Vs Presupuesto en *${v.toFixed(1)}%* · Inv $${parseFloat(r.inv||0).toFixed(1)} | Presup $${parseFloat(r.presup||0).toFixed(1)}`; }).join('\n')
+    + '\n\n_Revisá el Control Comercial para más detalle._';
   try {
-    await fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: msg, channel: '#mail-counter' }) });
+    await fetch(WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:msg,channel:'#mail-counter'})});
     alert('✅ Alertas enviadas a Slack');
-  } catch(e) { alert('❌ Error al enviar: ' + e.message); }
+  } catch(e) { alert('❌ Error al enviar: '+e.message); }
 }
 
 async function loadData() {
@@ -384,11 +679,383 @@ async function loadData() {
     renderTablas(raw);
   } catch(e) {
     document.getElementById('tbodyClientes').innerHTML = `<tr class="loading-row"><td colspan="13" style="color:#ff4455">⚠️ No se pudo conectar.</td></tr>`;
-    document.getElementById('tbodyBago').innerHTML = `<tr class="loading-row"><td colspan="11" style="color:#ff4455">⚠️ Error de conexión.</td></tr>`;
+    document.getElementById('tbodyBago').innerHTML     = `<tr class="loading-row"><td colspan="11" style="color:#ff4455">⚠️ Error de conexión.</td></tr>`;
     document.getElementById('periodoLabel').textContent = 'Sin conexión';
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   RENTABILIDAD — cálculos
+═══════════════════════════════════════════════════════════ */
+function getColCosto(mes) {
+  // Para Enero → usa Diciembre. Para el resto → columna RRHH asignada.
+  return MAPA_MES_COSTO[mes] || MES_VIGENTE;
+}
+
+function getCostoPuesto(puesto, mes) {
+  const col = getColCosto(mes);
+  return (TABLA_COSTOS[puesto] && TABLA_COSTOS[puesto][col]) || 0;
+}
+
+function calcCostoEquipoCliente(cliente, mes) {
+  const puestos = (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
+  let total = 0;
+  for (const [p, fte] of Object.entries(puestos)) {
+    total += getCostoPuesto(p, mes) * fte;
+  }
+  return total / 1000;
+}
+
+function calcRentabilidad(mes) {
+  return Object.keys(DIRECTORES).map(nombre => {
+    const ingresos = (INGRESOS[nombre] && INGRESOS[nombre][mes]) || 0;
+    const costoEq  = calcCostoEquipoCliente(nombre, mes);
+    const cm       = ingresos - costoEq;
+    const cmPct    = ingresos > 0 ? (cm / ingresos) * 100 : 0;
+    const puestos  = (CLIENTES_FTE[nombre] && CLIENTES_FTE[nombre][mes]) || {};
+    const fte      = Object.values(puestos).reduce((a,b) => a+b, 0);
+    return { nombre, ingresos, costoEq, cm, cmPct, fte };
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENTABILIDAD — render
+═══════════════════════════════════════════════════════════ */
+function renderMesSelector() {
+  const cont = document.getElementById('mesSelectorRent');
+  if (!cont) return;
+  cont.innerHTML = MESES_2026.map(m =>
+    `<button class="dir-btn${m===MES_ACTIVO?' active':''}" onclick="setMesActivo('${m}',this)">${m}</button>`
+  ).join('');
+}
+
+function setMesActivo(mes, btn) {
+  MES_ACTIVO = mes;
+  document.querySelectorAll('#mesSelectorRent .dir-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const rows = calcRentabilidad(mes);
+  renderKPIsRent(rows);
+  renderConsolidado(rows);
+  renderRanking(rows);
+  setTimeout(() => renderChart(rows), 60);
+  actualizarBannerVigencia();
+}
+
+function actualizarBannerVigencia() {
+  const col = getColCosto(MES_ACTIVO);
+  const el = document.getElementById('vigenciaMes');
+  if (el) el.textContent = col + (MES_ACTIVO === 'Enero' ? ' (Enero usa costos de Diciembre)' : '');
+  const el2 = document.getElementById('colVigenteLabel');
+  if (el2) el2.textContent = MES_VIGENTE;
+}
+
+function renderRentabilidadCompleto() {
+  renderMesSelector();
+  const rows = calcRentabilidad(MES_ACTIVO);
+  renderKPIsRent(rows);
+  renderConsolidado(rows);
+  renderRanking(rows);
+  setTimeout(() => renderChart(rows), 80);
+  renderClienteSelector();
+  actualizarBannerVigencia();
+}
+
+function renderKPIsRent(rows) {
+  const tIng   = rows.reduce((a,r) => a + r.ingresos, 0);
+  const tCosto = rows.reduce((a,r) => a + r.costoEq, 0);
+  const tCM    = rows.reduce((a,r) => a + r.cm, 0);
+  const tPct   = tIng > 0 ? (tCM/tIng)*100 : 0;
+  const tFTE   = rows.reduce((a,r) => a + r.fte, 0);
+  document.getElementById('kpisRent').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Ingresos Netos Total</div><div class="kpi-value" style="font-size:26px">$${tIng.toFixed(1)}k</div><div class="kpi-sub">Venta+Hon+Fees−Compra</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">$${tCosto.toFixed(1)}k</div><div class="kpi-sub">FTE × Costo Compañía</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">CM Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">$${tCM.toFixed(1)}k</div><div class="kpi-sub">Ingresos − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+    <div class="kpi"><div class="kpi-label">CM % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">Sobre ingresos netos</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
+    <div class="kpi"><div class="kpi-label">FTE Total Equipo</div><div class="kpi-value" style="font-size:26px">${tFTE.toFixed(2)}</div><div class="kpi-sub">Dedicación total período</div><div class="kpi-accent" style="background:var(--red)"></div></div>
+  `;
+}
+
+function renderConsolidado(rows) {
+  const maxCM = Math.max(...rows.map(r => r.cm));
+  let html = rows.map(r => {
+    const d = DIRECTORES[r.nombre] || {};
+    const pct = maxCM > 0 ? Math.max(0, Math.min(100, (r.cm/maxCM)*100)) : 0;
+    const barColor = r.cmPct >= 40 ? '#00c853' : r.cmPct >= 20 ? '#aa44ff' : r.cmPct >= 5 ? '#f5c400' : '#e8001c';
+    return `<tr>
+      <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
+      <td class="num" style="color:#aaa">$${r.ingresos.toFixed(1)}k</td>
+      <td class="num" style="color:var(--yellow)">$${r.costoEq.toFixed(1)}k</td>
+      <td class="num">
+        <div class="cm-bar-wrap">
+          <div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+          <span style="min-width:65px;text-align:right;color:${r.cm>=0?'#f0f0f0':'#ff4455'}">$${r.cm.toFixed(1)}k</span>
+        </div>
+      </td>
+      <td class="num" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'};font-weight:600">${r.cmPct.toFixed(1)}%</td>
+      <td class="num" style="color:#aaa">${r.fte.toFixed(2)}</td>
+      <td>${getSemaforo(r.cmPct)}</td>
+    </tr>`;
+  }).join('');
+  const tI = rows.reduce((a,r)=>a+r.ingresos,0), tC = rows.reduce((a,r)=>a+r.costoEq,0), tM = rows.reduce((a,r)=>a+r.cm,0);
+  const tP = tI>0?(tM/tI)*100:0;
+  html += `<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">$${tI.toFixed(1)}k</td><td class="num" style="color:var(--yellow)">$${tC.toFixed(1)}k</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">$${tM.toFixed(1)}k</td><td class="num" style="color:${tP>=20?'#00c853':tP>=5?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td class="num" style="color:#aaa">${rows.reduce((a,r)=>a+r.fte,0).toFixed(2)}</td><td></td></tr>`;
+  document.getElementById('tbodyConsolidado').innerHTML = html;
+}
+
+function renderRanking(rows) {
+  const medals = ['🥇','🥈','🥉'];
+  const byCM  = [...rows].sort((a,b) => b.cm - a.cm);
+  const byPct = [...rows].sort((a,b) => b.cmPct - a.cmPct);
+  document.getElementById('rankingCM').innerHTML = byCM.map((r,i) => {
+    const d = DIRECTORES[r.nombre]||{};
+    return `<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cm>=0?'#00c853':'#ff4455'}">$${r.cm.toFixed(1)}k</div></div>`;
+  }).join('');
+  document.getElementById('rankingPct').innerHTML = byPct.map((r,i) => {
+    return `<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'}">${r.cmPct.toFixed(1)}%</div></div>`;
+  }).join('');
+}
+
+function renderChart(rows) {
+  if (!rows) rows = calcRentabilidad();
+  if (chartRentInstance) { chartRentInstance.destroy(); chartRentInstance = null; }
+  const labels   = rows.map(r => r.nombre.length > 9 ? r.nombre.substring(0,9)+'…' : r.nombre);
+  chartRentInstance = new Chart(document.getElementById('chartRent'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label:'Ingresos Netos', data: rows.map(r=>parseFloat(r.ingresos.toFixed(1))), backgroundColor:'rgba(68,136,255,0.7)', borderColor:'#4488ff', borderWidth:1, borderRadius:4 },
+        { label:'Costo Equipo',   data: rows.map(r=>parseFloat(r.costoEq.toFixed(1))),  backgroundColor:'rgba(245,196,0,0.65)', borderColor:'#f5c400', borderWidth:1, borderRadius:4 },
+        { label:'CM $',           data: rows.map(r=>parseFloat(r.cm.toFixed(1))),        backgroundColor:'rgba(0,200,83,0.65)',  borderColor:'#00c853', borderWidth:1, borderRadius:4 },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ ticks:{color:'#606060',font:{family:'Poppins',size:11}}, grid:{color:'rgba(255,255,255,0.03)'} },
+        y:{ ticks:{color:'#606060',font:{family:'Poppins',size:11},callback: v=>'$'+v+'k'}, grid:{color:'rgba(255,255,255,0.05)'} }
+      }
+    }
+  });
+}
+
+/* Detalle por cliente */
+function renderClienteSelector() {
+  const cont = document.getElementById('clienteSelector');
+  if (!cont) return;
+  cont.innerHTML = Object.keys(DIRECTORES).map(nombre => {
+    const d = DIRECTORES[nombre]||{};
+    const isActive = nombre === clienteDetalleActivo;
+    return `<button class="cli-btn${isActive?' active':''}" style="${isActive?'background:'+d.color+';border-color:'+d.color+';color:white':''}" onclick="selectCliente('${nombre}',this,'${d.color||'#606060'}')">${nombre}</button>`;
+  }).join('');
+}
+
+function selectCliente(nombre, btn, color) {
+  clienteDetalleActivo = nombre;
+  document.querySelectorAll('.cli-btn').forEach(b => { b.classList.remove('active'); b.style.background=''; b.style.borderColor=''; b.style.color=''; });
+  btn.classList.add('active'); btn.style.background = color; btn.style.borderColor = color; btn.style.color = 'white';
+  renderDetalle(nombre);
+}
+
+function renderMesSelectorDetalle() {
+  const cont = document.getElementById('mesSelectorDetalle');
+  if (!cont) return;
+  cont.innerHTML = MESES_2026.map(m =>
+    `<button class="dir-btn${m===MES_ACTIVO?' active':''}" style="font-size:11px;padding:6px 13px" onclick="setMesDetalleActivo('${m}',this)">${m}</button>`
+  ).join('');
+}
+
+function setMesDetalleActivo(mes, btn) {
+  MES_ACTIVO = mes;
+  document.querySelectorAll('#mesSelectorDetalle .dir-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('#mesSelectorRent .dir-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === mes);
+  });
+  actualizarBannerVigencia();
+  renderDetalle(clienteDetalleActivo);
+}
+
+function renderDetalle(cliente) {
+  renderMesSelectorDetalle();
+  actualizarBannerVigencia();
+  const mes    = MES_ACTIVO;
+  const colCosto = getColCosto(mes);
+  const puestos  = Object.keys(TABLA_COSTOS);
+  const fteActual = (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
+
+  // Ingresos editables
+  const ingActual = (INGRESOS[cliente] && INGRESOS[cliente][mes]) || 0;
+  document.getElementById('ingresosEditable').value = ingActual || '';
+
+  const totalCosto = puestos.reduce((acc, p) => {
+    const fte = fteActual[p] || 0;
+    return acc + getCostoPuesto(p, mes) * fte;
+  }, 0);
+
+  // Solo mostrar puestos que tienen FTE o todos para cargar
+  let html = puestos.map(puesto => {
+    const costoUnit = getCostoPuesto(puesto, mes);
+    const fteVal    = fteActual[puesto] || 0;
+    const costoMes  = costoUnit * fteVal;
+    const pcTot     = totalCosto > 0 ? (costoMes / totalCosto) * 100 : 0;
+    const rowStyle  = fteVal > 0 ? '' : 'opacity:0.35';
+    return `<tr style="${rowStyle}">
+      <td style="font-weight:500;font-size:13px">${puesto}</td>
+      <td class="num">
+        <input type="number" class="fte-inline-input" value="${fteVal || ''}" placeholder="0.00" min="0" step="0.01"
+          onchange="saveFTE('${cliente}','${mes}','${puesto}',this.value)"
+          title="FTE para ${puesto} en ${mes}">
+      </td>
+      <td class="num" style="color:var(--yellow);font-size:12px">${fmtCosto(costoUnit)}</td>
+      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal > 0 ? fmtCosto(costoMes) : '—'}</td>
+      <td class="num">
+        ${fteVal > 0 ? `<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>` : '<span style="color:#303030;font-size:11px">—</span>'}
+      </td>
+    </tr>`;
+  }).join('');
+
+  html += `<tr class="total-row">
+    <td colspan="2">TOTAL · ${cliente} · ${mes}</td>
+    <td style="color:var(--text-muted);font-size:11px">Col. costo: ${colCosto}</td>
+    <td class="num" style="color:var(--yellow)">${fmtCosto(totalCosto)}</td>
+    <td class="num" style="color:#aaa">100%</td>
+  </tr>`;
+
+  document.getElementById('tbodyDetalle').innerHTML = html;
+}
+
+function saveFTE(cliente, mes, puesto, valor) {
+  const v = parseFloat(valor);
+  if (!CLIENTES_FTE[cliente]) CLIENTES_FTE[cliente] = {};
+  if (!CLIENTES_FTE[cliente][mes]) CLIENTES_FTE[cliente][mes] = {};
+  if (!isNaN(v) && v > 0) {
+    CLIENTES_FTE[cliente][mes][puesto] = v;
+  } else {
+    delete CLIENTES_FTE[cliente][mes][puesto];
+  }
+  renderDetalle(cliente);
+  // Actualizar consolidado si está visible
+  if (document.getElementById('rent-consolidado').style.display !== 'none') {
+    const rows = calcRentabilidad(MES_ACTIVO);
+    renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
+  }
+}
+
+function saveIngresos(cliente, mes, valor) {
+  const v = parseFloat(valor);
+  if (!INGRESOS[cliente]) INGRESOS[cliente] = {};
+  INGRESOS[cliente][mes] = isNaN(v) ? 0 : v;
+  renderDetalle(cliente);
+  if (document.getElementById('rent-consolidado').style.display !== 'none') {
+    const rows = calcRentabilidad(MES_ACTIVO);
+    renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
+  }
+}
+
+/* Tabla Costo Compañía maestra */
+function getColsRRHH() {
+  const set = new Set();
+  Object.values(TABLA_COSTOS).forEach(row => Object.keys(row).forEach(m => set.add(m)));
+  // Orden: Diciembre primero (base), luego cronológico
+  const orden = ['Diciembre', ...MESES_2026.filter(m => m !== 'Diciembre')];
+  return orden.filter(m => set.has(m));
+}
+
+function renderTablaCostoCia() {
+  const cols = getColsRRHH();
+  document.getElementById('colVigenteLabel').textContent = MES_VIGENTE;
+
+  document.getElementById('headCostoCia').innerHTML = `<tr>
+    <th style="min-width:210px">Puesto</th>
+    ${cols.map(m => `
+      <th class="mes-header num${m===MES_VIGENTE?' vigente-col':''}">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
+          <span>${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE?' ⚡':''}</span>
+          ${cols.length > 2 && m !== 'Diciembre' && m !== 'Febrero' ? `<button onclick="eliminarColRRHH('${m}')" title="Eliminar columna" style="background:transparent;border:none;color:#404040;cursor:pointer;font-size:12px;padding:0;line-height:1" onmouseover="this.style.color='#ff4455'" onmouseout="this.style.color='#404040'">✕</button>` : ''}
+        </div>
+      </th>`).join('')}
+  </tr>`;
+
+  document.getElementById('bodyCostoCia').innerHTML = Object.entries(TABLA_COSTOS).map(([puesto, costos]) => `
+    <tr>
+      <td class="puesto-col">${puesto}</td>
+      ${cols.map(m => {
+        const v = costos[m];
+        const isVig = m === MES_VIGENTE;
+        return `<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCell(this,'${puesto}','${m}')" title="Doble click para editar">${v ? fmtCosto(v) : '—'}</td>`;
+      }).join('')}
+    </tr>
+  `).join('');
+}
+
+function editCell(td, puesto, mes) {
+  const currentVal = TABLA_COSTOS[puesto]?.[mes] || 0;
+  td.innerHTML = `<input class="cell-input" type="number" value="${currentVal}" onblur="saveCell(this,'${puesto}','${mes}')" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')this.blur();">`;
+  td.querySelector('input').focus(); td.querySelector('input').select();
+}
+
+function saveCell(input, puesto, mes) {
+  const v = parseFloat(String(input.value).replace(',', '.'));
+  if (!isNaN(v) && v >= 0) {
+    if (!TABLA_COSTOS[puesto]) TABLA_COSTOS[puesto] = {};
+    TABLA_COSTOS[puesto][mes] = v;
+  }
+  renderTablaCostoCia();
+}
+
+function agregarMes() {
+  const nombre = prompt('Nombre del mes del nuevo dato de RRHH:\n(ej: Mayo, Agosto, etc.)');
+  if (!nombre || !nombre.trim()) return;
+  const mesKey = nombre.trim();
+  if (MAPA_MES_COSTO[mesKey] !== undefined || Object.values(TABLA_COSTOS)[0][mesKey] !== undefined) {
+    alert('Ese mes ya existe.'); return;
+  }
+  Object.keys(TABLA_COSTOS).forEach(p => { TABLA_COSTOS[p][mesKey] = 0; });
+  // Actualizar mapa: desde ese mes en adelante → nueva columna
+  let found = false;
+  MESES_2026.forEach(m => {
+    if (m === mesKey) found = true;
+    if (found) MAPA_MES_COSTO[m] = mesKey;
+  });
+  renderTablaCostoCia();
+}
+
+function eliminarColRRHH(mes) {
+  if (!confirm(`¿Eliminás la columna "${mes}"? Los FTE calculados con ese costo no se pierden.`)) return;
+  Object.keys(TABLA_COSTOS).forEach(p => delete TABLA_COSTOS[p][mes]);
+  // Revertir mapa a Febrero para los meses que apuntaban a esa col
+  Object.keys(MAPA_MES_COSTO).forEach(m => {
+    if (MAPA_MES_COSTO[m] === mes) MAPA_MES_COSTO[m] = MES_VIGENTE;
+  });
+  renderTablaCostoCia();
+}
+
+function guardarCostos() {
+  // Detectar col vigente = última con algún dato > 0 (excluyendo Diciembre si hay algo posterior)
+  const cols = getColsRRHH().filter(m => m !== 'Diciembre');
+  for (let i = cols.length - 1; i >= 0; i--) {
+    if (Object.values(TABLA_COSTOS).some(row => (row[cols[i]] || 0) > 0)) {
+      MES_VIGENTE = cols[i]; break;
+    }
+  }
+  renderRentabilidadCompleto();
+  // Volver a consolidado
+  document.querySelectorAll('.rent-section').forEach(s => s.style.display='none');
+  document.querySelectorAll('.rent-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('rent-consolidado').style.display='block';
+  document.querySelector('.rent-tab').classList.add('active');
+  setTimeout(() => renderChart(), 80);
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '✓ Guardado!'; btn.style.background='var(--green)'; btn.style.borderColor='var(--green)';
+  setTimeout(() => { btn.textContent = orig; btn.style.background='var(--red)'; btn.style.borderColor='var(--red)'; }, 2200);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
 loadData();
 </script>
 </body>
