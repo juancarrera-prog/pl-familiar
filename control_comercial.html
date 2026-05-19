@@ -552,10 +552,11 @@ function getSemaforo(pct) {
   return '<span class="badge red">Crítico</span>';
 }
 function fmtCosto(v) {
+  // v siempre viene en MILES de pesos (ej: 10766 = $10.766M)
   const n = parseFloat(v);
   if (!n) return '—';
-  if (n >= 1000000) return '$' + (n/1000000).toFixed(2) + 'M';
-  return '$' + (n/1000).toFixed(0) + 'k';
+  if (n >= 1000) return '$' + (n/1000).toFixed(2) + 'M';
+  return '$' + n.toFixed(1) + 'k';
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -793,9 +794,9 @@ function renderKPIsRent(rows) {
   const tIng=rows.reduce((a,r)=>a+r.ingresos,0), tCosto=rows.reduce((a,r)=>a+r.costoEq,0), tCM=rows.reduce((a,r)=>a+r.cm,0);
   const tPct=tIng>0?(tCM/tIng)*100:0, tFTE=rows.reduce((a,r)=>a+r.fte,0);
   document.getElementById('kpisRent').innerHTML = `
-    <div class="kpi"><div class="kpi-label">Ingresos Netos Total</div><div class="kpi-value" style="font-size:26px">$${tIng.toFixed(2)}M</div><div class="kpi-sub">Venta+Hon+Fees-Compra</div><div class="kpi-accent" style="background:#4488ff"></div></div>
-    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">$${tCosto.toFixed(2)}M</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
-    <div class="kpi"><div class="kpi-label">CM Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">$${tCM.toFixed(1)}k</div><div class="kpi-sub">Ingresos - Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+    <div class="kpi"><div class="kpi-label">Ingresos Netos Total</div><div class="kpi-value" style="font-size:26px">$${(tIng/1000).toFixed(2)}M</div><div class="kpi-sub">Venta+Hon+Fees-Compra</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">$${(tCosto/1000).toFixed(2)}M</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">CM Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">$${(tCM/1000).toFixed(2)}M</div><div class="kpi-sub">Ingresos - Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
     <div class="kpi"><div class="kpi-label">CM % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">Sobre ingresos netos</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
     <div class="kpi"><div class="kpi-label">FTE Total Equipo</div><div class="kpi-value" style="font-size:26px">${tFTE.toFixed(2)}</div><div class="kpi-sub">Dedicacion total periodo</div><div class="kpi-accent" style="background:var(--red)"></div></div>`;
 }
@@ -807,22 +808,22 @@ function renderConsolidado(rows) {
     const barColor=r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#e8001c';
     return `<tr>
       <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
-      <td class="num" style="color:#aaa">$${r.ingresos.toFixed(1)}k</td>
-      <td class="num" style="color:var(--yellow)">$${r.costoEq.toFixed(1)}k</td>
-      <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${r.cm>=0?'#f0f0f0':'#ff4455'}">$${r.cm.toFixed(1)}k</span></div></td>
+      <td class="num" style="color:#aaa">${'$'+(r.ingresos/1000).toFixed(2)+'M'}</td>
+      <td class="num" style="color:var(--yellow)">${'$'+(r.costoEq/1000).toFixed(2)+'M'}</td>
+      <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${r.cm>=0?'#f0f0f0':'#ff4455'}">${'$'+(r.cm/1000).toFixed(2)+'M'}</span></div></td>
       <td class="num" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'};font-weight:600">${r.cmPct.toFixed(1)}%</td>
       <td class="num" style="color:#aaa">${r.fte.toFixed(2)}</td>
       <td>${getSemaforo(r.cmPct)}</td></tr>`;
   }).join('');
   const tI=rows.reduce((a,r)=>a+r.ingresos,0),tC=rows.reduce((a,r)=>a+r.costoEq,0),tM=rows.reduce((a,r)=>a+r.cm,0);
   const tP=tI>0?(tM/tI)*100:0;
-  html+=`<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">$${tI.toFixed(1)}k</td><td class="num" style="color:var(--yellow)">$${tC.toFixed(1)}k</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">$${tM.toFixed(1)}k</td><td class="num" style="color:${tP>=20?'#00c853':tP>=5?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td class="num" style="color:#aaa">${rows.reduce((a,r)=>a+r.fte,0).toFixed(2)}</td><td></td></tr>`;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">${'$'+(tI/1000).toFixed(2)+'M'}</td><td class="num" style="color:var(--yellow)">${'$'+(tC/1000).toFixed(2)+'M'}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${'$'+(tM/1000).toFixed(2)+'M'}</td><td class="num" style="color:${tP>=20?'#00c853':tP>=5?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td class="num" style="color:#aaa">${rows.reduce((a,r)=>a+r.fte,0).toFixed(2)}</td><td></td></tr>`;
   document.getElementById('tbodyConsolidado').innerHTML = html;
 }
 function renderRanking(rows) {
   const medals=['🥇','🥈','🥉'];
   const byCM=[...rows].sort((a,b)=>b.cm-a.cm), byPct=[...rows].sort((a,b)=>b.cmPct-a.cmPct);
-  document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cm>=0?'#00c853':'#ff4455'}">$${r.cm.toFixed(1)}k</div></div>`;}).join('');
+  document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cm>=0?'#00c853':'#ff4455'}">$${(r.cm/1000).toFixed(2)}M</div></div>`;}).join('');
   document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'}">${r.cmPct.toFixed(1)}%</div></div>`).join('');
 }
 function renderChart(rows) {
