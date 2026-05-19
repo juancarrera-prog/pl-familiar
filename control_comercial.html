@@ -705,7 +705,10 @@ async function loadData() {
     const json = await res2.json();
 
     if (json.costos && Object.keys(json.costos).length > 0) {
-      TABLA_COSTOS = json.costos;
+      Object.entries(json.costos).forEach(([puesto, meses]) => {
+        if (!TABLA_COSTOS[puesto]) TABLA_COSTOS[puesto] = {};
+        Object.entries(meses).forEach(([mes, valor]) => { TABLA_COSTOS[puesto][mes] = valor; });
+      });
       const cols = getColsRRHH().filter(m => m !== 'Diciembre');
       for (let i = cols.length - 1; i >= 0; i--) {
         if (Object.values(TABLA_COSTOS).some(r => (r[cols[i]] || 0) > 0)) {
