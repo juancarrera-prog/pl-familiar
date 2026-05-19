@@ -420,7 +420,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 /* ═══════════════════════════════════════════════════════════
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbz51P15rgzWahNRVuiHWN-yBjRLZkUTszhyxPAyL66JQobldusabaswCNg5bkTjm9PiWg/exec';
+const API_URL    = 'https://script.google.com/macros/s/AKfycbz51P15rgzWahNRVuiHWN-yBjRLZkUTszhyxPAyL66JQobldusabaswCNg5bkTjm9PiWg/exec'; // Script Control Comercial
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiyaz1VPDlmCTyam1KYpgprYiL5X-4sFvigsVzCu8EUu6s0ErnAZvXmsPaF_Q0qiVw/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
 
 const DIRECTORES = {
@@ -671,6 +672,7 @@ async function enviarAlertas() {
 }
 
 async function loadData() {
+  // Control Comercial (script original)
   try {
     const res = await fetch(API_URL);
     const raw = await res.json();
@@ -678,34 +680,71 @@ async function loadData() {
     if (raw.periodo) document.getElementById('periodoLabel').textContent = raw.periodo;
     renderTablas(raw);
   } catch(e) {
-    document.getElementById('tbodyClientes').innerHTML = `<tr class="loading-row"><td colspan="13" style="color:#ff4455">⚠️ No se pudo conectar.</td></tr>`;
-    document.getElementById('tbodyBago').innerHTML     = `<tr class="loading-row"><td colspan="11" style="color:#ff4455">⚠️ Error de conexión.</td></tr>`;
-    document.getElementById('periodoLabel').textContent = 'Sin conexión';
+    document.getElementById('tbodyClientes').innerHTML = '<tr class="loading-row"><td colspan="13" style="color:#ff4455">No se pudo conectar.</td></tr>';
+    document.getElementById('tbodyBago').innerHTML     = '<tr class="loading-row"><td colspan="11" style="color:#ff4455">Error de conexion.</td></tr>';
+    document.getElementById('periodoLabel').textContent = 'Sin conexion';
+  }
+
+  // Rentabilidad (script nuevo - GET)
+  try {
+    const res2 = await fetch(SCRIPT_URL);
+    const json = await res2.json();
+
+    if (json.costos && Object.keys(json.costos).length > 0) {
+      TABLA_COSTOS = json.costos;
+      const cols = getColsRRHH().filter(m => m !== 'Diciembre');
+      for (let i = cols.length - 1; i >= 0; i--) {
+        if (Object.values(TABLA_COSTOS).some(r => (r[cols[i]] || 0) > 0)) {
+          MES_VIGENTE = cols[i];
+          let found = false;
+          MESES_2026.forEach(m => { if (m === MES_VIGENTE) found = true; if (found) MAPA_MES_COSTO[m] = MES_VIGENTE; });
+          break;
+        }
+      }
+    }
+
+    if (json.fte && Object.keys(json.fte).length > 0) {
+      Object.entries(json.fte).forEach(([cliente, meses]) => {
+        if (!CLIENTES_FTE[cliente]) CLIENTES_FTE[cliente] = {};
+        Object.entries(meses).forEach(([mes, puestos]) => { CLIENTES_FTE[cliente][mes] = puestos; });
+      });
+    }
+
+    if (json.ingresos && Object.keys(json.ingresos).length > 0) {
+      Object.entries(json.ingresos).forEach(([cliente, meses]) => {
+        if (!INGRESOS[cliente]) INGRESOS[cliente] = {};
+        Object.entries(meses).forEach(([mes, valor]) => { INGRESOS[cliente][mes] = valor; });
+      });
+    }
+    console.log('Rentabilidad cargada desde Sheet');
+  } catch(e) {
+    console.warn('Rentabilidad sin conexion, usando datos locales:', e.message);
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   RENTABILIDAD — cálculos
-═══════════════════════════════════════════════════════════ */
-function getColCosto(mes) {
-  // Para Enero → usa Diciembre. Para el resto → columna RRHH asignada.
-  return MAPA_MES_COSTO[mes] || MES_VIGENTE;
+// POST al Sheet - guarda cada cambio en tiempo real
+async function postSheet(tipo, data) {
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ tipo, data })
+    });
+  } catch(e) {
+    console.warn('No se pudo guardar en Sheet:', e.message);
+  }
 }
 
-function getCostoPuesto(puesto, mes) {
-  const col = getColCosto(mes);
-  return (TABLA_COSTOS[puesto] && TABLA_COSTOS[puesto][col]) || 0;
-}
 
+/* RENTABILIDAD - calculos */
+function getColCosto(mes) { return MAPA_MES_COSTO[mes] || MES_VIGENTE; }
+function getCostoPuesto(puesto, mes) { const col = getColCosto(mes); return (TABLA_COSTOS[puesto] && TABLA_COSTOS[puesto][col]) || 0; }
 function calcCostoEquipoCliente(cliente, mes) {
   const puestos = (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
   let total = 0;
-  for (const [p, fte] of Object.entries(puestos)) {
-    total += getCostoPuesto(p, mes) * fte;
-  }
+  for (const [p, fte] of Object.entries(puestos)) total += getCostoPuesto(p, mes) * fte;
   return total / 1000;
 }
-
 function calcRentabilidad(mes) {
   return Object.keys(DIRECTORES).map(nombre => {
     const ingresos = (INGRESOS[nombre] && INGRESOS[nombre][mes]) || 0;
@@ -718,9 +757,7 @@ function calcRentabilidad(mes) {
   });
 }
 
-/* ═══════════════════════════════════════════════════════════
-   RENTABILIDAD — render
-═══════════════════════════════════════════════════════════ */
+/* RENTABILIDAD - render */
 function renderMesSelector() {
   const cont = document.getElementById('mesSelectorRent');
   if (!cont) return;
@@ -728,19 +765,15 @@ function renderMesSelector() {
     `<button class="dir-btn${m===MES_ACTIVO?' active':''}" onclick="setMesActivo('${m}',this)">${m}</button>`
   ).join('');
 }
-
 function setMesActivo(mes, btn) {
   MES_ACTIVO = mes;
   document.querySelectorAll('#mesSelectorRent .dir-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   const rows = calcRentabilidad(mes);
-  renderKPIsRent(rows);
-  renderConsolidado(rows);
-  renderRanking(rows);
+  renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
   setTimeout(() => renderChart(rows), 60);
   actualizarBannerVigencia();
 }
-
 function actualizarBannerVigencia() {
   const col = getColCosto(MES_ACTIVO);
   const el = document.getElementById('vigenciaMes');
@@ -748,95 +781,65 @@ function actualizarBannerVigencia() {
   const el2 = document.getElementById('colVigenteLabel');
   if (el2) el2.textContent = MES_VIGENTE;
 }
-
 function renderRentabilidadCompleto() {
   renderMesSelector();
   const rows = calcRentabilidad(MES_ACTIVO);
-  renderKPIsRent(rows);
-  renderConsolidado(rows);
-  renderRanking(rows);
+  renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
   setTimeout(() => renderChart(rows), 80);
   renderClienteSelector();
   actualizarBannerVigencia();
 }
-
 function renderKPIsRent(rows) {
-  const tIng   = rows.reduce((a,r) => a + r.ingresos, 0);
-  const tCosto = rows.reduce((a,r) => a + r.costoEq, 0);
-  const tCM    = rows.reduce((a,r) => a + r.cm, 0);
-  const tPct   = tIng > 0 ? (tCM/tIng)*100 : 0;
-  const tFTE   = rows.reduce((a,r) => a + r.fte, 0);
+  const tIng=rows.reduce((a,r)=>a+r.ingresos,0), tCosto=rows.reduce((a,r)=>a+r.costoEq,0), tCM=rows.reduce((a,r)=>a+r.cm,0);
+  const tPct=tIng>0?(tCM/tIng)*100:0, tFTE=rows.reduce((a,r)=>a+r.fte,0);
   document.getElementById('kpisRent').innerHTML = `
-    <div class="kpi"><div class="kpi-label">Ingresos Netos Total</div><div class="kpi-value" style="font-size:26px">$${tIng.toFixed(1)}k</div><div class="kpi-sub">Venta+Hon+Fees−Compra</div><div class="kpi-accent" style="background:#4488ff"></div></div>
-    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">$${tCosto.toFixed(1)}k</div><div class="kpi-sub">FTE × Costo Compañía</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
-    <div class="kpi"><div class="kpi-label">CM Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">$${tCM.toFixed(1)}k</div><div class="kpi-sub">Ingresos − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+    <div class="kpi"><div class="kpi-label">Ingresos Netos Total</div><div class="kpi-value" style="font-size:26px">$${tIng.toFixed(1)}k</div><div class="kpi-sub">Venta+Hon+Fees-Compra</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">$${tCosto.toFixed(1)}k</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">CM Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">$${tCM.toFixed(1)}k</div><div class="kpi-sub">Ingresos - Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
     <div class="kpi"><div class="kpi-label">CM % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">Sobre ingresos netos</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
-    <div class="kpi"><div class="kpi-label">FTE Total Equipo</div><div class="kpi-value" style="font-size:26px">${tFTE.toFixed(2)}</div><div class="kpi-sub">Dedicación total período</div><div class="kpi-accent" style="background:var(--red)"></div></div>
-  `;
+    <div class="kpi"><div class="kpi-label">FTE Total Equipo</div><div class="kpi-value" style="font-size:26px">${tFTE.toFixed(2)}</div><div class="kpi-sub">Dedicacion total periodo</div><div class="kpi-accent" style="background:var(--red)"></div></div>`;
 }
-
 function renderConsolidado(rows) {
-  const maxCM = Math.max(...rows.map(r => r.cm));
+  const maxCM = Math.max(...rows.map(r=>r.cm));
   let html = rows.map(r => {
-    const d = DIRECTORES[r.nombre] || {};
-    const pct = maxCM > 0 ? Math.max(0, Math.min(100, (r.cm/maxCM)*100)) : 0;
-    const barColor = r.cmPct >= 40 ? '#00c853' : r.cmPct >= 20 ? '#aa44ff' : r.cmPct >= 5 ? '#f5c400' : '#e8001c';
+    const d=DIRECTORES[r.nombre]||{};
+    const pct=maxCM>0?Math.max(0,Math.min(100,(r.cm/maxCM)*100)):0;
+    const barColor=r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#e8001c';
     return `<tr>
       <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
       <td class="num" style="color:#aaa">$${r.ingresos.toFixed(1)}k</td>
       <td class="num" style="color:var(--yellow)">$${r.costoEq.toFixed(1)}k</td>
-      <td class="num">
-        <div class="cm-bar-wrap">
-          <div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
-          <span style="min-width:65px;text-align:right;color:${r.cm>=0?'#f0f0f0':'#ff4455'}">$${r.cm.toFixed(1)}k</span>
-        </div>
-      </td>
+      <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${r.cm>=0?'#f0f0f0':'#ff4455'}">$${r.cm.toFixed(1)}k</span></div></td>
       <td class="num" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'};font-weight:600">${r.cmPct.toFixed(1)}%</td>
       <td class="num" style="color:#aaa">${r.fte.toFixed(2)}</td>
-      <td>${getSemaforo(r.cmPct)}</td>
-    </tr>`;
+      <td>${getSemaforo(r.cmPct)}</td></tr>`;
   }).join('');
-  const tI = rows.reduce((a,r)=>a+r.ingresos,0), tC = rows.reduce((a,r)=>a+r.costoEq,0), tM = rows.reduce((a,r)=>a+r.cm,0);
-  const tP = tI>0?(tM/tI)*100:0;
-  html += `<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">$${tI.toFixed(1)}k</td><td class="num" style="color:var(--yellow)">$${tC.toFixed(1)}k</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">$${tM.toFixed(1)}k</td><td class="num" style="color:${tP>=20?'#00c853':tP>=5?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td class="num" style="color:#aaa">${rows.reduce((a,r)=>a+r.fte,0).toFixed(2)}</td><td></td></tr>`;
+  const tI=rows.reduce((a,r)=>a+r.ingresos,0),tC=rows.reduce((a,r)=>a+r.costoEq,0),tM=rows.reduce((a,r)=>a+r.cm,0);
+  const tP=tI>0?(tM/tI)*100:0;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="num" style="color:#aaa">$${tI.toFixed(1)}k</td><td class="num" style="color:var(--yellow)">$${tC.toFixed(1)}k</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">$${tM.toFixed(1)}k</td><td class="num" style="color:${tP>=20?'#00c853':tP>=5?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td class="num" style="color:#aaa">${rows.reduce((a,r)=>a+r.fte,0).toFixed(2)}</td><td></td></tr>`;
   document.getElementById('tbodyConsolidado').innerHTML = html;
 }
-
 function renderRanking(rows) {
-  const medals = ['🥇','🥈','🥉'];
-  const byCM  = [...rows].sort((a,b) => b.cm - a.cm);
-  const byPct = [...rows].sort((a,b) => b.cmPct - a.cmPct);
-  document.getElementById('rankingCM').innerHTML = byCM.map((r,i) => {
-    const d = DIRECTORES[r.nombre]||{};
-    return `<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cm>=0?'#00c853':'#ff4455'}">$${r.cm.toFixed(1)}k</div></div>`;
-  }).join('');
-  document.getElementById('rankingPct').innerHTML = byPct.map((r,i) => {
-    return `<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'}">${r.cmPct.toFixed(1)}%</div></div>`;
-  }).join('');
+  const medals=['🥇','🥈','🥉'];
+  const byCM=[...rows].sort((a,b)=>b.cm-a.cm), byPct=[...rows].sort((a,b)=>b.cmPct-a.cmPct);
+  document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cm>=0?'#00c853':'#ff4455'}">$${r.cm.toFixed(1)}k</div></div>`;}).join('');
+  document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'}">${r.cmPct.toFixed(1)}%</div></div>`).join('');
 }
-
+let chartRentInstance = null;
 function renderChart(rows) {
-  if (!rows) rows = calcRentabilidad();
+  if (!rows) rows = calcRentabilidad(MES_ACTIVO);
   if (chartRentInstance) { chartRentInstance.destroy(); chartRentInstance = null; }
-  const labels   = rows.map(r => r.nombre.length > 9 ? r.nombre.substring(0,9)+'…' : r.nombre);
+  const labels=rows.map(r=>r.nombre.length>9?r.nombre.substring(0,9)+'...':r.nombre);
   chartRentInstance = new Chart(document.getElementById('chartRent'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label:'Ingresos Netos', data: rows.map(r=>parseFloat(r.ingresos.toFixed(1))), backgroundColor:'rgba(68,136,255,0.7)', borderColor:'#4488ff', borderWidth:1, borderRadius:4 },
-        { label:'Costo Equipo',   data: rows.map(r=>parseFloat(r.costoEq.toFixed(1))),  backgroundColor:'rgba(245,196,0,0.65)', borderColor:'#f5c400', borderWidth:1, borderRadius:4 },
-        { label:'CM $',           data: rows.map(r=>parseFloat(r.cm.toFixed(1))),        backgroundColor:'rgba(0,200,83,0.65)',  borderColor:'#00c853', borderWidth:1, borderRadius:4 },
-      ]
-    },
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false} },
-      scales:{
-        x:{ ticks:{color:'#606060',font:{family:'Poppins',size:11}}, grid:{color:'rgba(255,255,255,0.03)'} },
-        y:{ ticks:{color:'#606060',font:{family:'Poppins',size:11},callback: v=>'$'+v+'k'}, grid:{color:'rgba(255,255,255,0.05)'} }
-      }
-    }
+    type:'bar',
+    data:{ labels, datasets:[
+      {label:'Ingresos Netos',data:rows.map(r=>parseFloat(r.ingresos.toFixed(1))),backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
+      {label:'Costo Equipo',  data:rows.map(r=>parseFloat(r.costoEq.toFixed(1))), backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
+      {label:'CM $',          data:rows.map(r=>parseFloat(r.cm.toFixed(1))),       backgroundColor:'rgba(0,200,83,0.65)', borderColor:'#00c853',borderWidth:1,borderRadius:4},
+    ]},
+    options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#606060',font:{family:'Poppins',size:11}},grid:{color:'rgba(255,255,255,0.03)'}},
+              y:{ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>'$'+v+'k'},grid:{color:'rgba(255,255,255,0.05)'}}}}
   });
 }
 
@@ -845,19 +848,16 @@ function renderClienteSelector() {
   const cont = document.getElementById('clienteSelector');
   if (!cont) return;
   cont.innerHTML = Object.keys(DIRECTORES).map(nombre => {
-    const d = DIRECTORES[nombre]||{};
-    const isActive = nombre === clienteDetalleActivo;
+    const d=DIRECTORES[nombre]||{}, isActive=nombre===clienteDetalleActivo;
     return `<button class="cli-btn${isActive?' active':''}" style="${isActive?'background:'+d.color+';border-color:'+d.color+';color:white':''}" onclick="selectCliente('${nombre}',this,'${d.color||'#606060'}')">${nombre}</button>`;
   }).join('');
 }
-
 function selectCliente(nombre, btn, color) {
   clienteDetalleActivo = nombre;
-  document.querySelectorAll('.cli-btn').forEach(b => { b.classList.remove('active'); b.style.background=''; b.style.borderColor=''; b.style.color=''; });
-  btn.classList.add('active'); btn.style.background = color; btn.style.borderColor = color; btn.style.color = 'white';
+  document.querySelectorAll('.cli-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';b.style.color='';});
+  btn.classList.add('active'); btn.style.background=color; btn.style.borderColor=color; btn.style.color='white';
   renderDetalle(nombre);
 }
-
 function renderMesSelectorDetalle() {
   const cont = document.getElementById('mesSelectorDetalle');
   if (!cont) return;
@@ -865,197 +865,109 @@ function renderMesSelectorDetalle() {
     `<button class="dir-btn${m===MES_ACTIVO?' active':''}" style="font-size:11px;padding:6px 13px" onclick="setMesDetalleActivo('${m}',this)">${m}</button>`
   ).join('');
 }
-
 function setMesDetalleActivo(mes, btn) {
   MES_ACTIVO = mes;
-  document.querySelectorAll('#mesSelectorDetalle .dir-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#mesSelectorDetalle .dir-btn').forEach(b=>b.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  document.querySelectorAll('#mesSelectorRent .dir-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent === mes);
-  });
+  document.querySelectorAll('#mesSelectorRent .dir-btn').forEach(b=>{b.classList.toggle('active',b.textContent===mes);});
   actualizarBannerVigencia();
   renderDetalle(clienteDetalleActivo);
 }
-
 function renderDetalle(cliente) {
   renderMesSelectorDetalle();
   actualizarBannerVigencia();
-  const mes    = MES_ACTIVO;
-  const colCosto = getColCosto(mes);
-  const puestos  = Object.keys(TABLA_COSTOS);
-  const fteActual = (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
-
-  // Ingresos editables
-  const ingActual = (INGRESOS[cliente] && INGRESOS[cliente][mes]) || 0;
-  document.getElementById('ingresosEditable').value = ingActual || '';
-
-  const totalCosto = puestos.reduce((acc, p) => {
-    const fte = fteActual[p] || 0;
-    return acc + getCostoPuesto(p, mes) * fte;
-  }, 0);
-
-  // Solo mostrar puestos que tienen FTE o todos para cargar
-  let html = puestos.map(puesto => {
-    const costoUnit = getCostoPuesto(puesto, mes);
-    const fteVal    = fteActual[puesto] || 0;
-    const costoMes  = costoUnit * fteVal;
-    const pcTot     = totalCosto > 0 ? (costoMes / totalCosto) * 100 : 0;
-    const rowStyle  = fteVal > 0 ? '' : 'opacity:0.35';
+  const mes=MES_ACTIVO, colCosto=getColCosto(mes), puestos=Object.keys(TABLA_COSTOS);
+  const fteActual=(CLIENTES_FTE[cliente]&&CLIENTES_FTE[cliente][mes])||{};
+  const ingActual=(INGRESOS[cliente]&&INGRESOS[cliente][mes])||0;
+  const ingEl=document.getElementById('ingresosEditable');
+  if(ingEl) ingEl.value=ingActual||'';
+  const totalCosto=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuesto(p,mes)*fte;},0);
+  let html=puestos.map(puesto=>{
+    const costoUnit=getCostoPuesto(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=costoUnit*fteVal;
+    const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
     return `<tr style="${rowStyle}">
       <td style="font-weight:500;font-size:13px">${puesto}</td>
-      <td class="num">
-        <input type="number" class="fte-inline-input" value="${fteVal || ''}" placeholder="0.00" min="0" step="0.01"
-          onchange="saveFTE('${cliente}','${mes}','${puesto}',this.value)"
-          title="FTE para ${puesto} en ${mes}">
-      </td>
+      <td class="num"><input type="number" class="fte-inline-input" value="${fteVal||''}" placeholder="0.00" min="0" step="0.01" onchange="saveFTE('${cliente}','${mes}','${puesto}',this.value)" title="FTE ${puesto} en ${mes}"></td>
       <td class="num" style="color:var(--yellow);font-size:12px">${fmtCosto(costoUnit)}</td>
-      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal > 0 ? fmtCosto(costoMes) : '—'}</td>
-      <td class="num">
-        ${fteVal > 0 ? `<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>` : '<span style="color:#303030;font-size:11px">—</span>'}
-      </td>
+      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtCosto(costoMes):'—'}</td>
+      <td class="num">${fteVal>0?`<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>`:'<span style="color:#303030;font-size:11px">—</span>'}</td>
     </tr>`;
   }).join('');
-
-  html += `<tr class="total-row">
-    <td colspan="2">TOTAL · ${cliente} · ${mes}</td>
-    <td style="color:var(--text-muted);font-size:11px">Col. costo: ${colCosto}</td>
-    <td class="num" style="color:var(--yellow)">${fmtCosto(totalCosto)}</td>
-    <td class="num" style="color:#aaa">100%</td>
-  </tr>`;
-
+  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${colCosto}</td><td class="num" style="color:var(--yellow)">${fmtCosto(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
   document.getElementById('tbodyDetalle').innerHTML = html;
 }
-
 function saveFTE(cliente, mes, puesto, valor) {
-  const v = parseFloat(valor);
-  if (!CLIENTES_FTE[cliente]) CLIENTES_FTE[cliente] = {};
-  if (!CLIENTES_FTE[cliente][mes]) CLIENTES_FTE[cliente][mes] = {};
-  if (!isNaN(v) && v > 0) {
-    CLIENTES_FTE[cliente][mes][puesto] = v;
-  } else {
-    delete CLIENTES_FTE[cliente][mes][puesto];
-  }
+  const v=parseFloat(valor);
+  if(!CLIENTES_FTE[cliente]) CLIENTES_FTE[cliente]={};
+  if(!CLIENTES_FTE[cliente][mes]) CLIENTES_FTE[cliente][mes]={};
+  if(!isNaN(v)&&v>0){CLIENTES_FTE[cliente][mes][puesto]=v; postSheet('fte',{cliente,mes,puesto,fte:v});}
+  else {delete CLIENTES_FTE[cliente][mes][puesto]; postSheet('fte',{cliente,mes,puesto,fte:0});}
   renderDetalle(cliente);
-  // Actualizar consolidado si está visible
-  if (document.getElementById('rent-consolidado').style.display !== 'none') {
-    const rows = calcRentabilidad(MES_ACTIVO);
-    renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
-  }
+  if(document.getElementById('rent-consolidado').style.display!=='none'){const rows=calcRentabilidad(MES_ACTIVO);renderKPIsRent(rows);renderConsolidado(rows);renderRanking(rows);}
 }
-
 function saveIngresos(cliente, mes, valor) {
-  const v = parseFloat(valor);
-  if (!INGRESOS[cliente]) INGRESOS[cliente] = {};
-  INGRESOS[cliente][mes] = isNaN(v) ? 0 : v;
+  const val=parseFloat(valor)||0;
+  if(!INGRESOS[cliente]) INGRESOS[cliente]={};
+  INGRESOS[cliente][mes]=val;
+  postSheet('ingresos',{cliente,mes,valor:val});
   renderDetalle(cliente);
-  if (document.getElementById('rent-consolidado').style.display !== 'none') {
-    const rows = calcRentabilidad(MES_ACTIVO);
-    renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
-  }
+  if(document.getElementById('rent-consolidado').style.display!=='none'){const rows=calcRentabilidad(MES_ACTIVO);renderKPIsRent(rows);renderConsolidado(rows);renderRanking(rows);}
 }
 
-/* Tabla Costo Compañía maestra */
+/* Tabla Costo Compania */
 function getColsRRHH() {
-  const set = new Set();
-  Object.values(TABLA_COSTOS).forEach(row => Object.keys(row).forEach(m => set.add(m)));
-  // Orden: Diciembre primero (base), luego cronológico
-  const orden = ['Diciembre', ...MESES_2026.filter(m => m !== 'Diciembre')];
-  return orden.filter(m => set.has(m));
+  const set=new Set();
+  Object.values(TABLA_COSTOS).forEach(row=>Object.keys(row).forEach(m=>set.add(m)));
+  const orden=['Diciembre',...MESES_2026.filter(m=>m!=='Diciembre')];
+  return orden.filter(m=>set.has(m));
 }
-
 function renderTablaCostoCia() {
-  const cols = getColsRRHH();
-  document.getElementById('colVigenteLabel').textContent = MES_VIGENTE;
-
-  document.getElementById('headCostoCia').innerHTML = `<tr>
-    <th style="min-width:210px">Puesto</th>
-    ${cols.map(m => `
-      <th class="mes-header num${m===MES_VIGENTE?' vigente-col':''}">
-        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px">
-          <span>${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE?' ⚡':''}</span>
-          ${cols.length > 2 && m !== 'Diciembre' && m !== 'Febrero' ? `<button onclick="eliminarColRRHH('${m}')" title="Eliminar columna" style="background:transparent;border:none;color:#404040;cursor:pointer;font-size:12px;padding:0;line-height:1" onmouseover="this.style.color='#ff4455'" onmouseout="this.style.color='#404040'">✕</button>` : ''}
-        </div>
-      </th>`).join('')}
-  </tr>`;
-
-  document.getElementById('bodyCostoCia').innerHTML = Object.entries(TABLA_COSTOS).map(([puesto, costos]) => `
-    <tr>
-      <td class="puesto-col">${puesto}</td>
-      ${cols.map(m => {
-        const v = costos[m];
-        const isVig = m === MES_VIGENTE;
-        return `<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCell(this,'${puesto}','${m}')" title="Doble click para editar">${v ? fmtCosto(v) : '—'}</td>`;
-      }).join('')}
-    </tr>
-  `).join('');
+  const cols=getColsRRHH();
+  document.getElementById('colVigenteLabel').textContent=MES_VIGENTE;
+  document.getElementById('headCostoCia').innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE?' vigente-col':''}"><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px"><span>${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE?' ⚡':''}</span>${cols.length>2&&m!=='Diciembre'&&m!=='Febrero'?`<button onclick="eliminarColRRHH('${m}')" style="background:transparent;border:none;color:#404040;cursor:pointer;font-size:12px;padding:0" onmouseover="this.style.color='#ff4455'" onmouseout="this.style.color='#404040'">x</button>`:''}</div></th>`).join('')}</tr>`;
+  document.getElementById('bodyCostoCia').innerHTML=Object.entries(TABLA_COSTOS).map(([puesto,costos])=>`<tr><td class="puesto-col">${puesto}</td>${cols.map(m=>{const v=costos[m],isVig=m===MES_VIGENTE;return`<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCell(this,'${puesto}','${m}')" title="Doble click para editar">${v?fmtCosto(v):'—'}</td>`;}).join('')}</tr>`).join('');
 }
-
 function editCell(td, puesto, mes) {
-  const currentVal = TABLA_COSTOS[puesto]?.[mes] || 0;
-  td.innerHTML = `<input class="cell-input" type="number" value="${currentVal}" onblur="saveCell(this,'${puesto}','${mes}')" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')this.blur();">`;
+  const cur=TABLA_COSTOS[puesto]?.[mes]||0;
+  td.innerHTML=`<input class="cell-input" type="number" value="${cur}" onblur="saveCell(this,'${puesto}','${mes}')" onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')this.blur();">`;
   td.querySelector('input').focus(); td.querySelector('input').select();
 }
-
 function saveCell(input, puesto, mes) {
-  const v = parseFloat(String(input.value).replace(',', '.'));
-  if (!isNaN(v) && v >= 0) {
-    if (!TABLA_COSTOS[puesto]) TABLA_COSTOS[puesto] = {};
-    TABLA_COSTOS[puesto][mes] = v;
-  }
+  const v=parseFloat(String(input.value).replace(',','.'));
+  if(!isNaN(v)&&v>=0){if(!TABLA_COSTOS[puesto]) TABLA_COSTOS[puesto]={};TABLA_COSTOS[puesto][mes]=v;postSheet('costos',{puesto,mes,valor:v});}
   renderTablaCostoCia();
 }
-
 function agregarMes() {
-  const nombre = prompt('Nombre del mes del nuevo dato de RRHH:\n(ej: Mayo, Agosto, etc.)');
-  if (!nombre || !nombre.trim()) return;
-  const mesKey = nombre.trim();
-  if (MAPA_MES_COSTO[mesKey] !== undefined || Object.values(TABLA_COSTOS)[0][mesKey] !== undefined) {
-    alert('Ese mes ya existe.'); return;
-  }
-  Object.keys(TABLA_COSTOS).forEach(p => { TABLA_COSTOS[p][mesKey] = 0; });
-  // Actualizar mapa: desde ese mes en adelante → nueva columna
-  let found = false;
-  MESES_2026.forEach(m => {
-    if (m === mesKey) found = true;
-    if (found) MAPA_MES_COSTO[m] = mesKey;
-  });
+  const nombre=prompt('Nombre del mes del nuevo dato de RRHH (ej: Mayo, Agosto):');
+  if(!nombre||!nombre.trim()) return;
+  const mesKey=nombre.trim();
+  if(Object.values(TABLA_COSTOS)[0][mesKey]!==undefined){alert('Ese mes ya existe.');return;}
+  Object.keys(TABLA_COSTOS).forEach(p=>{TABLA_COSTOS[p][mesKey]=0;});
+  let found=false;
+  MESES_2026.forEach(m=>{if(m===mesKey)found=true;if(found)MAPA_MES_COSTO[m]=mesKey;});
   renderTablaCostoCia();
 }
-
 function eliminarColRRHH(mes) {
-  if (!confirm(`¿Eliminás la columna "${mes}"? Los FTE calculados con ese costo no se pierden.`)) return;
-  Object.keys(TABLA_COSTOS).forEach(p => delete TABLA_COSTOS[p][mes]);
-  // Revertir mapa a Febrero para los meses que apuntaban a esa col
-  Object.keys(MAPA_MES_COSTO).forEach(m => {
-    if (MAPA_MES_COSTO[m] === mes) MAPA_MES_COSTO[m] = MES_VIGENTE;
-  });
+  if(!confirm(`Eliminar columna "${mes}"?`)) return;
+  Object.keys(TABLA_COSTOS).forEach(p=>delete TABLA_COSTOS[p][mes]);
+  Object.keys(MAPA_MES_COSTO).forEach(m=>{if(MAPA_MES_COSTO[m]===mes)MAPA_MES_COSTO[m]=MES_VIGENTE;});
   renderTablaCostoCia();
 }
-
 function guardarCostos() {
-  // Detectar col vigente = última con algún dato > 0 (excluyendo Diciembre si hay algo posterior)
-  const cols = getColsRRHH().filter(m => m !== 'Diciembre');
-  for (let i = cols.length - 1; i >= 0; i--) {
-    if (Object.values(TABLA_COSTOS).some(row => (row[cols[i]] || 0) > 0)) {
-      MES_VIGENTE = cols[i]; break;
-    }
-  }
+  const cols=getColsRRHH().filter(m=>m!=='Diciembre');
+  for(let i=cols.length-1;i>=0;i--){if(Object.values(TABLA_COSTOS).some(r=>(r[cols[i]]||0)>0)){MES_VIGENTE=cols[i];break;}}
   renderRentabilidadCompleto();
-  // Volver a consolidado
-  document.querySelectorAll('.rent-section').forEach(s => s.style.display='none');
-  document.querySelectorAll('.rent-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.rent-section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('.rent-tab').forEach(b=>b.classList.remove('active'));
   document.getElementById('rent-consolidado').style.display='block';
   document.querySelector('.rent-tab').classList.add('active');
-  setTimeout(() => renderChart(), 80);
-  const btn = event.target;
-  const orig = btn.textContent;
-  btn.textContent = '✓ Guardado!'; btn.style.background='var(--green)'; btn.style.borderColor='var(--green)';
-  setTimeout(() => { btn.textContent = orig; btn.style.background='var(--red)'; btn.style.borderColor='var(--red)'; }, 2200);
+  setTimeout(()=>renderChart(),80);
+  const btn=event.target,orig=btn.textContent;
+  btn.textContent='Guardado!'; btn.style.background='var(--green)'; btn.style.borderColor='var(--green)';
+  setTimeout(()=>{btn.textContent=orig;btn.style.background='var(--red)';btn.style.borderColor='var(--red)';},2200);
 }
 
-/* ═══════════════════════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════════════════════ */
+/* INIT */
 loadData();
 </script>
 </body>
