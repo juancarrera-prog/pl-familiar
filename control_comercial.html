@@ -720,7 +720,9 @@ async function loadData() {
     if (json.fte && Object.keys(json.fte).length > 0) {
       Object.entries(json.fte).forEach(([cliente, meses]) => {
         if (!CLIENTES_FTE[cliente]) CLIENTES_FTE[cliente] = {};
-        Object.entries(meses).forEach(([mes, puestos]) => { CLIENTES_FTE[cliente][mes] = puestos; });
+        Object.entries(meses).forEach(([mes, puestos]) => { 
+          CLIENTES_FTE[cliente][mes] = Object.assign({}, CLIENTES_FTE[cliente][mes], puestos);
+        });
       });
     }
 
@@ -739,14 +741,14 @@ async function loadData() {
     window._rentDataReady = true;
     // Si el tab está abierto ahora, renderizar con los datos recién cargados
     if (document.getElementById('page-rentabilidad').classList.contains('active')) {
-      renderRentabilidadCompleto();
+      setTimeout(() => renderRentabilidadCompleto(), 100);
     }
   } catch(e) {
     console.warn('Rentabilidad sin conexion, usando datos locales:', e.message);
     window._rentDataReady = true;
     // Si el tab está abierto ahora, renderizar con los datos recién cargados
     if (document.getElementById('page-rentabilidad').classList.contains('active')) {
-      renderRentabilidadCompleto();
+      setTimeout(() => renderRentabilidadCompleto(), 100);
     }
   }
 }
