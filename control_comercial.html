@@ -880,7 +880,7 @@ function renderDetalle(cliente) {
   const ingActual=(INGRESOS[cliente]&&INGRESOS[cliente][mes])||0;
   const ingEl=document.getElementById('ingresosEditable');
   if(ingEl) ingEl.value=ingActual||'';
-  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=(fteActual[p]||0)/100;return acc+getCostoPuesto(p,mes)*fte;},0);const totalCosto=totalCostoRaw/1000;
+  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuesto(p,mes)*fte;},0);const totalCosto=totalCostoRaw/1000;
   let html=puestos.map(puesto=>{
     const costoUnit=getCostoPuesto(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=costoUnit*fteVal;
     const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
