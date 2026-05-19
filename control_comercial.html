@@ -742,7 +742,7 @@ function getCostoPuesto(puesto, mes) { const col = getColCosto(mes); return (TAB
 function calcCostoEquipoCliente(cliente, mes) {
   const puestos = (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
   let total = 0;
-  for (const [p, fte] of Object.entries(puestos)) total += getCostoPuesto(p, mes) * (fte / 100);  // FTE está en porcentaje
+  for (const [p, fte] of Object.entries(puestos)) total += getCostoPuesto(p, mes) * fte;
   return total / 1000;
 }
 function calcRentabilidad(mes) {
@@ -882,7 +882,7 @@ function renderDetalle(cliente) {
   if(ingEl) ingEl.value=ingActual||'';
   const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuesto(p,mes)*fte;},0);const totalCosto=totalCostoRaw/1000;
   let html=puestos.map(puesto=>{
-    const costoUnit=getCostoPuesto(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=costoUnit*fteVal;
+    const costoUnit=getCostoPuesto(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=(costoUnit*fteVal)/1000;
     const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
     return `<tr style="${rowStyle}">
       <td style="font-weight:500;font-size:13px">${puesto}</td>
