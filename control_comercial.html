@@ -742,7 +742,7 @@ function getCostoPuesto(puesto, mes) { const col = getColCosto(mes); return (TAB
 function calcCostoEquipoCliente(cliente, mes) {
   const puestos = (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
   let total = 0;
-  for (const [p, fte] of Object.entries(puestos)) total += getCostoPuesto(p, mes) * fte;
+  for (const [p, fte] of Object.entries(puestos)) total += getCostoPuesto(p, mes) * (fte / 100);  // FTE está en porcentaje
   return total / 1000;
 }
 function calcRentabilidad(mes) {
@@ -752,7 +752,7 @@ function calcRentabilidad(mes) {
     const cm       = ingresos - costoEq;
     const cmPct    = ingresos > 0 ? (cm / ingresos) * 100 : 0;
     const puestos  = (CLIENTES_FTE[nombre] && CLIENTES_FTE[nombre][mes]) || {};
-    const fte      = Object.values(puestos).reduce((a,b) => a+b, 0);
+    const fte      = Object.values(puestos).reduce((a,b) => a+b, 0) / 100;  // convertir de porcentaje a decimal
     return { nombre, ingresos, costoEq, cm, cmPct, fte };
   });
 }
@@ -880,13 +880,13 @@ function renderDetalle(cliente) {
   const ingActual=(INGRESOS[cliente]&&INGRESOS[cliente][mes])||0;
   const ingEl=document.getElementById('ingresosEditable');
   if(ingEl) ingEl.value=ingActual||'';
-  const totalCosto=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuesto(p,mes)*fte;},0);
+  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=(fteActual[p]||0)/100;return acc+getCostoPuesto(p,mes)*fte;},0);const totalCosto=totalCostoRaw/1000;
   let html=puestos.map(puesto=>{
     const costoUnit=getCostoPuesto(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=costoUnit*fteVal;
     const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
     return `<tr style="${rowStyle}">
       <td style="font-weight:500;font-size:13px">${puesto}</td>
-      <td class="num"><input type="number" class="fte-inline-input" value="${fteVal||''}" placeholder="0.00" min="0" step="0.01" onchange="saveFTE('${cliente}','${mes}','${puesto}',this.value)" title="FTE ${puesto} en ${mes}"></td>
+      <td class="num"><input type="number" class="fte-inline-input" value="${fteVal?(fteVal*100).toFixed(2):''}" placeholder="370.39" min="0" step="0.01" onchange="saveFTE('${cliente}','${mes}','${puesto}',this.value)" title="FTE ${puesto} en ${mes}"></td>
       <td class="num" style="color:var(--yellow);font-size:12px">${fmtCosto(costoUnit)}</td>
       <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtCosto(costoMes):'—'}</td>
       <td class="num">${fteVal>0?`<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>`:'<span style="color:#303030;font-size:11px">—</span>'}</td>
@@ -896,7 +896,8 @@ function renderDetalle(cliente) {
   document.getElementById('tbodyDetalle').innerHTML = html;
 }
 function saveFTE(cliente, mes, puesto, valor) {
-  const v=parseFloat(valor);
+  const vPct=parseFloat(valor);
+  const v=vPct/100; // Convierte % a decimal (370.39% → 3.7039)
   if(!CLIENTES_FTE[cliente]) CLIENTES_FTE[cliente]={};
   if(!CLIENTES_FTE[cliente][mes]) CLIENTES_FTE[cliente][mes]={};
   if(!isNaN(v)&&v>0){CLIENTES_FTE[cliente][mes][puesto]=v; postSheet('fte',{cliente,mes,puesto,fte:v});}
