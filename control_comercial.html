@@ -421,7 +421,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
 const API_URL    = 'https://script.google.com/macros/s/AKfycbz51P15rgzWahNRVuiHWN-yBjRLZkUTszhyxPAyL66JQobldusabaswCNg5bkTjm9PiWg/exec'; // Script Control Comercial
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiyaz1VPDlmCTyam1KYpgprYiL5X-4sFvigsVzCu8EUu6s0ErnAZvXmsPaF_Q0qiVw/exec'; // Script Rentabilidad (GET+POST)
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhHVG6_jL9VSMzJFim_53WnK3NEdHwg-Azg_4hyxVM2KgOlFDSYj_adqxXeCohYFOP0g/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
 
 const DIRECTORES = {
@@ -825,7 +825,6 @@ function renderRanking(rows) {
   document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cm>=0?'#00c853':'#ff4455'}">$${r.cm.toFixed(1)}k</div></div>`;}).join('');
   document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'}">${r.cmPct.toFixed(1)}%</div></div>`).join('');
 }
-let chartRentInstance = null;
 function renderChart(rows) {
   if (!rows) rows = calcRentabilidad(MES_ACTIVO);
   if (chartRentInstance) { chartRentInstance.destroy(); chartRentInstance = null; }
