@@ -567,7 +567,20 @@ function switchPage(page, btn) {
   document.querySelectorAll('.page-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   btn.classList.add('active');
-  if (page === 'rentabilidad') renderRentabilidadCompleto();
+  if (page === 'rentabilidad') {
+    if (window._rentDataReady) {
+      renderRentabilidadCompleto();
+    } else {
+      // Datos todavía cargando — mostrar spinner y esperar
+      document.getElementById('kpisRent').innerHTML = '<div style="color:var(--text-muted);padding:20px;font-size:13px">⏳ Cargando datos del Sheet...</div>';
+      const waitRent = setInterval(() => {
+        if (window._rentDataReady) {
+          clearInterval(waitRent);
+          renderRentabilidadCompleto();
+        }
+      }, 300);
+    }
+  }
 }
 function switchRentTab(tab, btn) {
   document.querySelectorAll('.rent-section').forEach(s => s.style.display = 'none');
@@ -718,8 +731,15 @@ async function loadData() {
       });
     }
     console.log('Rentabilidad cargada desde Sheet');
+    // Si el tab de rentabilidad está activo, re-renderizar con los datos del Sheet
+    if (document.getElementById('page-rentabilidad').classList.contains('active')) {
+      renderRentabilidadCompleto();
+    }
+    // Marcar que los datos están listos para cuando el usuario abra el tab
+    window._rentDataReady = true;
   } catch(e) {
     console.warn('Rentabilidad sin conexion, usando datos locales:', e.message);
+    window._rentDataReady = true;
   }
 }
 
