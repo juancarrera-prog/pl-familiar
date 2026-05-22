@@ -552,10 +552,9 @@ function getSemaforo(pct) {
   return '<span class="badge red">Crítico</span>';
 }
 function fmtCosto(v) {
-  // v siempre viene en MILES de pesos (ej: 10766 = $10.766M)
   const n = parseFloat(v);
   if (!n) return '—';
-  if (n >= 1000) return '$' + (n/1000).toFixed(2) + 'M';
+  if (n >= 1000) return '$' + (n/1000).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) + 'M';
   return '$' + n.toFixed(1) + 'k';
 }
 
@@ -780,13 +779,29 @@ function calcCostoEquipoCliente(cliente, mes) {
   return total / 1000;
 }
 function calcRentabilidad(mes) {
+  if (mes === 'Total') {
+    // Sumar todos los meses
+    return Object.keys(DIRECTORES).map(nombre => {
+      let totalIng = 0, totalCosto = 0, totalFte = 0;
+      MESES_2026.filter(m => m !== 'Total').forEach(m => {
+        totalIng += (INGRESOS[nombre] && INGRESOS[nombre][m]) || 0;
+        totalCosto += calcCostoEquipoCliente(nombre, m);
+        const puestos = (CLIENTES_FTE[nombre] && CLIENTES_FTE[nombre][m]) || {};
+        totalFte += Object.values(puestos).reduce((a,b) => a+b, 0);
+      });
+      const cm = totalIng - totalCosto;
+      const cmPct = totalIng > 0 ? (cm / totalIng) * 100 : 0;
+      return { nombre, ingresos: totalIng, costoEq: totalCosto, cm, cmPct, fte: totalFte };
+    });
+  }
+  
   return Object.keys(DIRECTORES).map(nombre => {
     const ingresos = (INGRESOS[nombre] && INGRESOS[nombre][mes]) || 0;
     const costoEq  = calcCostoEquipoCliente(nombre, mes);
     const cm       = ingresos - costoEq;
     const cmPct    = ingresos > 0 ? (cm / ingresos) * 100 : 0;
     const puestos  = (CLIENTES_FTE[nombre] && CLIENTES_FTE[nombre][mes]) || {};
-    const fte      = Object.values(puestos).reduce((a,b) => a+b, 0);  // ya están guardados como decimales
+    const fte      = Object.values(puestos).reduce((a,b) => a+b, 0);
     return { nombre, ingresos, costoEq, cm, cmPct, fte };
   });
 }
