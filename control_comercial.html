@@ -307,6 +307,24 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 
       <div class="kpis" id="kpisRent"></div>
 
+      <div class="section-header">
+        <div><div class="section-title">Tabla Consolidada · Rentabilidad</div><div class="section-sub">Ingresos Netos = Venta Facturable + Honorarios + Fees − Compra Indirecta</div></div>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead><tr>
+            <th>Cliente</th>
+            <th class="num">Ingresos Netos</th>
+            <th class="num">Costo Equipo</th>
+            <th class="num">CM $</th>
+            <th class="num">CM %</th>
+            <th class="num">FTE</th>
+            <th>Semáforo</th>
+          </tr></thead>
+          <tbody id="tbodyConsolidado"></tbody>
+        </table>
+      </div>
+
       <div class="ranking-grid">
         <div class="rank-card">
           <div class="rank-card-title">Ranking · CM $ (mayor a menor)</div>
@@ -327,24 +345,6 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <div style="position:relative;width:100%;height:270px">
           <canvas id="chartRent" role="img" aria-label="Gráfico comparativo ingresos, costo equipo y CM por cliente"></canvas>
         </div>
-      </div>
-
-      <div class="section-header">
-        <div><div class="section-title">Tabla Consolidada · Rentabilidad</div><div class="section-sub">Ingresos Netos = Venta Facturable + Honorarios + Fees − Compra Indirecta</div></div>
-      </div>
-      <div class="table-card">
-        <table>
-          <thead><tr>
-            <th>Cliente</th>
-            <th class="num">Ingresos Netos</th>
-            <th class="num">Costo Equipo</th>
-            <th class="num">CM $</th>
-            <th class="num">CM %</th>
-            <th class="num">FTE</th>
-            <th>Semáforo</th>
-          </tr></thead>
-          <tbody id="tbodyConsolidado"></tbody>
-        </table>
       </div>
     </div>
 
@@ -427,27 +427,40 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <div id="mesSelectorPerf" class="mes-btns"></div>
     </div>
     <div id="kpisPerf" class="kpis"></div>
-    <div class="rankings-grid">
-      <div class="table-card">
-        <div class="section-title">🏆 Ranking CM $</div>
-        <div id="rankingPerfCM" class="ranking-list"></div>
-      </div>
-      <div class="table-card">
-        <div class="section-title">📈 Ranking CM %</div>
-        <div id="rankingPerfPct" class="ranking-list"></div>
-      </div>
+
+    <div class="section-header">
+      <div><div class="section-title">Tabla Consolidada · Performance</div><div class="section-sub">Ingresos Netos = Venta Facturable + Honorarios + Fees − Compra Indirecta</div></div>
     </div>
     <div class="table-card">
-      <canvas id="chartPerf" style="max-height:260px"></canvas>
-    </div>
-    <div class="table-card">
-      <table class="data-table">
+      <table>
         <thead><tr>
-          <th>Cliente</th><th class="num">Ingresos</th><th class="num">Costo Equipo</th>
-          <th class="num">CM $</th><th class="num">CM %</th><th class="num">FTE</th><th>Estado</th>
+          <th>Cliente</th><th class="num">Ingresos Netos</th><th class="num">Costo Equipo</th>
+          <th class="num">CM $</th><th class="num">CM %</th><th class="num">FTE</th><th>Semáforo</th>
         </tr></thead>
         <tbody id="tbodyPerfConsolidado"></tbody>
       </table>
+    </div>
+
+    <div class="ranking-grid">
+      <div class="rank-card">
+        <div class="rank-card-title">Ranking · CM $ (mayor a menor)</div>
+        <div id="rankingPerfCM"></div>
+      </div>
+      <div class="rank-card">
+        <div class="rank-card-title">Ranking · CM % (mayor a menor)</div>
+        <div id="rankingPerfPct"></div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-sq" style="background:#4488ff"></span>Ingresos Netos</span>
+        <span class="legend-item"><span class="legend-sq" style="background:#f5c400"></span>Costo Equipo</span>
+        <span class="legend-item"><span class="legend-sq" style="background:#00c853"></span>CM $</span>
+      </div>
+      <div style="position:relative;width:100%;height:270px">
+        <canvas id="chartPerf"></canvas>
+      </div>
     </div>
   </div>
 
