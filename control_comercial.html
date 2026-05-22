@@ -413,6 +413,86 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 
   </div><!-- /page-rentabilidad -->
 
+<div id="page-performance" class="page">
+  <div class="rent-tabs">
+    <button class="rent-tab active" onclick="switchPerfTab('perf-consolidado',this)">📊 Consolidado por Cliente</button>
+    <button class="rent-tab" onclick="switchPerfTab('perf-detalle',this)">🔍 Detalle por Cliente</button>
+    <button class="rent-tab" onclick="switchPerfTab('perf-costos',this)">💼 Tabla Costo Compañía</button>
+  </div>
+
+  <div id="perf-consolidado" class="rent-section" style="display:block">
+    <div class="mes-selector-row">
+      <span class="mes-label">MES DE ANÁLISIS</span>
+      <div id="mesSelectorPerf" class="mes-btns"></div>
+    </div>
+    <div id="kpisPerf" class="kpis-grid"></div>
+    <div class="rankings-grid">
+      <div class="table-card">
+        <div class="section-title">🏆 Ranking CM $</div>
+        <div id="rankingPerfCM" class="ranking-list"></div>
+      </div>
+      <div class="table-card">
+        <div class="section-title">📈 Ranking CM %</div>
+        <div id="rankingPerfPct" class="ranking-list"></div>
+      </div>
+    </div>
+    <div class="table-card">
+      <canvas id="chartPerf" style="max-height:260px"></canvas>
+    </div>
+    <div class="table-card">
+      <table class="data-table">
+        <thead><tr>
+          <th>Cliente</th><th class="num">Ingresos</th><th class="num">Costo Equipo</th>
+          <th class="num">CM $</th><th class="num">CM %</th><th class="num">FTE</th><th>Estado</th>
+        </tr></thead>
+        <tbody id="tbodyPerfConsolidado"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="perf-detalle" class="rent-section" style="display:none">
+    <div class="mes-selector-row">
+      <span class="mes-label">MES DE ANÁLISIS</span>
+      <div id="mesSelectorPerfDetalle" class="mes-btns"></div>
+    </div>
+    <div id="clienteSelectorPerf" class="director-filter" style="margin:16px 0 8px 0;gap:8px;flex-wrap:wrap;display:flex"></div>
+    <div class="vigencia-banner">
+      <span>⚡</span>
+      <span>Costo Cía. aplicado: columna <strong id="vigenciaMesPerf">—</strong></span>
+    </div>
+    <div class="table-card" style="margin-top:12px">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+        <span style="color:var(--text-muted);font-size:13px">Ingresos Netos (miles $)</span>
+        <input id="ingresosEditablePerf" type="number" placeholder="0"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:150px"
+          onchange="saveIngresosPerf(clienteDetalleActivoPerf, MES_ACTIVO_PERF, this.value)">
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Editá el FTE de cada puesto directamente en la tabla.</p>
+      <table class="data-table">
+        <thead><tr><th>Puesto</th><th class="num">FTE %</th><th class="num">Costo Cía.</th><th class="num">Costo Mensual</th><th class="num">% del total</th></tr></thead>
+        <tbody id="tbodyPerfDetalle"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="perf-costos" class="rent-section" style="display:none">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn-action" onclick="agregarMesPerf()">+ Nuevo mes RRHH</button>
+      <button class="btn-action primary" onclick="guardarCostosPerf()">✓ Guardar y recalcular</button>
+    </div>
+    <div class="vigencia-banner">
+      <span>⚡</span>
+      <span>Columna activa: <strong id="colVigenteLabelPerf">—</strong></span>
+    </div>
+    <div class="table-card costo-cia-wrap">
+      <table id="tablaCostoCiaPerf">
+        <thead id="headCostoCiaPerf"></thead>
+        <tbody id="bodyCostoCiaPerf"></tbody>
+      </table>
+    </div>
+  </div>
+</div><!-- /page-performance -->
+
 </div><!-- /wrap -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -423,6 +503,43 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 const API_URL    = 'https://script.google.com/macros/s/AKfycbz51P15rgzWahNRVuiHWN-yBjRLZkUTszhyxPAyL66JQobldusabaswCNg5bkTjm9PiWg/exec'; // Script Control Comercial
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywZ75gVItz3WH3x_uFSc9tls8fc7i4qibGBYZq5QkA3BGZuIifTqIEiP-4DTb_R7iYLw/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
+
+const DIRECTORES_PERF = {
+  'ITBA':                { color: '#ff6b35' },
+  'Parts Vu':            { color: '#aa44ff' },
+  'Bagó':                { color: '#e8001c' },
+  'Banco Patagonia':     { color: '#4444ff' },
+  'Yamaha O.P.':         { color: '#00c853' },
+  'Violetta':            { color: '#ff44aa' },
+  'Belgrano Day School': { color: '#f5c400' },
+};
+
+const TABLA_COSTOS_PERF = {
+  'Performance MKT Manager':     { 'Diciembre': 4631260, 'Febrero': 5001761 },
+  'Performance MKT Coordinator': { 'Diciembre': 3844153, 'Febrero': 4151686 },
+  'Performance MKT Specialist':  { 'Diciembre': 3051127, 'Febrero': 3295217 },
+  'Performance MKT Analyst':     { 'Diciembre': 2433049, 'Febrero': 2632804 },
+};
+
+let CLIENTES_FTE_PERF = {
+  'ITBA':                {}, 'Parts Vu': {}, 'Bagó': {},
+  'Banco Patagonia':     {}, 'Yamaha O.P.': {}, 'Violetta': {},
+  'Belgrano Day School': {},
+};
+
+let INGRESOS_PERF = {
+  'ITBA': {}, 'Parts Vu': {}, 'Bagó': {}, 'Banco Patagonia': {},
+  'Yamaha O.P.': {}, 'Violetta': {}, 'Belgrano Day School': {},
+};
+
+let MES_VIGENTE_PERF = 'Febrero';
+const MAPA_MES_COSTO_PERF = {
+  'Total':'Febrero','Enero':'Diciembre','Febrero':'Febrero','Marzo':'Febrero','Abril':'Febrero',
+  'Mayo':'Febrero','Junio':'Febrero','Julio':'Febrero','Agosto':'Febrero','Septiembre':'Febrero',
+  'Octubre':'Febrero','Noviembre':'Febrero','Diciembre':'Diciembre',
+};
+let clienteDetalleActivoPerf = 'ITBA';
+let MES_ACTIVO_PERF = 'Enero';
 
 const DIRECTORES = {
   'Bagó':                 { dir:'mechi', color:'#e8001c', nombre:'Mechi' },
@@ -570,15 +687,14 @@ function switchPage(page, btn) {
     if (window._rentDataReady) {
       renderRentabilidadCompleto();
     } else {
-      // Datos todavía cargando — mostrar spinner y esperar
       document.getElementById('kpisRent').innerHTML = '<div style="color:var(--text-muted);padding:20px;font-size:13px">⏳ Cargando datos del Sheet...</div>';
       const waitRent = setInterval(() => {
-        if (window._rentDataReady) {
-          clearInterval(waitRent);
-          renderRentabilidadCompleto();
-        }
+        if (window._rentDataReady) { clearInterval(waitRent); renderRentabilidadCompleto(); }
       }, 300);
     }
+  }
+  if (page === 'performance') {
+    renderPerfCompleto();
   }
 }
 function switchRentTab(tab, btn) {
@@ -734,6 +850,27 @@ async function loadData() {
         Object.entries(meses).forEach(([mes, valor]) => { INGRESOS[cliente][mes] = valor; });
       });
     }
+    // Cargar datos Performance
+    if (json.fte_perf && Object.keys(json.fte_perf).length > 0) {
+      Object.entries(json.fte_perf).forEach(([cliente, meses]) => {
+        if (!CLIENTES_FTE_PERF[cliente]) CLIENTES_FTE_PERF[cliente] = {};
+        Object.entries(meses).forEach(([mes, puestos]) => {
+          CLIENTES_FTE_PERF[cliente][mes] = Object.assign({}, CLIENTES_FTE_PERF[cliente][mes], puestos);
+        });
+      });
+    }
+    if (json.ingresos_perf && Object.keys(json.ingresos_perf).length > 0) {
+      Object.entries(json.ingresos_perf).forEach(([cliente, meses]) => {
+        if (!INGRESOS_PERF[cliente]) INGRESOS_PERF[cliente] = {};
+        Object.entries(meses).forEach(([mes, valor]) => { INGRESOS_PERF[cliente][mes] = valor; });
+      });
+    }
+    if (json.costos_perf && Object.keys(json.costos_perf).length > 0) {
+      Object.entries(json.costos_perf).forEach(([puesto, meses]) => {
+        if (!TABLA_COSTOS_PERF[puesto]) TABLA_COSTOS_PERF[puesto] = {};
+        Object.entries(meses).forEach(([mes, valor]) => { TABLA_COSTOS_PERF[puesto][mes] = valor; });
+      });
+    }
     console.log('Rentabilidad cargada desde Sheet');
     // Si el tab de rentabilidad está activo, re-renderizar con los datos del Sheet
     if (document.getElementById('page-rentabilidad').classList.contains('active')) {
@@ -768,6 +905,237 @@ async function postSheet(tipo, data) {
   }
 }
 
+
+function switchPerfTab(tab, btn) {
+  document.querySelectorAll('#page-performance .rent-section').forEach(s => s.style.display='none');
+  document.querySelectorAll('#page-performance .rent-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(tab).style.display = 'block';
+  btn.classList.add('active');
+  if (tab === 'perf-consolidado') { const rows=calcRentabilidadPerf(MES_ACTIVO_PERF); renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows); setTimeout(()=>renderChartPerf(rows),80); }
+  if (tab === 'perf-detalle') renderDetallePerf(clienteDetalleActivoPerf);
+  if (tab === 'perf-costos') { renderTablaCostoCiaPerf(); actualizarBannerVigenciaPerf(); }
+}
+
+/* PERFORMANCE - calculos */
+function getColCostoPerf(mes) { return MAPA_MES_COSTO_PERF[mes] || MES_VIGENTE_PERF; }
+function getCostoPuestoPerf(puesto, mes) { const col=getColCostoPerf(mes); return (TABLA_COSTOS_PERF[puesto]&&TABLA_COSTOS_PERF[puesto][col])||0; }
+function calcCostoEquipoPerf(cliente, mes) {
+  if (mes === 'Total') {
+    return MESES_2026.filter(m=>m!=='Total').reduce((acc,m)=>acc+calcCostoEquipoPerf(cliente,m),0);
+  }
+  const puestos=(CLIENTES_FTE_PERF[cliente]&&CLIENTES_FTE_PERF[cliente][mes])||{};
+  let total=0;
+  for (const [p,fte] of Object.entries(puestos)) total+=getCostoPuestoPerf(p,mes)*fte;
+  return total/1000;
+}
+function calcRentabilidadPerf(mes) {
+  if (mes === 'Total') {
+    return Object.keys(DIRECTORES_PERF).map(nombre => {
+      let totalIng=0,totalCosto=0,totalFte=0;
+      MESES_2026.filter(m=>m!=='Total').forEach(m=>{
+        totalIng+=(INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][m])||0;
+        totalCosto+=calcCostoEquipoPerf(nombre,m);
+        const p=(CLIENTES_FTE_PERF[nombre]&&CLIENTES_FTE_PERF[nombre][m])||{};
+        totalFte+=Object.values(p).reduce((a,b)=>a+b,0);
+      });
+      const cm=totalIng-totalCosto, cmPct=totalIng>0?(cm/totalIng)*100:0;
+      return {nombre,ingresos:totalIng,costoEq:totalCosto,cm,cmPct,fte:totalFte};
+    });
+  }
+  return Object.keys(DIRECTORES_PERF).map(nombre=>{
+    const ingresos=(INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][mes])||0;
+    const costoEq=calcCostoEquipoPerf(nombre,mes);
+    const cm=ingresos-costoEq, cmPct=ingresos>0?(cm/ingresos)*100:0;
+    const puestos=(CLIENTES_FTE_PERF[nombre]&&CLIENTES_FTE_PERF[nombre][mes])||{};
+    const fte=Object.values(puestos).reduce((a,b)=>a+b,0);
+    return {nombre,ingresos,costoEq,cm,cmPct,fte};
+  });
+}
+
+/* PERFORMANCE - render */
+function actualizarBannerVigenciaPerf() {
+  const col=getColCostoPerf(MES_ACTIVO_PERF);
+  const el=document.getElementById('vigenciaMesPerf'); if(el) el.textContent=col+(MES_ACTIVO_PERF==='Enero'?' (Enero usa costos de Diciembre)':'');
+  const el2=document.getElementById('colVigenteLabelPerf'); if(el2) el2.textContent=MES_VIGENTE_PERF;
+}
+function renderPerfCompleto() {
+  // Mes selector
+  const cont=document.getElementById('mesSelectorPerf');
+  if(cont) cont.innerHTML=MESES_2026.map(m=>`<button class="dir-btn${m===MES_ACTIVO_PERF?' active':''}" onclick="setMesActivoPerf('${m}',this)">${m}</button>`).join('');
+  const rows=calcRentabilidadPerf(MES_ACTIVO_PERF);
+  renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows);
+  setTimeout(()=>renderChartPerf(rows),80);
+  renderClienteSelectorPerf();
+  actualizarBannerVigenciaPerf();
+}
+function setMesActivoPerf(mes,btn) {
+  MES_ACTIVO_PERF=mes;
+  document.querySelectorAll('#mesSelectorPerf .dir-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const rows=calcRentabilidadPerf(mes);
+  renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows);
+  setTimeout(()=>renderChartPerf(rows),60);
+  actualizarBannerVigenciaPerf();
+}
+function renderKPIsPerf(rows) {
+  const tIng=rows.reduce((a,r)=>a+r.ingresos,0), tCosto=rows.reduce((a,r)=>a+r.costoEq,0);
+  const tCM=rows.reduce((a,r)=>a+r.cm,0), tPct=tIng>0?(tCM/tIng)*100:0, tFTE=rows.reduce((a,r)=>a+r.fte,0);
+  const fmtM=v=>'$'+(v/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})+'M';
+  document.getElementById('kpisPerf').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Ingresos Netos Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tIng)}</div><div class="kpi-sub">Venta+Hon+Fees-Compra</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">CM Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">Ingresos - Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+    <div class="kpi"><div class="kpi-label">CM % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">Sobre ingresos netos</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
+    <div class="kpi"><div class="kpi-label">FTE Total Equipo</div><div class="kpi-value" style="font-size:26px">${tFTE.toFixed(2)}</div><div class="kpi-sub">Dedicacion total periodo</div><div class="kpi-accent" style="background:var(--red)"></div></div>`;
+}
+function renderPerfConsolidado(rows) {
+  const maxCM=Math.max(...rows.map(r=>r.cm));
+  const fmtM=v=>'$'+(v/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})+'M';
+  let html=rows.map(r=>{
+    const d=DIRECTORES_PERF[r.nombre]||{};
+    const pct=maxCM>0?Math.max(0,Math.min(100,(r.cm/maxCM)*100)):0;
+    const barColor=r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#e8001c';
+    return `<tr>
+      <td><div class="client-name"><div class="client-dot" style="background:${d.color||'#606060'}"></div>${r.nombre}</div></td>
+      <td class="num" style="color:#aaa">${fmtM(r.ingresos)}</td>
+      <td class="num" style="color:var(--yellow)">${fmtM(r.costoEq)}</td>
+      <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${r.cm>=0?'#f0f0f0':'#ff4455'}">${fmtM(r.cm)}</span></div></td>
+      <td class="num" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'};font-weight:600">${r.cmPct.toFixed(1)}%</td>
+      <td class="num" style="color:#aaa">${r.fte.toFixed(2)}</td>
+      <td>${getSemaforo(r.cmPct)}</td></tr>`;
+  }).join('');
+  const tI=rows.reduce((a,r)=>a+r.ingresos,0),tC=rows.reduce((a,r)=>a+r.costoEq,0),tM=rows.reduce((a,r)=>a+r.cm,0);
+  const tP=tI>0?(tM/tI)*100:0;
+  html+=`<tr class="total-row"><td>TOTAL</td><td class="num">${fmtM(tI)}</td><td class="num">${fmtM(tC)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM)}</td><td class="num" style="color:${tP>=20?'#00c853':tP>=5?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td class="num">${rows.reduce((a,r)=>a+r.fte,0).toFixed(2)}</td><td></td></tr>`;
+  document.getElementById('tbodyPerfConsolidado').innerHTML=html;
+}
+function renderRankingPerf(rows) {
+  const medals=['🥇','🥈','🥉'];
+  const byCM=[...rows].sort((a,b)=>b.cm-a.cm), byPct=[...rows].sort((a,b)=>b.cmPct-a.cmPct);
+  document.getElementById('rankingPerfCM').innerHTML=byCM.map((r,i)=>{const d=DIRECTORES_PERF[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cm>=0?'#00c853':'#ff4455'}">$${(r.cm/1000).toFixed(2)}M</div></div>`;}).join('');
+  document.getElementById('rankingPerfPct').innerHTML=byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'}">${r.cmPct.toFixed(1)}%</div></div>`).join('');
+}
+let chartPerfInstance=null;
+function renderChartPerf(rows) {
+  if(!rows) rows=calcRentabilidadPerf(MES_ACTIVO_PERF);
+  if(chartPerfInstance){chartPerfInstance.destroy();chartPerfInstance=null;}
+  const labels=rows.map(r=>r.nombre.length>9?r.nombre.substring(0,9)+'...':r.nombre);
+  chartPerfInstance=new Chart(document.getElementById('chartPerf'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Ingresos',data:rows.map(r=>parseFloat((r.ingresos/1000).toFixed(1))),backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
+      {label:'Costo',   data:rows.map(r=>parseFloat((r.costoEq/1000).toFixed(1))),  backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
+      {label:'CM $',    data:rows.map(r=>parseFloat((r.cm/1000).toFixed(1))),        backgroundColor:'rgba(0,200,83,0.65)', borderColor:'#00c853',borderWidth:1,borderRadius:4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#606060',font:{family:'Poppins',size:11}},grid:{color:'rgba(255,255,255,0.03)'}},
+              y:{ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>'$'+v+'M'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+  });
+}
+function renderClienteSelectorPerf() {
+  const cont=document.getElementById('clienteSelectorPerf');
+  if(!cont) return;
+  cont.innerHTML=Object.keys(DIRECTORES_PERF).map(nombre=>{
+    const d=DIRECTORES_PERF[nombre]||{}, isActive=nombre===clienteDetalleActivoPerf;
+    return `<button class="cli-btn${isActive?' active':''}" style="${isActive?'background:'+d.color+';border-color:'+d.color+';color:white':''}" onclick="selectClientePerf('${nombre}',this,'${d.color||'#606060'}')">${nombre}</button>`;
+  }).join('');
+}
+function selectClientePerf(nombre,btn,color) {
+  clienteDetalleActivoPerf=nombre;
+  document.querySelectorAll('#clienteSelectorPerf .cli-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';b.style.color='';});
+  btn.classList.add('active'); btn.style.background=color; btn.style.borderColor=color; btn.style.color='white';
+  renderDetallePerf(nombre);
+}
+function renderDetallePerf(cliente) {
+  // Mes selector detalle
+  const cont=document.getElementById('mesSelectorPerfDetalle');
+  if(cont) cont.innerHTML=MESES_2026.map(m=>`<button class="dir-btn${m===MES_ACTIVO_PERF?' active':''}" style="font-size:11px;padding:6px 13px" onclick="setMesPerfDetalleActivo('${m}',this)">${m}</button>`).join('');
+  actualizarBannerVigenciaPerf();
+  const mes=MES_ACTIVO_PERF, puestos=Object.keys(TABLA_COSTOS_PERF);
+  const fteActual=(CLIENTES_FTE_PERF[cliente]&&CLIENTES_FTE_PERF[cliente][mes])||{};
+  const ingActual=(INGRESOS_PERF[cliente]&&INGRESOS_PERF[cliente][mes])||0;
+  const ingEl=document.getElementById('ingresosEditablePerf');
+  if(ingEl) ingEl.value=ingActual?(ingActual*1000):'';
+  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoPerf(p,mes)*fte;},0);
+  const totalCosto=totalCostoRaw/1000;
+  let html=puestos.map(puesto=>{
+    const costoUnit=getCostoPuestoPerf(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=(costoUnit*fteVal)/1000;
+    const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
+    return `<tr style="${rowStyle}">
+      <td style="font-weight:500;font-size:13px">${puesto}</td>
+      <td class="num"><input type="number" class="fte-inline-input" value="${fteVal?(fteVal*100).toFixed(2):''}" placeholder="100" min="0" step="0.01" onchange="saveFTEPerf('${cliente}','${mes}','${puesto}',this.value)"></td>
+      <td class="num" style="color:var(--yellow);font-size:12px">${fmtCosto(costoUnit)}</td>
+      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtCosto(costoMes):'—'}</td>
+      <td class="num">${fteVal>0?`<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>`:'<span style="color:#303030;font-size:11px">—</span>'}</td>
+    </tr>`;
+  }).join('');
+  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${getColCostoPerf(mes)}</td><td class="num" style="color:var(--yellow)">${fmtCosto(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
+  document.getElementById('tbodyPerfDetalle').innerHTML=html;
+}
+function setMesPerfDetalleActivo(mes,btn) {
+  MES_ACTIVO_PERF=mes;
+  document.querySelectorAll('#mesSelectorPerfDetalle .dir-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('#mesSelectorPerf .dir-btn').forEach(b=>{b.classList.toggle('active',b.textContent===mes);});
+  actualizarBannerVigenciaPerf();
+  renderDetallePerf(clienteDetalleActivoPerf);
+}
+function saveFTEPerf(cliente,mes,puesto,valor) {
+  const vPct=parseFloat(valor), v=vPct/100;
+  if(!CLIENTES_FTE_PERF[cliente]) CLIENTES_FTE_PERF[cliente]={};
+  if(!CLIENTES_FTE_PERF[cliente][mes]) CLIENTES_FTE_PERF[cliente][mes]={};
+  if(!isNaN(v)&&v>0){CLIENTES_FTE_PERF[cliente][mes][puesto]=v; postSheet('fte_perf',{cliente,mes,puesto,fte:v});}
+  else{delete CLIENTES_FTE_PERF[cliente][mes][puesto]; postSheet('fte_perf',{cliente,mes,puesto,fte:0});}
+  renderDetallePerf(cliente);
+}
+function saveIngresosPerf(cliente,mes,valor) {
+  const val=(parseFloat(valor)||0)/1000;
+  if(!INGRESOS_PERF[cliente]) INGRESOS_PERF[cliente]={};
+  INGRESOS_PERF[cliente][mes]=val;
+  postSheet('ingresos_perf',{cliente,mes,valor:val});
+  renderDetallePerf(cliente);
+}
+function getColsRRHHPerf() {
+  const set=new Set();
+  Object.values(TABLA_COSTOS_PERF).forEach(row=>Object.keys(row).forEach(m=>set.add(m)));
+  const orden=['Diciembre',...MESES_2026.filter(m=>m!=='Diciembre'&&m!=='Total')];
+  return orden.filter(m=>set.has(m));
+}
+function renderTablaCostoCiaPerf() {
+  const cols=getColsRRHHPerf();
+  document.getElementById('colVigenteLabelPerf').textContent=MES_VIGENTE_PERF;
+  document.getElementById('headCostoCiaPerf').innerHTML=`<tr><th style="min-width:210px">Puesto</th>${cols.map(m=>`<th class="mes-header num${m===MES_VIGENTE_PERF?' vigente-col':''}">${m}${m==='Diciembre'?' (base Ene)':''}${m===MES_VIGENTE_PERF?' ⚡':''}</th>`).join('')}</tr>`;
+  document.getElementById('bodyCostoCiaPerf').innerHTML=Object.entries(TABLA_COSTOS_PERF).map(([puesto,costos])=>`<tr><td class="puesto-col">${puesto}</td>${cols.map(m=>{const v=costos[m],isVig=m===MES_VIGENTE_PERF;return`<td class="costo-cell${isVig?' vigente':''} editable" ondblclick="editCellPerf(this,'${puesto}','${m}')" title="Doble click para editar">${v?fmtCosto(v):'—'}</td>`;}).join('')}</tr>`).join('');
+}
+function editCellPerf(td,puesto,mes) {
+  const cur=TABLA_COSTOS_PERF[puesto]?.[mes]||0;
+  td.innerHTML=`<input class="cell-input" type="number" value="${cur}" onblur="saveCellPerf(this,'${puesto}','${mes}')" onkeydown="if(event.key==='Enter')this.blur();">`;
+  td.querySelector('input').focus(); td.querySelector('input').select();
+}
+function saveCellPerf(input,puesto,mes) {
+  const v=parseFloat(String(input.value).replace(',','.'));
+  if(!isNaN(v)&&v>=0){if(!TABLA_COSTOS_PERF[puesto]) TABLA_COSTOS_PERF[puesto]={};TABLA_COSTOS_PERF[puesto][mes]=v;postSheet('costos_perf',{puesto,mes,valor:v});}
+  renderTablaCostoCiaPerf();
+}
+function agregarMesPerf() {
+  const nombre=prompt('Nombre del mes (ej: Mayo):');
+  if(!nombre||!nombre.trim()) return;
+  const mesKey=nombre.trim();
+  Object.keys(TABLA_COSTOS_PERF).forEach(p=>{TABLA_COSTOS_PERF[p][mesKey]=0;});
+  let found=false;
+  MESES_2026.forEach(m=>{if(m===mesKey)found=true;if(found)MAPA_MES_COSTO_PERF[m]=mesKey;});
+  renderTablaCostoCiaPerf();
+}
+function guardarCostosPerf() {
+  const cols=getColsRRHHPerf().filter(m=>m!=='Diciembre');
+  for(let i=cols.length-1;i>=0;i--){if(Object.values(TABLA_COSTOS_PERF).some(r=>(r[cols[i]]||0)>0)){MES_VIGENTE_PERF=cols[i];break;}}
+  renderPerfCompleto();
+  document.querySelectorAll('#page-performance .rent-section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('#page-performance .rent-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('perf-consolidado').style.display='block';
+  document.querySelector('#page-performance .rent-tab').classList.add('active');
+  setTimeout(()=>renderChartPerf(),80);
+}
 
 /* RENTABILIDAD - calculos */
 function getColCosto(mes) { return MAPA_MES_COSTO[mes] || MES_VIGENTE; }
