@@ -841,9 +841,10 @@ function renderRentabilidadCompleto() {
 function renderKPIsRent(rows) {
   const tIng=rows.reduce((a,r)=>a+r.ingresos,0), tCosto=rows.reduce((a,r)=>a+r.costoEq,0), tCM=rows.reduce((a,r)=>a+r.cm,0);
   const tPct=tIng>0?(tCM/tIng)*100:0, tFTE=rows.reduce((a,r)=>a+r.fte,0);
+  const fmtM = v => '$' + (v/1000).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) + 'M';
   document.getElementById('kpisRent').innerHTML = `
-    <div class="kpi"><div class="kpi-label">Ingresos Netos Total</div><div class="kpi-value" style="font-size:26px">$${(tIng/1000).toFixed(2)}M</div><div class="kpi-sub">Venta+Hon+Fees-Compra</div><div class="kpi-accent" style="background:#4488ff"></div></div>
-    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">$${(tCosto/1000).toFixed(2)}M</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">Ingresos Netos Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tIng)}</div><div class="kpi-sub">Venta+Hon+Fees-Compra</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
     <div class="kpi"><div class="kpi-label">CM Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">$${(tCM/1000).toFixed(2)}M</div><div class="kpi-sub">Ingresos - Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
     <div class="kpi"><div class="kpi-label">CM % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">Sobre ingresos netos</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
     <div class="kpi"><div class="kpi-label">FTE Total Equipo</div><div class="kpi-value" style="font-size:26px">${tFTE.toFixed(2)}</div><div class="kpi-sub">Dedicacion total periodo</div><div class="kpi-accent" style="background:var(--red)"></div></div>`;
