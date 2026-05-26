@@ -231,6 +231,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <div class="kpi"><div class="kpi-label">Vs Presupuesto</div><div class="kpi-value" id="kpiVs">—</div><div class="kpi-sub">desvío del período</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
       <div class="kpi"><div class="kpi-label">Dif. Vs Presupuesto</div><div class="kpi-value" id="kpiDif">—</div><div class="kpi-sub">inversión vs presupuesto</div><div class="kpi-accent" style="background:var(--green)"></div></div>
       <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" id="kpiCmb">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
+      <div class="kpi"><div class="kpi-label">CMB $ Presup</div><div class="kpi-value" id="kpiCmbPresup">—</div><div class="kpi-sub">CMB presupuestado</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+      <div class="kpi"><div class="kpi-label">Vs CMB Presup</div><div class="kpi-value" id="kpiVsCmbPct">—</div><div class="kpi-sub">CMB real vs presupuestado %</div><div class="kpi-accent" style="background:var(--red)"></div></div>
     </div>
 
     <div class="section-header">
@@ -243,10 +245,12 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
           <th class="num">Inv. Período</th><th class="num">Presup. Período</th>
           <th>Vs Presup.</th><th>Consumido Anual</th>
           <th class="num">Presup. Anual</th><th class="num">CMB $</th><th class="num">CMB %</th>
-          <th class="num">FTE Ant.</th><th class="num">FTE Act.</th>
+            <th class="num">CMB $ Presup</th>
+            <th class="num">Vs CMB Presup</th>
+            <th class="num">FTE Ant.</th><th class="num">FTE Act.</th>
           <th>Vs Mes</th><th class="num">FTE Total</th>
         </tr></thead>
-        <tbody id="tbodyClientes"><tr class="loading-row"><td colspan="13">Cargando datos...</td></tr></tbody>
+        <tbody id="tbodyClientes"><tr class="loading-row"><td colspan="15">Cargando datos...</td></tr></tbody>
       </table>
     </div>
 
@@ -307,6 +311,9 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 
       <div class="kpis" id="kpisRent"></div>
 
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button id="btnOHEquipo" onclick="toggleOH('equipo')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
+      </div>
       <div class="section-header">
         <div><div class="section-title">Tabla Consolidada · Rentabilidad</div><div class="section-sub">Ingresos Netos = Venta Facturable + Honorarios + Fees − Compra Indirecta</div></div>
       </div>
@@ -319,7 +326,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
             <th class="num">CM $</th>
             <th class="num">CM %</th>
             <th class="num">FTE</th>
-            <th>Semáforo</th>
+            <th>Con OH</th>
           </tr></thead>
           <tbody id="tbodyConsolidado"></tbody>
         </table>
@@ -428,14 +435,17 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
     <div id="kpisPerf" class="kpis"></div>
 
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button id="btnOHPerf" onclick="toggleOH('perf')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
+    </div>
     <div class="section-header">
-      <div><div class="section-title">Tabla Consolidada · Performance</div><div class="section-sub">Ingresos Netos = Venta Facturable + Honorarios + Fees − Compra Indirecta</div></div>
+      <div><div class="section-title">Tabla Consolidada · Performance</div><div class="section-sub">Fees − Costo de Equipo</div></div>
     </div>
     <div class="table-card">
       <table>
         <thead><tr>
           <th>Cliente</th><th class="num">Ingresos Netos</th><th class="num">Costo Equipo</th>
-          <th class="num">CM $</th><th class="num">CM %</th><th class="num">FTE</th><th>Semáforo</th>
+          <th class="num">CM $</th><th class="num">CM %</th><th class="num">FTE</th><th>Con OH</th>
         </tr></thead>
         <tbody id="tbodyPerfConsolidado"></tbody>
       </table>
@@ -514,9 +524,14 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 /* ═══════════════════════════════════════════════════════════
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
-const API_URL    = 'https://script.google.com/macros/s/AKfycbz51P15rgzWahNRVuiHWN-yBjRLZkUTszhyxPAyL66JQobldusabaswCNg5bkTjm9PiWg/exec'; // Script Control Comercial
+const API_URL    = 'https://script.google.com/macros/s/AKfycbyhJKfKqJP5Cm7SYk9yu8CILfHWzJxwOYOZ2MTE_hCWe1fAMTtVIZJ_wFF88ywETBlXtA/exec'; // Script Control Comercial
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsO0afw1YW55GkKAfA_6TxGFQvUmO5xYv6edvRpwLQRsZrlXd9q69nbccglQzcwXqmVg/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
+
+const OH_EQUIPO = 1.23;   // Overhead Rentabilidad de Equipo (123%)
+const OH_PERF   = 0.68;   // Overhead Rentabilidad Performance (68%)
+let   ohActivoEquipo = false;
+let   ohActivoPerf   = false;
 
 const DIRECTORES_PERF = {
   'ITBA':                { color: '#ff6b35' },
@@ -681,6 +696,13 @@ function getProgressBar(raw) {
   const cls = pct >= 90 ? 'high' : pct >= 60 ? 'mid' : 'low';
   return `<div class="progress-wrap"><div class="progress-bg"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div><span class="progress-pct">${v.toFixed(0)}%</span></div>`;
 }
+function getSemaforoOH(pct) {
+  // Barra de color sin info — ancho dinámico según % (max 100%)
+  const ancho = Math.min(100, Math.max(0, pct));
+  const color = pct > 35 ? '#00c853' : pct >= 30 ? '#f5c400' : '#ff4455';
+  return `<div style="width:100%;height:10px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden"><div style="width:${ancho}%;height:100%;background:${color};border-radius:4px;transition:width .3s"></div></div>`;
+}
+
 function getSemaforo(pct) {
   if (pct >= 40) return '<span class="badge green">Excelente</span>';
   if (pct >= 20) return '<span class="badge purple">Bueno</span>';
@@ -740,8 +762,8 @@ function filtrarDirector(dir, btn) {
 }
 
 function renderKPIsComercial(clientes) {
-  let tInv=0, tPresup=0, tCmb=0;
-  clientes.forEach(r => { tInv += parseFloat(r.inv)||0; tPresup += parseFloat(r.presup)||0; tCmb += parseFloat(r.cmb)||0; });
+  let tInv=0, tPresup=0, tCmb=0, tCmbPresup=0;
+  clientes.forEach(r => { tInv += parseFloat(r.inv)||0; tPresup += parseFloat(r.presup)||0; tCmb += parseFloat(r.cmb)||0; tCmbPresup += parseFloat(r.cmbPresup||0); });
   const avgVs = tPresup > 0 ? ((tInv - tPresup)/tPresup)*100 : 0;
   const dif = tInv - tPresup;
   document.getElementById('kpiInv').textContent    = '$' + tInv.toFixed(1);
@@ -751,6 +773,18 @@ function renderKPIsComercial(clientes) {
   document.getElementById('kpiDif').textContent    = (dif>=0?'+$':'-$') + Math.abs(dif).toFixed(1);
   document.getElementById('kpiDif').style.color    = dif >= 0 ? '#00c853' : '#ff4455';
   document.getElementById('kpiCmb').textContent    = '$' + tCmb.toFixed(1);
+  if (document.getElementById('kpiCmbPresup')) {
+    document.getElementById('kpiCmbPresup').textContent = tCmbPresup > 0 ? '$' + tCmbPresup.toFixed(1) : '—';
+    const vsCmb = tCmbPresup > 0 ? ((tCmb - tCmbPresup) / tCmbPresup) * 100 : null;
+    const vsCmbEl = document.getElementById('kpiVsCmb');
+    vsCmbEl.textContent = vsCmb != null ? (vsCmb >= 0 ? '+' : '') + vsCmb.toFixed(1) + '%' : '—';
+    vsCmbEl.style.color = vsCmb == null ? '' : vsCmb >= 0 ? '#00c853' : '#ff4455';
+    const vsCmbPctEl = document.getElementById('kpiVsCmbPct');
+    if (vsCmbPctEl) {
+      vsCmbPctEl.textContent = vsCmb != null ? (vsCmb >= 0 ? '+' : '') + vsCmb.toFixed(1) + '%' : '—';
+      vsCmbPctEl.style.color = vsCmb == null ? '' : vsCmb >= 0 ? '#00c853' : '#ff4455';
+    }
+  }
 
   const alertas = clientes.filter(r => { const v=parseFloat(String(r.vs||'').replace('%','').replace(',','.')); return !isNaN(v)&&v<-10; });
   const panel = document.getElementById('alertPanel');
@@ -773,7 +807,7 @@ function renderTablas(data) {
 
   const tbody = document.getElementById('tbodyClientes');
   if (!filt.length) {
-    tbody.innerHTML = '<tr class="loading-row"><td colspan="13" style="color:var(--text-muted)">Sin datos para este director</td></tr>';
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="15" style="color:var(--text-muted)">Sin datos para este director</td></tr>';
   } else {
     let html = filt.map(r => {
       const d = DIRECTORES[r.nombre] || {};
@@ -784,6 +818,8 @@ function renderTablas(data) {
         <td>${getVsBadge(r.vs)}</td><td>${getProgressBar(r.consumidoAnual)}</td>
         <td class="num">${fmt(r.presupAnual)}</td><td class="num">${fmt(r.cmb)}</td>
         <td class="num" style="color:#ccc">${r.cmbPct||'—'}</td>
+        <td class="num" style="color:var(--text-muted)">${r.cmbPresup!=null?fmt(r.cmbPresup):'—'}</td>
+        <td class="num" style="color:${r.vsCmb!=null?(parseFloat(r.vsCmb)>=0?'#00c853':'#ff4455'):'var(--text-muted)'}">${r.vsCmb!=null?(parseFloat(r.vsCmb)>=0?'+':'')+parseFloat(r.vsCmb).toFixed(1)+'%':'—'}</td>
         <td class="num">${fmtFte(r.fteAnt)}</td><td class="num">${fmtFte(r.fteAct)}</td>
         <td>${fmtVsMes(r.vsMes)}</td><td class="num">${fmtFte(r.fteTotal)}</td>
       </tr>`;
@@ -828,7 +864,7 @@ async function loadData() {
     if (raw.periodo) document.getElementById('periodoLabel').textContent = raw.periodo;
     renderTablas(raw);
   } catch(e) {
-    document.getElementById('tbodyClientes').innerHTML = '<tr class="loading-row"><td colspan="13" style="color:#ff4455">No se pudo conectar.</td></tr>';
+    document.getElementById('tbodyClientes').innerHTML = '<tr class="loading-row"><td colspan="15" style="color:#ff4455">No se pudo conectar.</td></tr>';
     document.getElementById('tbodyBago').innerHTML     = '<tr class="loading-row"><td colspan="11" style="color:#ff4455">Error de conexion.</td></tr>';
     document.getElementById('periodoLabel').textContent = 'Sin conexion';
   }
@@ -931,6 +967,32 @@ async function postSheet(tipo, data) {
 }
 
 
+function toggleOH(tipo) {
+  if (tipo === 'equipo') {
+    ohActivoEquipo = !ohActivoEquipo;
+    const btn = document.getElementById('btnOHEquipo');
+    btn.style.background  = ohActivoEquipo ? 'var(--purple)' : 'var(--surface2)';
+    btn.style.borderColor = ohActivoEquipo ? 'var(--purple)' : 'var(--border)';
+    btn.style.color       = ohActivoEquipo ? '#fff' : 'var(--text-muted)';
+    const rows = calcRentabilidad(MES_ACTIVO);
+    renderKPIsRent(rows);
+    renderConsolidado(rows);
+    renderRanking(rows);
+    setTimeout(() => renderChart(rows), 60);
+  } else {
+    ohActivoPerf = !ohActivoPerf;
+    const btn = document.getElementById('btnOHPerf');
+    btn.style.background  = ohActivoPerf ? 'var(--purple)' : 'var(--surface2)';
+    btn.style.borderColor = ohActivoPerf ? 'var(--purple)' : 'var(--border)';
+    btn.style.color       = ohActivoPerf ? '#fff' : 'var(--text-muted)';
+    const rows = calcRentabilidadPerf(MES_ACTIVO_PERF);
+    renderKPIsPerf(rows);
+    renderPerfConsolidado(rows);
+    renderRankingPerf(rows);
+    setTimeout(() => renderChartPerf(rows), 60);
+  }
+}
+
 function switchPerfTab(tab, btn) {
   document.querySelectorAll('#page-performance .rent-section').forEach(s => s.style.display='none');
   document.querySelectorAll('#page-performance .rent-tab').forEach(b => b.classList.remove('active'));
@@ -951,7 +1013,8 @@ function calcCostoEquipoPerf(cliente, mes) {
   const puestos=(CLIENTES_FTE_PERF[cliente]&&CLIENTES_FTE_PERF[cliente][mes])||{};
   let total=0;
   for (const [p,fte] of Object.entries(puestos)) total+=getCostoPuestoPerf(p,mes)*fte;
-  return total/1000;
+  const base=total/1000;
+  return ohActivoPerf ? base*(1+OH_PERF) : base;
 }
 function calcRentabilidadPerf(mes) {
   if (mes === 'Total') {
@@ -1007,7 +1070,7 @@ function renderKPIsPerf(rows) {
   const tCM=rows.reduce((a,r)=>a+r.cm,0), tPct=tIng>0?(tCM/tIng)*100:0, tFTE=rows.reduce((a,r)=>a+r.fte,0);
   const fmtM=v=>'$'+(v/1000).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})+'M';
   document.getElementById('kpisPerf').innerHTML=`
-    <div class="kpi"><div class="kpi-label">Ingresos Netos Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tIng)}</div><div class="kpi-sub">Venta+Hon+Fees-Compra</div><div class="kpi-accent" style="background:#4488ff"></div></div>
+    <div class="kpi"><div class="kpi-label">Fees</div><div class="kpi-value" style="font-size:26px">${fmtM(tIng)}</div><div class="kpi-sub">Fee facturado al cliente</div><div class="kpi-accent" style="background:#4488ff"></div></div>
     <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
     <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">Ingresos Netos − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
     <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO / Ingresos Netos Totales</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
@@ -1024,9 +1087,9 @@ function renderPerfConsolidado(rows) {
       <td class="num" style="color:#aaa">${fmtM(r.ingresos)}</td>
       <td class="num" style="color:var(--yellow)">${fmtM(r.costoEq)}</td>
       <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${r.cm>=0?'#f0f0f0':'#ff4455'}">${fmtM(r.cm)}</span></div></td>
-      <td class="num" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'};font-weight:600">${r.cmPct.toFixed(1)}%</td>
+      <td class="num" style="color:${ohActivoEquipo?(r.cmPct>35?'#00c853':r.cmPct>=30?'#f5c400':'#ff4455'):(r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455')};font-weight:600">${r.cmPct.toFixed(1)}%</td>
       <td class="num" style="color:#aaa">${r.fte.toFixed(2)}</td>
-      <td>${getSemaforo(r.cmPct)}</td></tr>`;
+      <td>${ohActivoPerf ? getSemaforoOH(r.cmPct) : ''}</td></tr>`;
   }).join('');
   const tI=rows.reduce((a,r)=>a+r.ingresos,0),tC=rows.reduce((a,r)=>a+r.costoEq,0),tM=rows.reduce((a,r)=>a+r.cm,0);
   const tP=tI>0?(tM/tI)*100:0;
@@ -1164,11 +1227,17 @@ function guardarCostosPerf() {
 /* RENTABILIDAD - calculos */
 function getColCosto(mes) { return MAPA_MES_COSTO[mes] || MES_VIGENTE; }
 function getCostoPuesto(puesto, mes) { const col = getColCosto(mes); return (TABLA_COSTOS[puesto] && TABLA_COSTOS[puesto][col]) || 0; }
+function getCostoConOH(costoBase, esPerf) {
+  const oh = esPerf ? OH_PERF : OH_EQUIPO;
+  return costoBase * (1 + oh);
+}
+
 function calcCostoEquipoCliente(cliente, mes) {
   const puestos = (CLIENTES_FTE[cliente] && CLIENTES_FTE[cliente][mes]) || {};
   let total = 0;
   for (const [p, fte] of Object.entries(puestos)) total += getCostoPuesto(p, mes) * fte;
-  return total / 1000;
+  const base = total / 1000;
+  return ohActivoEquipo ? base * (1 + OH_EQUIPO) : base;
 }
 function calcRentabilidad(mes) {
   if (mes === 'Total') {
@@ -1236,7 +1305,6 @@ function renderKPIsRent(rows) {
   const fmtM = v => '$' + (v/1000).toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2}) + 'M';
   const tInv = rows.reduce((a,r) => a + ((INVERSION[r.nombre] && INVERSION[r.nombre][MES_ACTIVO]) || 0), 0);
   document.getElementById('kpisRent').innerHTML = `
-    <div class="kpi"><div class="kpi-label">Inversión del Período</div><div class="kpi-value" style="font-size:26px">${fmtM(tInv)}</div><div class="kpi-sub">Inversión publicitaria del período</div><div class="kpi-accent" style="background:#ff6b35"></div></div>
     <div class="kpi"><div class="kpi-label">Ingresos Netos Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tIng)}</div><div class="kpi-sub">Venta+Hon+Fees-Compra</div><div class="kpi-accent" style="background:#4488ff"></div></div>
     <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
     <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">Ingresos Netos − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
@@ -1253,9 +1321,9 @@ function renderConsolidado(rows) {
       <td class="num" style="color:#aaa">${'$'+(r.ingresos/1000).toFixed(2)+'M'}</td>
       <td class="num" style="color:var(--yellow)">${'$'+(r.costoEq/1000).toFixed(2)+'M'}</td>
       <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${r.cm>=0?'#f0f0f0':'#ff4455'}">${'$'+(r.cm/1000).toFixed(2)+'M'}</span></div></td>
-      <td class="num" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'};font-weight:600">${r.cmPct.toFixed(1)}%</td>
+      <td class="num" style="color:${ohActivoEquipo?(r.cmPct>35?'#00c853':r.cmPct>=30?'#f5c400':'#ff4455'):(r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455')};font-weight:600">${r.cmPct.toFixed(1)}%</td>
       <td class="num" style="color:#aaa">${r.fte.toFixed(2)}</td>
-      <td>${getSemaforo(r.cmPct)}</td></tr>`;
+      <td>${ohActivoEquipo ? getSemaforoOH(r.cmPct) : ''}</td></tr>`;
   }).join('');
   const tI=rows.reduce((a,r)=>a+r.ingresos,0),tC=rows.reduce((a,r)=>a+r.costoEq,0),tM=rows.reduce((a,r)=>a+r.cm,0);
   const tP=tI>0?(tM/tI)*100:0;
