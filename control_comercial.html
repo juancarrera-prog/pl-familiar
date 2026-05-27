@@ -1088,7 +1088,7 @@ function renderPerfConsolidado(rows) {
       <td class="num"><div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${pct.toFixed(0)}%;background:${barColor}"></div></div><span style="min-width:65px;text-align:right;color:${r.cm>=0?'#f0f0f0':'#ff4455'}">${fmtM(r.cm)}</span></div></td>
       <td class="num" style="color:${ohActivoEquipo?(r.cmPct>35?'#00c853':r.cmPct>=30?'#f5c400':'#ff4455'):(r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455')};font-weight:600">${r.cmPct.toFixed(1)}%</td>
       <td class="num" style="color:#aaa">${r.fte.toFixed(2)}</td>
-      <td>${ohActivoPerf ? getSemaforoOH(r.cmPct) : ''}</td></tr>`;
+      <td>${ohActivoPerf ? getSemaforoOH(r.cmPct, true) : ''}</td></tr>`;
   }).join('');
   const tI=rows.reduce((a,r)=>a+r.ingresos,0),tC=rows.reduce((a,r)=>a+r.costoEq,0),tM=rows.reduce((a,r)=>a+r.cm,0);
   const tP=tI>0?(tM/tI)*100:0;
