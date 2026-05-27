@@ -742,7 +742,14 @@ function switchPage(page, btn) {
     }
   }
   if (page === 'performance') {
-    renderPerfCompleto();
+    if (window._perfDataReady) {
+      renderPerfCompleto();
+    } else {
+      document.getElementById('kpisPerf').innerHTML = '<div style="color:var(--text-muted);padding:20px;font-size:13px">⏳ Cargando datos del Sheet...</div>';
+      const waitPerf = setInterval(() => {
+        if (window._perfDataReady) { clearInterval(waitPerf); renderPerfCompleto(); }
+      }, 300);
+    }
   }
 }
 function switchRentTab(tab, btn) {
@@ -942,23 +949,29 @@ async function loadData() {
       });
     }
     console.log('Rentabilidad cargada desde Sheet');
-    // Si el tab de rentabilidad está activo, re-renderizar con los datos del Sheet
-    if (document.getElementById('page-rentabilidad').classList.contains('active')) {
-      renderRentabilidadCompleto();
-    }
-    // Marcar que los datos están listos para cuando el usuario abra el tab
     window._rentDataReady = true;
-    // Si el tab está abierto ahora, renderizar con los datos recién cargados
-    if (document.getElementById('page-rentabilidad').classList.contains('active')) {
-      setTimeout(() => renderRentabilidadCompleto(), 100);
-    }
+    window._perfDataReady = true;
+    // Re-renderizar si alguno de los tabs ya está activo
+    setTimeout(() => {
+      if (document.getElementById('page-rentabilidad').classList.contains('active')) {
+        renderRentabilidadCompleto();
+      }
+      if (document.getElementById('page-performance').classList.contains('active')) {
+        renderPerfCompleto();
+      }
+    }, 100);
   } catch(e) {
     console.warn('Rentabilidad sin conexion, usando datos locales:', e.message);
     window._rentDataReady = true;
-    // Si el tab está abierto ahora, renderizar con los datos recién cargados
-    if (document.getElementById('page-rentabilidad').classList.contains('active')) {
-      setTimeout(() => renderRentabilidadCompleto(), 100);
-    }
+    window._perfDataReady = true;
+    setTimeout(() => {
+      if (document.getElementById('page-rentabilidad').classList.contains('active')) {
+        renderRentabilidadCompleto();
+      }
+      if (document.getElementById('page-performance').classList.contains('active')) {
+        renderPerfCompleto();
+      }
+    }, 100);
   }
 }
 
