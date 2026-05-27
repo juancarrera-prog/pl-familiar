@@ -524,7 +524,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 /* ═══════════════════════════════════════════════════════════
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxg4aH1sNwUlymi16BbaaPW4Uwbj2SBDaGEhJj9JLsTySQB4FYlNBVfmrTqGKYcEfkN6Q/exec'; // Script Control Comercial
+const API_URL    = 'https://script.google.com/macros/s/AKfycbxg4aH1sNwUlymi16BbaaPW4Uwbj2SBDaGEhJj9JLsTySQB4FYlNBVfmrTqGKYcEfkN6Q/exec'; // Script Control Comercial
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsO0afw1YW55GkKAfA_6TxGFQvUmO5xYv6edvRpwLQRsZrlXd9q69nbccglQzcwXqmVg/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
 
@@ -777,8 +777,10 @@ function renderKPIsComercial(clientes) {
     document.getElementById('kpiCmbPresup').textContent = tCmbPresup > 0 ? '$' + tCmbPresup.toFixed(1) : '—';
     const vsCmb = tCmbPresup > 0 ? ((tCmb - tCmbPresup) / tCmbPresup) * 100 : null;
     const vsCmbEl = document.getElementById('kpiVsCmb');
-    vsCmbEl.textContent = vsCmb != null ? (vsCmb >= 0 ? '+' : '') + vsCmb.toFixed(1) + '%' : '—';
-    vsCmbEl.style.color = vsCmb == null ? '' : vsCmb >= 0 ? '#00c853' : '#ff4455';
+    if (vsCmbEl) {
+      vsCmbEl.textContent = vsCmb != null ? (vsCmb >= 0 ? '+' : '') + vsCmb.toFixed(1) + '%' : '—';
+      vsCmbEl.style.color = vsCmb == null ? '' : vsCmb >= 0 ? '#00c853' : '#ff4455';
+    }
     const vsCmbPctEl = document.getElementById('kpiVsCmbPct');
     if (vsCmbPctEl) {
       vsCmbPctEl.textContent = vsCmb != null ? (vsCmb >= 0 ? '+' : '') + vsCmb.toFixed(1) + '%' : '—';
@@ -856,9 +858,9 @@ async function enviarAlertas() {
 }
 
 async function loadData() {
-  // Control Comercial (script original)
+  // Control Comercial
   try {
-    const res = await fetch(API_URL);
+    const res = await fetch(API_URL, { redirect: 'follow' });
     const raw = await res.json();
     DATA = raw;
     if (raw.periodo) document.getElementById('periodoLabel').textContent = raw.periodo;
