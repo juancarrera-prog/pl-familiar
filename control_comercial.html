@@ -177,6 +177,32 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   .progress-bg { width: 50px; }
   .page-tab { padding: 10px 14px; font-size: 12px; }
 }
+
+/* ── MODAL CARGA DATOS ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:1000; display:none; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); width:100%; max-width:860px; max-height:90vh; overflow-y:auto; padding:28px 32px; position:relative; }
+.modal-box::-webkit-scrollbar { width:6px; } .modal-box::-webkit-scrollbar-track { background:transparent; } .modal-box::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+.modal-title { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; margin-bottom:4px; }
+.modal-sub { font-size:12px; color:var(--text-muted); margin-bottom:24px; }
+.modal-close { position:absolute; top:18px; right:20px; background:transparent; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; line-height:1; }
+.modal-close:hover { color:var(--text); }
+.modal-section { margin-bottom:28px; }
+.modal-section-title { font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:1.5px; color:var(--red); margin-bottom:14px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.modal-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
+.modal-field { display:flex; flex-direction:column; gap:4px; }
+.modal-field label { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); font-weight:600; }
+.modal-field input { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 10px; color:var(--text); font-family:'Poppins',sans-serif; font-size:13px; outline:none; transition:border-color .2s; }
+.modal-field input:focus { border-color:var(--red); }
+.modal-client-header { display:flex; align-items:center; gap:8px; font-weight:600; font-size:13px; margin-bottom:10px; margin-top:18px; }
+.modal-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; padding-top:18px; border-top:1px solid var(--border); }
+.modal-mes-selector { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; }
+.modal-mes-btn { padding:6px 14px; border-radius:100px; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-family:'Poppins',sans-serif; font-size:11px; font-weight:500; cursor:pointer; transition:all .2s; }
+.modal-mes-btn:hover { border-color:var(--text-muted); color:var(--text); }
+.modal-mes-btn.active { background:var(--red); border-color:var(--red); color:white; font-weight:600; }
+.modal-saved-badge { display:none; align-items:center; gap:6px; font-size:12px; color:var(--green); }
+.modal-saved-badge.show { display:flex; }
 </style>
 </head>
 <body>
@@ -196,6 +222,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <div class="live-dot"></div>
         Período: <span id="periodoLabel">Cargando...</span>
       </div>
+      <button class="slack-btn" onclick="abrirModalCarga()" style="border-color:var(--red);color:var(--red)">📥 Cargar datos del mes</button>
       <button class="slack-btn" onclick="enviarAlertas()">📣 Enviar alertas Slack</button>
     </div>
   </div>
@@ -203,8 +230,8 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   <!-- PAGE TABS -->
   <div class="page-tabs">
     <button class="page-tab active" onclick="switchPage('comercial', this)">📊 Control Comercial</button>
-    <button class="page-tab" onclick="switchPage('rentabilidad', this)">💰 Rentabilidad de Equipo <span class="tab-badge" id="alertBadge" style="display:none">!</span></button>
-    <button class="page-tab" onclick="switchPage('performance', this)">🚀 Rentabilidad Performance</button>
+    <button class="page-tab" onclick="switchPage('rentabilidad', this)">👥 Clientes Big 7 <span class="tab-badge" id="alertBadge" style="display:none">!</span></button>
+    <button class="page-tab" onclick="switchPage('performance', this)">🚀 Performance</button>
   </div>
 
   <!-- ══════════════════════════════════════════ -->
@@ -225,6 +252,26 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <div class="alert-items" id="alertItems"></div>
     </div>
 
+    <!-- TOTAL AGENCIA — va primero -->
+    <div class="section-header">
+      <div><div class="section-title">Total Agencia</div><div class="section-sub">Consolidado de todos los clientes · datos cargados en Sheet</div></div>
+    </div>
+    <div class="kpis" id="kpisAgencia">
+      <div class="kpi"><div class="kpi-label">Inversión del Período</div><div class="kpi-value" id="agInv">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:var(--red)"></div></div>
+      <div class="kpi"><div class="kpi-label">Presupuesto del Período</div><div class="kpi-value" id="agPresup">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:#4444ff"></div></div>
+      <div class="kpi"><div class="kpi-label">Vs Presupuesto</div><div class="kpi-value" id="agVs">—</div><div class="kpi-sub">desvío del período</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+      <div class="kpi"><div class="kpi-label">Consumido Anual</div><div class="kpi-value" id="agConsumido">—</div><div class="kpi-sub">% del presup. anual ejecutado</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+      <div class="kpi"><div class="kpi-label">Presup. Anual</div><div class="kpi-value" id="agPresupAnual">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:#4444ff"></div></div>
+      <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" id="agCmb">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
+      <div class="kpi"><div class="kpi-label">CMB %</div><div class="kpi-value" id="agCmbPct">—</div><div class="kpi-sub">sobre inversión</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
+      <div class="kpi"><div class="kpi-label">CMB $ Presup</div><div class="kpi-value" id="agCmbPresup">—</div><div class="kpi-sub">CMB presupuestado</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+      <div class="kpi"><div class="kpi-label">Vs CMB Presup</div><div class="kpi-value" id="agVsCmb">—</div><div class="kpi-sub">CMB real vs presupuestado</div><div class="kpi-accent" style="background:var(--red)"></div></div>
+    </div>
+
+    <!-- BIG 7 -->
+    <div class="section-header" style="margin-top:32px">
+      <div><div class="section-title">Big 7</div><div class="section-sub">Inversión, presupuesto y CMB de los 7 clientes principales</div></div>
+    </div>
     <div class="kpis">
       <div class="kpi" style="--a:var(--red)"><div class="kpi-label">Inversión del Período</div><div class="kpi-value" id="kpiInv">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:var(--red)"></div></div>
       <div class="kpi"><div class="kpi-label">Presupuesto del Período</div><div class="kpi-value" id="kpiPresup">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:#4444ff"></div></div>
@@ -285,6 +332,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <div class="dir-row"><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--green);font-size:18px">●</span><div><div class="dir-row-name">En objetivo</div><div class="dir-row-clients">Vs Presup. mayor a -5%</div></div></div><div class="badge green">OK</div></div>
       </div>
     </div>
+
 
   </div><!-- /page-comercial -->
 
@@ -485,13 +533,20 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <span>Costo Cía. aplicado: columna <strong id="vigenciaMesPerf">—</strong></span>
     </div>
     <div class="table-card" style="margin-top:12px">
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
-        <span style="color:var(--text-muted);font-size:13px">Ingresos Netos (miles $)</span>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="color:var(--text-muted);font-size:13px">Fee / Ingresos Netos (miles $)</span>
         <input id="ingresosEditablePerf" type="number" placeholder="0"
           style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:150px"
           onchange="saveIngresosPerf(clienteDetalleActivoPerf, MES_ACTIVO_PERF, this.value)">
       </div>
-      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Editá el FTE de cada puesto directamente en la tabla.</p>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="color:var(--text-muted);font-size:13px">Diferencial Programmatic (miles $)</span>
+        <input id="diferencialPerfInput" type="number" placeholder="0"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:150px"
+          onchange="saveDiferencialPerf(clienteDetalleActivoPerf, MES_ACTIVO_PERF, this.value)">
+        <span id="totalIngresosPerf" style="font-size:12px;color:var(--green);font-weight:600"></span>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Editá el FTE de cada puesto directamente en la tabla. El Diferencial Programmatic se suma a los Ingresos Netos para el cálculo de CM.</p>
       <table class="data-table">
         <thead><tr><th>Puesto</th><th class="num">FTE %</th><th class="num">Costo Cía.</th><th class="num">Costo Mensual</th><th class="num">% del total</th></tr></thead>
         <tbody id="tbodyPerfDetalle"></tbody>
@@ -517,6 +572,42 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
   </div>
 </div><!-- /page-performance -->
 
+
+<!-- ══════════════════════════════════════════ -->
+<!-- MODAL CARGA DATOS CONTROL COMERCIAL       -->
+<!-- ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalCarga" onclick="cerrarModalSiOverlay(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModalCarga()">✕</button>
+    <div class="modal-title">📥 Cargar datos del mes</div>
+    <div class="modal-sub">Completá los campos y guardá — el dashboard se actualiza automáticamente</div>
+
+    <!-- Selector de mes -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+      <span class="filter-label">Mes</span>
+      <div class="modal-mes-selector" id="modalMesSelector"></div>
+    </div>
+
+    <!-- Clientes Big Seven -->
+    <div class="modal-section">
+      <div class="modal-section-title">Clientes · Big Seven</div>
+      <div id="modalClientesForm"></div>
+    </div>
+
+    <!-- Bagó por marca -->
+    <div class="modal-section">
+      <div class="modal-section-title">Unidades de Negocio · Bagó</div>
+      <div id="modalBagoForm"></div>
+    </div>
+
+    <div class="modal-actions">
+      <div class="modal-saved-badge" id="modalSavedBadge">✅ Guardado correctamente</div>
+      <button class="btn-action" onclick="cerrarModalCarga()">Cancelar</button>
+      <button class="btn-action primary" onclick="guardarDatosComercial()">✓ Guardar y actualizar</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /wrap -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -524,7 +615,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 /* ═══════════════════════════════════════════════════════════
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
-const API_URL    = 'https://script.google.com/macros/s/AKfycbxg4aH1sNwUlymi16BbaaPW4Uwbj2SBDaGEhJj9JLsTySQB4FYlNBVfmrTqGKYcEfkN6Q/exec'; // Script Control Comercial
+const API_URL    = 'https://script.google.com/macros/s/AKfycbx3HFLHNkjeAhfKUGAF0D4IJ06hOWWg6gsjGm-0epn1hFjVXGlFQVKNuL5W5foLR-Tf-w/exec'; // Script Control Comercial
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsO0afw1YW55GkKAfA_6TxGFQvUmO5xYv6edvRpwLQRsZrlXd9q69nbccglQzcwXqmVg/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
 
@@ -562,6 +653,12 @@ let INVERSION = {
 };
 
 let INGRESOS_PERF = {
+  'ITBA': {}, 'Parts Vu': {}, 'Bagó': {}, 'Banco Patagonia': {},
+  'Yamaha O.P.': {}, 'Violetta': {}, 'Belgrano Day School': {},
+};
+
+// Diferencial Programmatic por cliente/mes (se suma a Ingresos Netos)
+let DIFERENCIAL_PERF = {
   'ITBA': {}, 'Parts Vu': {}, 'Bagó': {}, 'Banco Patagonia': {},
   'Yamaha O.P.': {}, 'Violetta': {}, 'Belgrano Day School': {},
 };
@@ -775,6 +872,37 @@ function filtrarDirector(dir, btn) {
   if (DATA) renderTablas(DATA);
 }
 
+function renderKPIsAgencia(ag) {
+  if (!ag) return;
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  const setColor = (id, val, good, warn) => { const el=document.getElementById(id); if(!el) return; el.textContent=val; el.style.color = parseFloat(val)>=(good||0)?'#00c853':parseFloat(val)>=(warn||-5)?'#f5c400':'#ff4455'; };
+
+  set('agInv',    ag.inv    != null ? '$'+parseFloat(ag.inv).toFixed(1)    : '—');
+  set('agPresup', ag.presup != null ? '$'+parseFloat(ag.presup).toFixed(1) : '—');
+  set('agPresupAnual', ag.presupAnual != null ? '$'+parseFloat(ag.presupAnual).toFixed(1) : '—');
+  set('agCmb',    ag.cmb    != null ? '$'+parseFloat(ag.cmb).toFixed(1)    : '—');
+  set('agCmbPct', ag.cmbPct || '—');
+  set('agCmbPresup', ag.cmbPresup != null ? '$'+parseFloat(ag.cmbPresup).toFixed(1) : '—');
+
+  // Vs Presup con color
+  const vs = parseFloat(ag.vs);
+  const vsEl = document.getElementById('agVs');
+  if(vsEl){ vsEl.textContent=(vs>0?'+':'')+vs.toFixed(1)+'%'; vsEl.style.color=vs<-10?'#ff4455':vs<-5?'#f5c400':'#00c853'; }
+
+  // Consumido anual
+  const cons = parseFloat(ag.consumidoAnual);
+  const consEl = document.getElementById('agConsumido');
+  if(consEl){ consEl.textContent=(!isNaN(cons)?cons.toFixed(1):'—')+'%'; }
+
+  // Vs CMB Presup con color
+  const vsCmb = ag.vsCmb ? parseFloat(String(ag.vsCmb).replace('%','').replace(',','.')) : null;
+  const vsCmbEl = document.getElementById('agVsCmb');
+  if(vsCmbEl){
+    vsCmbEl.textContent = vsCmb!=null ? (vsCmb>=0?'+':'')+vsCmb.toFixed(1)+'%' : '—';
+    vsCmbEl.style.color = vsCmb==null?'':vsCmb>=0?'#00c853':'#ff4455';
+  }
+}
+
 function renderKPIsComercial(clientes) {
   let tInv=0, tPresup=0, tCmb=0, tCmbPresup=0;
   clientes.forEach(r => { tInv += parseFloat(r.inv)||0; tPresup += parseFloat(r.presup)||0; tCmb += parseFloat(r.cmb)||0; tCmbPresup += parseFloat(r.cmbPresup||0); });
@@ -879,6 +1007,7 @@ async function loadData() {
     DATA = raw;
     if (raw.periodo) document.getElementById('periodoLabel').textContent = raw.periodo;
     renderTablas(raw);
+    if (raw.agencia) renderKPIsAgencia(raw.agencia);
   } catch(e) {
     document.getElementById('tbodyClientes').innerHTML = '<tr class="loading-row"><td colspan="15" style="color:#ff4455">No se pudo conectar.</td></tr>';
     document.getElementById('tbodyBago').innerHTML     = '<tr class="loading-row"><td colspan="11" style="color:#ff4455">Error de conexion.</td></tr>';
@@ -949,6 +1078,7 @@ async function loadData() {
       });
     }
     console.log('Rentabilidad cargada desde Sheet');
+    cargarDatosComercialDesdeSheet(json);
     window._rentDataReady = true;
     window._perfDataReady = true;
     // Re-renderizar si alguno de los tabs ya está activo
@@ -962,6 +1092,7 @@ async function loadData() {
     }, 100);
   } catch(e) {
     console.warn('Rentabilidad sin conexion, usando datos locales:', e.message);
+    cargarDatosComercialDesdeSheet(json);
     window._rentDataReady = true;
     window._perfDataReady = true;
     setTimeout(() => {
@@ -1043,7 +1174,9 @@ function calcRentabilidadPerf(mes) {
     return Object.keys(DIRECTORES_PERF).map(nombre => {
       let totalIng=0,totalCosto=0,totalFte=0;
       MESES_2026.filter(m=>m!=='Total').forEach(m=>{
-        totalIng+=(INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][m])||0;
+        const fee=(INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][m])||0;
+        const dif=(DIFERENCIAL_PERF[nombre]&&DIFERENCIAL_PERF[nombre][m])||0;
+        totalIng+=fee+dif;
         totalCosto+=calcCostoEquipoPerf(nombre,m);
         const p=(CLIENTES_FTE_PERF[nombre]&&CLIENTES_FTE_PERF[nombre][m])||{};
         totalFte+=Object.values(p).reduce((a,b)=>a+b,0);
@@ -1053,12 +1186,14 @@ function calcRentabilidadPerf(mes) {
     });
   }
   return Object.keys(DIRECTORES_PERF).map(nombre=>{
-    const ingresos=(INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][mes])||0;
+    const fee=(INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][mes])||0;
+    const dif=(DIFERENCIAL_PERF[nombre]&&DIFERENCIAL_PERF[nombre][mes])||0;
+    const ingresos=fee+dif;
     const costoEq=calcCostoEquipoPerf(nombre,mes);
     const cm=ingresos-costoEq, cmPct=ingresos>0?(cm/ingresos)*100:0;
     const puestos=(CLIENTES_FTE_PERF[nombre]&&CLIENTES_FTE_PERF[nombre][mes])||{};
     const fte=Object.values(puestos).reduce((a,b)=>a+b,0);
-    return {nombre,ingresos,costoEq,cm,cmPct,fte};
+    return {nombre,ingresos,costoEq,cm,cmPct,fte,fee,dif};
   });
 }
 
@@ -1163,8 +1298,16 @@ function renderDetallePerf(cliente) {
   const mes=MES_ACTIVO_PERF, puestos=Object.keys(TABLA_COSTOS_PERF);
   const fteActual=(CLIENTES_FTE_PERF[cliente]&&CLIENTES_FTE_PERF[cliente][mes])||{};
   const ingActual=(INGRESOS_PERF[cliente]&&INGRESOS_PERF[cliente][mes])||0;
+  const difActual=(DIFERENCIAL_PERF[cliente]&&DIFERENCIAL_PERF[cliente][mes])||0;
   const ingEl=document.getElementById('ingresosEditablePerf');
   if(ingEl) ingEl.value=ingActual?(ingActual*1000):'';
+  const difEl=document.getElementById('diferencialPerfInput');
+  if(difEl) difEl.value=difActual?(difActual*1000):'';
+  const totalIngLabel=document.getElementById('totalIngresosPerf');
+  if(totalIngLabel){
+    const totalIng=ingActual+difActual;
+    totalIngLabel.textContent=totalIng>0?'Total: $'+totalIng.toFixed(2)+'k':'';
+  }
   const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoPerf(p,mes)*fte;},0);
   const totalCosto=totalCostoRaw/1000;
   let html=puestos.map(puesto=>{
@@ -1203,6 +1346,19 @@ function saveIngresosPerf(cliente,mes,valor) {
   INGRESOS_PERF[cliente][mes]=val;
   postSheet('ingresos_perf',{cliente,mes,valor:val});
   renderDetallePerf(cliente);
+}
+function saveDiferencialPerf(cliente,mes,valor) {
+  const val=(parseFloat(valor)||0)/1000;
+  if(!DIFERENCIAL_PERF[cliente]) DIFERENCIAL_PERF[cliente]={};
+  DIFERENCIAL_PERF[cliente][mes]=val;
+  postSheet('diferencial_perf',{cliente,mes,valor:val});
+  renderDetallePerf(cliente);
+  // Actualizar consolidado si está visible
+  const tab=document.getElementById('perf-consolidado');
+  if(tab&&tab.style.display!=='none'){
+    const rows=calcRentabilidadPerf(MES_ACTIVO_PERF);
+    renderKPIsPerf(rows); renderPerfConsolidado(rows); renderRankingPerf(rows);
+  }
 }
 function getColsRRHHPerf() {
   const set=new Set();
@@ -1508,6 +1664,212 @@ function guardarCostos() {
   const btn=event.target,orig=btn.textContent;
   btn.textContent='Guardado!'; btn.style.background='var(--green)'; btn.style.borderColor='var(--green)';
   setTimeout(()=>{btn.textContent=orig;btn.style.background='var(--red)';btn.style.borderColor='var(--red)';},2200);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTROL COMERCIAL — DATOS EMBEBIDOS + MODAL DE CARGA
+═══════════════════════════════════════════════════════════ */
+
+const CLIENTES_COMERCIAL = ['Bagó','Banco Patagonia','La Paulina','Pfizer','McCain','Escorial','Universal Assistance'];
+const BAGO_MARCAS = ['Esoprazol','Anaflex','Faciales','Corporales','Capilares','Solares','Bagó +','Dioxaflex','Institucional'];
+const MESES_COMERCIAL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// Estructura de datos embebidos Control Comercial
+let DATOS_COMERCIAL = {
+  clientes: {},  // { 'Bagó': { 'Enero': { inv, presup, cmb, cmbPresup, fteAnt, fteAct, presupAnual, consumidoAnual, cmbPct, vsCmb, vsMes, fteTotal } } }
+  bago: {}       // { 'Esoprazol': { 'Enero': { inv, presup, presupAnual, consumidoAnual, soi, fteAnt, fteAct, vsMes, fteTotal } } }
+};
+
+let MES_MODAL = 'Mayo'; // mes activo en el modal
+
+function abrirModalCarga() {
+  document.getElementById('modalCarga').classList.add('open');
+  renderModalMesSelector();
+  renderModalForms();
+}
+function cerrarModalCarga() {
+  document.getElementById('modalCarga').classList.remove('open');
+}
+function cerrarModalSiOverlay(e) {
+  if (e.target === document.getElementById('modalCarga')) cerrarModalCarga();
+}
+
+function renderModalMesSelector() {
+  const cont = document.getElementById('modalMesSelector');
+  cont.innerHTML = MESES_COMERCIAL.map(m =>
+    `<button class="modal-mes-btn${m===MES_MODAL?' active':''}" onclick="setMesModal('${m}',this)">${m}</button>`
+  ).join('');
+}
+
+function setMesModal(mes, btn) {
+  MES_MODAL = mes;
+  document.querySelectorAll('.modal-mes-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderModalForms();
+}
+
+function getValModal(cliente, mes, campo, esBago) {
+  const src = esBago ? DATOS_COMERCIAL.bago : DATOS_COMERCIAL.clientes;
+  return (src[cliente] && src[cliente][mes] && src[cliente][mes][campo] != null)
+    ? src[cliente][mes][campo] : '';
+}
+
+function renderModalForms() {
+  const mes = MES_MODAL;
+
+  // ── Clientes ──
+  const clientesCont = document.getElementById('modalClientesForm');
+  clientesCont.innerHTML = CLIENTES_COMERCIAL.map(cli => {
+    const d = DIRECTORES[cli] || {};
+    return `
+      <div class="modal-client-header">
+        <div class="modal-dot" style="background:${d.color||'#606060'}"></div>
+        ${cli} <span style="color:var(--text-muted);font-size:11px;font-weight:400;margin-left:4px">${d.nombre||''}</span>
+      </div>
+      <div class="modal-grid">
+        <div class="modal-field"><label>Inv. Período ($k)</label><input type="number" step="0.1" id="mc_${cli}_inv" value="${getValModal(cli,mes,'inv',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>Presup. Período ($k)</label><input type="number" step="0.1" id="mc_${cli}_presup" value="${getValModal(cli,mes,'presup',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>Presup. Anual ($k)</label><input type="number" step="0.1" id="mc_${cli}_presupAnual" value="${getValModal(cli,mes,'presupAnual',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>Consumido Anual (%)</label><input type="number" step="0.1" id="mc_${cli}_consumidoAnual" value="${getValModal(cli,mes,'consumidoAnual',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>CMB $ ($k)</label><input type="number" step="0.1" id="mc_${cli}_cmb" value="${getValModal(cli,mes,'cmb',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>CMB % (%)</label><input type="number" step="0.1" id="mc_${cli}_cmbPct" value="${getValModal(cli,mes,'cmbPct',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>CMB $ Presup ($k)</label><input type="number" step="0.1" id="mc_${cli}_cmbPresup" value="${getValModal(cli,mes,'cmbPresup',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>FTE Anterior</label><input type="number" step="0.01" id="mc_${cli}_fteAnt" value="${getValModal(cli,mes,'fteAnt',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>FTE Actual</label><input type="number" step="0.01" id="mc_${cli}_fteAct" value="${getValModal(cli,mes,'fteAct',false)}" placeholder="0"></div>
+        <div class="modal-field"><label>FTE Total</label><input type="number" step="0.01" id="mc_${cli}_fteTotal" value="${getValModal(cli,mes,'fteTotal',false)}" placeholder="0"></div>
+      </div>`;
+  }).join('<div style="border-top:1px solid var(--border);margin:10px 0"></div>');
+
+  // ── Bagó marcas ──
+  const bagoCont = document.getElementById('modalBagoForm');
+  bagoCont.innerHTML = BAGO_MARCAS.map(marca => `
+    <div class="modal-client-header">
+      <div class="modal-dot" style="background:#e8001c"></div>${marca}
+    </div>
+    <div class="modal-grid">
+      <div class="modal-field"><label>Inv. Período ($k)</label><input type="number" step="0.1" id="mb_${marca}_inv" value="${getValModal(marca,mes,'inv',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>Presup. Período ($k)</label><input type="number" step="0.1" id="mb_${marca}_presup" value="${getValModal(marca,mes,'presup',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>Presup. Anual ($k)</label><input type="number" step="0.1" id="mb_${marca}_presupAnual" value="${getValModal(marca,mes,'presupAnual',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>Consumido Anual (%)</label><input type="number" step="0.1" id="mb_${marca}_consumidoAnual" value="${getValModal(marca,mes,'consumidoAnual',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>SOI Bagó (%)</label><input type="number" step="0.1" id="mb_${marca}_soi" value="${getValModal(marca,mes,'soi',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>FTE Anterior</label><input type="number" step="0.01" id="mb_${marca}_fteAnt" value="${getValModal(marca,mes,'fteAnt',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>FTE Actual</label><input type="number" step="0.01" id="mb_${marca}_fteAct" value="${getValModal(marca,mes,'fteAct',true)}" placeholder="0"></div>
+      <div class="modal-field"><label>FTE Total</label><input type="number" step="0.01" id="mb_${marca}_fteTotal" value="${getValModal(marca,mes,'fteTotal',true)}" placeholder="0"></div>
+    </div>`
+  ).join('<div style="border-top:1px solid var(--border);margin:10px 0"></div>');
+}
+
+function guardarDatosComercial() {
+  const mes = MES_MODAL;
+  const n = id => { const v = parseFloat(document.getElementById(id)?.value); return isNaN(v) ? null : v; };
+
+  // Leer clientes
+  CLIENTES_COMERCIAL.forEach(cli => {
+    if (!DATOS_COMERCIAL.clientes[cli]) DATOS_COMERCIAL.clientes[cli] = {};
+    const d = {
+      inv:            n(`mc_${cli}_inv`),
+      presup:         n(`mc_${cli}_presup`),
+      presupAnual:    n(`mc_${cli}_presupAnual`),
+      consumidoAnual: n(`mc_${cli}_consumidoAnual`),
+      cmb:            n(`mc_${cli}_cmb`),
+      cmbPct:         n(`mc_${cli}_cmbPct`),
+      cmbPresup:      n(`mc_${cli}_cmbPresup`),
+      fteAnt:         n(`mc_${cli}_fteAnt`),
+      fteAct:         n(`mc_${cli}_fteAct`),
+      fteTotal:       n(`mc_${cli}_fteTotal`),
+    };
+    // calcular derivados automáticamente
+    if (d.inv != null && d.presup != null && d.presup !== 0)
+      d.vs = (((d.inv - d.presup) / d.presup) * 100).toFixed(1);
+    if (d.fteAnt != null && d.fteAct != null && d.fteAnt !== 0)
+      d.vsMes = (((d.fteAct - d.fteAnt) / d.fteAnt) * 100).toFixed(1);
+    if (d.cmb != null && d.cmbPresup != null && d.cmbPresup !== 0)
+      d.vsCmb = (((d.cmb - d.cmbPresup) / d.cmbPresup) * 100).toFixed(1);
+    DATOS_COMERCIAL.clientes[cli][mes] = d;
+  });
+
+  // Leer Bagó marcas
+  BAGO_MARCAS.forEach(marca => {
+    if (!DATOS_COMERCIAL.bago[marca]) DATOS_COMERCIAL.bago[marca] = {};
+    const d = {
+      inv:            n(`mb_${marca}_inv`),
+      presup:         n(`mb_${marca}_presup`),
+      presupAnual:    n(`mb_${marca}_presupAnual`),
+      consumidoAnual: n(`mb_${marca}_consumidoAnual`),
+      soi:            n(`mb_${marca}_soi`),
+      fteAnt:         n(`mb_${marca}_fteAnt`),
+      fteAct:         n(`mb_${marca}_fteAct`),
+      fteTotal:       n(`mb_${marca}_fteTotal`),
+    };
+    if (d.inv != null && d.presup != null && d.presup !== 0)
+      d.vs = (((d.inv - d.presup) / d.presup) * 100).toFixed(1);
+    if (d.fteAnt != null && d.fteAct != null && d.fteAnt !== 0)
+      d.vsMes = (((d.fteAct - d.fteAnt) / d.fteAnt) * 100).toFixed(1);
+    DATOS_COMERCIAL.bago[marca][mes] = d;
+  });
+
+  // Guardar en Sheet
+  postSheet('comercial', { clientes: DATOS_COMERCIAL.clientes, bago: DATOS_COMERCIAL.bago });
+
+  // Actualizar periodo badge
+  const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const idx = MESES_COMERCIAL.indexOf(mes);
+  if (idx >= 0) document.getElementById('periodoLabel').textContent = meses[idx] + ' 2026';
+
+  // Re-renderizar tablas con datos embebidos
+  renderTablasDesdeLocal(mes);
+
+  // Feedback visual
+  const badge = document.getElementById('modalSavedBadge');
+  badge.classList.add('show');
+  setTimeout(() => { badge.classList.remove('show'); cerrarModalCarga(); }, 1800);
+}
+
+function renderTablasDesdeLocal(mes) {
+  // Armar estructura compatible con renderTablas()
+  const clientes = CLIENTES_COMERCIAL.map(nombre => {
+    const d = (DATOS_COMERCIAL.clientes[nombre] && DATOS_COMERCIAL.clientes[nombre][mes]) || {};
+    return { nombre, ...d };
+  }).filter(r => r.inv != null || r.presup != null);
+
+  const bago = BAGO_MARCAS.map(nombre => {
+    const d = (DATOS_COMERCIAL.bago[nombre] && DATOS_COMERCIAL.bago[nombre][mes]) || {};
+    return { nombre, ...d };
+  }).filter(r => r.inv != null || r.presup != null);
+
+  DATA = { clientes, bago, periodo: mes + ' 2026' };
+  renderTablas(DATA);
+}
+
+// Cargar datos comercial embebidos desde Sheet al iniciar
+function cargarDatosComercialDesdeSheet(json) {
+  if (!json.comercial_clientes && !json.comercial) return;
+  const src = json.comercial || {};
+  if (src.clientes) {
+    Object.entries(src.clientes).forEach(([cli, meses]) => {
+      if (!DATOS_COMERCIAL.clientes[cli]) DATOS_COMERCIAL.clientes[cli] = {};
+      Object.entries(meses).forEach(([mes, vals]) => {
+        DATOS_COMERCIAL.clientes[cli][mes] = vals;
+      });
+    });
+  }
+  if (src.bago) {
+    Object.entries(src.bago).forEach(([marca, meses]) => {
+      if (!DATOS_COMERCIAL.bago[marca]) DATOS_COMERCIAL.bago[marca] = {};
+      Object.entries(meses).forEach(([mes, vals]) => {
+        DATOS_COMERCIAL.bago[marca][mes] = vals;
+      });
+    });
+  }
+  // Detectar mes más reciente con datos y renderizar
+  const mesesConDatos = [];
+  Object.values(DATOS_COMERCIAL.clientes).forEach(mObj => Object.keys(mObj).forEach(m => { if (!mesesConDatos.includes(m)) mesesConDatos.push(m); }));
+  if (mesesConDatos.length > 0) {
+    const ordenado = MESES_COMERCIAL.filter(m => mesesConDatos.includes(m));
+    const mesReciente = ordenado[ordenado.length - 1];
+    MES_MODAL = mesReciente;
+    renderTablasDesdeLocal(mesReciente);
+  }
 }
 
 /* INIT */
