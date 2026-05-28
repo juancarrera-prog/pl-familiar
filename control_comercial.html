@@ -222,7 +222,6 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <div class="live-dot"></div>
         Período: <span id="periodoLabel">Cargando...</span>
       </div>
-      <button class="slack-btn" onclick="abrirModalCarga()" style="border-color:var(--red);color:var(--red)">📥 Cargar datos del mes</button>
       <button class="slack-btn" onclick="enviarAlertas()">📣 Enviar alertas Slack</button>
     </div>
   </div>
@@ -670,7 +669,7 @@ const MAPA_MES_COSTO_PERF = {
   'Octubre':'Febrero','Noviembre':'Febrero','Diciembre':'Diciembre',
 };
 let clienteDetalleActivoPerf = 'ITBA';
-let MES_ACTIVO_PERF = 'Enero';
+let MES_ACTIVO_PERF = 'Total';
 
 const DIRECTORES = {
   'Bagó':                 { dir:'mechi', color:'#e8001c', nombre:'Mechi' },
