@@ -479,12 +479,12 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <button id="btnOHPerf" onclick="toggleOH('perf')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
     </div>
     <div class="section-header">
-      <div><div class="section-title">Tabla Consolidada · Performance</div><div class="section-sub">CMB − Costo de Equipo</div></div>
+      <div><div class="section-title">Tabla Consolidada · Performance</div><div class="section-sub">Fee − Costo de Equipo · CMO % = CMO $ / Fee</div></div>
     </div>
     <div class="table-card">
       <table>
         <thead><tr>
-          <th>Cliente</th><th class="num">CMB</th><th class="num">Costo Equipo</th>
+          <th>Cliente</th><th class="num">Fee</th><th class="num">Costo Equipo</th>
           <th class="num">CMO $</th><th class="num">CMO %</th><th>Con OH</th>
         </tr></thead>
         <tbody id="tbodyPerfConsolidado"></tbody>
@@ -526,6 +526,12 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
     <div class="table-card" style="margin-top:12px">
 
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="color:var(--text-muted);font-size:13px">Fee (millones $)</span>
+        <input id="ingresosEditablePerf" type="number" placeholder="0"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:150px"
+          onchange="saveIngresosPerf(clienteDetalleActivoPerf, MES_ACTIVO_PERF, this.value)">
+      </div>
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap">
         <span style="color:var(--text-muted);font-size:13px">Diferencial Programmatic (miles $)</span>
         <input id="diferencialPerfInput" type="number" placeholder="0"
@@ -533,7 +539,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
           onchange="saveDiferencialPerf(clienteDetalleActivoPerf, MES_ACTIVO_PERF, this.value)">
         <span id="totalIngresosPerf" style="font-size:12px;color:var(--green);font-weight:600"></span>
       </div>
-      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Editá el FTE de cada puesto directamente en la tabla. El CMB se toma automáticamente de Control Comercial.</p>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Editá el FTE de cada puesto directamente en la tabla. El Diferencial Programmatic se suma al Fee para el cálculo de CMO.</p>
       <table class="data-table">
         <thead><tr><th>Puesto</th><th class="num">FTE %</th><th class="num">Costo Cía.</th><th class="num">Costo Mensual</th><th class="num">% del total</th></tr></thead>
         <tbody id="tbodyPerfDetalle"></tbody>
@@ -1064,7 +1070,8 @@ async function loadData() {
     if (json.ingresos_perf && Object.keys(json.ingresos_perf).length > 0) {
       Object.entries(json.ingresos_perf).forEach(([cliente, meses]) => {
         if (!INGRESOS_PERF[cliente]) INGRESOS_PERF[cliente] = {};
-        Object.entries(meses).forEach(([mes, valor]) => { INGRESOS_PERF[cliente][mes] = valor; });
+        // ingresos_perf viene en miles del Sheet → convertir a millones
+        Object.entries(meses).forEach(([mes, valor]) => { INGRESOS_PERF[cliente][mes] = valor / 1000; });
       });
     }
     if (json.costos_perf && Object.keys(json.costos_perf).length > 0) {
@@ -1159,26 +1166,38 @@ function calcCostoEquipoPerf(cliente, mes) {
   if (mes === 'Total') {
     return MESES_2026.filter(m=>m!=='Total').reduce((acc,m)=>acc+calcCostoEquipoPerf(cliente,m),0);
   }
+  // TABLA_COSTOS_PERF en pesos enteros → millones
   const puestos=(CLIENTES_FTE_PERF[cliente]&&CLIENTES_FTE_PERF[cliente][mes])||{};
   let total=0;
   for (const [p,fte] of Object.entries(puestos)) total+=getCostoPuestoPerf(p,mes)*fte;
-  const base=total/1000;
-  return ohActivoPerf ? base*(1+OH_PERF) : base;
+  return total/1000000;
 }
 function getCmbCliente(nombre, mes) {
-  // Toma CMB $ del Sheet (DATA.clientes) + diferencial programmatic
+  // Para clientes Big 7: toma CMB del Sheet (DATA.clientes)
+  // Para clientes Performance: toma de INGRESOS_PERF (cargado manualmente en millones)
   const clienteData = (DATA&&DATA.clientes||[]).find(c=>c.nombre===nombre);
-  const cmbSheet = (mes==='Total')
-    ? MESES_2026.filter(m=>m!=='Total').reduce((_,m)=>{
-        const cd=(DATA&&DATA.clientes||[]).find(c=>c.nombre===nombre);
-        return _ + (cd&&cd.cmb||0);
-      }, 0)
-    : (clienteData&&clienteData.cmb||0);
-  // Diferencial programmatic acumulado si es Total
+  let cmbBase;
+  // Siempre usar INGRESOS_PERF para clientes de Performance (aunque existan en Big 7)
+  const esPerfCliente = Object.keys(DIRECTORES_PERF).includes(nombre);
+  if (esPerfCliente) {
+    if (mes === 'Total') {
+      cmbBase = MESES_2026.filter(m=>m!=='Total').reduce((_,m)=>_+((INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][m])||0), 0);
+    } else {
+      cmbBase = (INGRESOS_PERF[nombre]&&INGRESOS_PERF[nombre][mes])||0;
+    }
+  } else {
+    // Big 7: toma CMB del Sheet
+    if (mes === 'Total') {
+      cmbBase = clienteData ? (clienteData.cmb||0) : 0;
+    } else {
+      cmbBase = clienteData ? (clienteData.cmb||0) : 0;
+    }
+  }
+  // Sumar diferencial programmatic
   const dif = (mes==='Total')
     ? MESES_2026.filter(m=>m!=='Total').reduce((_,m)=>_+((DIFERENCIAL_PERF[nombre]&&DIFERENCIAL_PERF[nombre][m])||0),0)
     : ((DIFERENCIAL_PERF[nombre]&&DIFERENCIAL_PERF[nombre][mes])||0);
-  return cmbSheet + dif;
+  return cmbBase + dif;
 }
 
 function getInvCliente(nombre, mes) {
@@ -1199,22 +1218,20 @@ function calcRentabilidadPerf(mes) {
         const p=(CLIENTES_FTE_PERF[nombre]&&CLIENTES_FTE_PERF[nombre][m])||{};
         totalFte+=Object.values(p).reduce((a,b)=>a+b,0);
       });
-      const cmb=getCmbCliente(nombre,'Total');
-      const inv=getInvCliente(nombre,'Total');
-      const cm=cmb-totalCosto;
-      const cmPct=inv>0?(cm/inv)*100:0;
-      return {nombre,ingresos:cmb,costoEq:totalCosto,cm,cmPct,fte:totalFte,inv};
+      const fee=getCmbCliente(nombre,'Total'); // Fee = INGRESOS_PERF + Diferencial
+      const cm=fee-totalCosto;
+      const cmPct=fee>0?(cm/fee)*100:0;      // CMO% = CMO$ / Fee
+      return {nombre,ingresos:fee,costoEq:totalCosto,cm,cmPct,fte:totalFte};
     });
   }
   return Object.keys(DIRECTORES_PERF).map(nombre=>{
-    const cmb=getCmbCliente(nombre,mes);
-    const inv=getInvCliente(nombre,mes);
+    const fee=getCmbCliente(nombre,mes);     // Fee = INGRESOS_PERF + Diferencial
     const costoEq=calcCostoEquipoPerf(nombre,mes);
-    const cm=cmb-costoEq;
-    const cmPct=inv>0?(cm/inv)*100:0;
+    const cm=fee-costoEq;
+    const cmPct=fee>0?(cm/fee)*100:0;        // CMO% = CMO$ / Fee
     const puestos=(CLIENTES_FTE_PERF[nombre]&&CLIENTES_FTE_PERF[nombre][mes])||{};
     const fte=Object.values(puestos).reduce((a,b)=>a+b,0);
-    return {nombre,ingresos:cmb,costoEq,cm,cmPct,fte,inv};
+    return {nombre,ingresos:fee,costoEq,cm,cmPct,fte};
   });
 }
 
@@ -1245,24 +1262,24 @@ function setMesActivoPerf(mes,btn) {
 }
 function renderKPIsPerf(rows) {
   const tIng=rows.reduce((a,r)=>a+r.ingresos,0), tCosto=rows.reduce((a,r)=>a+r.costoEq,0);
-  const tCM=rows.reduce((a,r)=>a+r.cm,0), tPct=tIng>0?(tCM/tIng)*100:0, tFTE=rows.reduce((a,r)=>a+r.fte,0);
-  const fmtM=v=>'$'+v.toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1})+' M';
+  const tCM=rows.reduce((a,r)=>a+r.cm,0);
+  // CMO% = CMO$ / Fee total
+  const tPct=tIng>0?(tCM/tIng)*100:0, tFTE=rows.reduce((a,r)=>a+r.fte,0);
   document.getElementById('kpisPerf').innerHTML=`
     <div class="kpi"><div class="kpi-label">Fees</div><div class="kpi-value" style="font-size:26px">${fmtM(tIng)}</div><div class="kpi-sub">Fee facturado al cliente</div><div class="kpi-accent" style="background:#4488ff"></div></div>
     <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
     <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">Ingresos Netos − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
-    <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO / Ingresos Netos Totales</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
+    <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO $ / Fee Total</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
 }
 function renderPerfConsolidado(rows) {
   const maxCM=Math.max(...rows.map(r=>r.cm));
-  const fmtM=v=>'$'+v.toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1})+' M';
   let html=rows.map(r=>{
     const d=DIRECTORES_PERF[r.nombre]||{};
     // Con OH: costo se multiplica por (1+OH), sin OH: costo base
     const costoDisplay = ohActivoPerf ? r.costoEq*(1+OH_PERF) : r.costoEq;
     const cmDisplay = r.ingresos - costoDisplay;
-    const inv = r.inv||r.ingresos||0;
-    const cmPctDisplay = inv>0 ? (cmDisplay/inv)*100 : 0;
+    // CMO% = CMO$ / Fee (r.ingresos)
+    const cmPctDisplay = r.ingresos>0 ? (cmDisplay/r.ingresos)*100 : 0;
     const pct=maxCM>0?Math.max(0,Math.min(100,(cmDisplay/maxCM)*100)):0;
     const barColor=cmPctDisplay>=40?'#00c853':cmPctDisplay>=20?'#aa44ff':cmPctDisplay>=5?'#f5c400':'#e8001c';
     return `<tr>
@@ -1276,8 +1293,7 @@ function renderPerfConsolidado(rows) {
   const tI=rows.reduce((a,r)=>a+r.ingresos,0);
   const tC=ohActivoPerf ? rows.reduce((a,r)=>a+r.costoEq*(1+OH_PERF),0) : rows.reduce((a,r)=>a+r.costoEq,0);
   const tM=tI-tC;
-  const tInv=rows.reduce((a,r)=>a+(r.inv||r.ingresos||0),0);
-  const tP=tInv>0?(tM/tInv)*100:0;
+  const tP=tI>0?(tM/tI)*100:0;
   html+=`<tr class="total-row"><td>TOTAL</td><td class="num">${fmtM(tI)}</td><td class="num">${fmtM(tC)}</td><td class="num" style="color:${tM>=0?'#f0f0f0':'#ff4455'}">${fmtM(tM)}</td><td class="num" style="color:${tP>=25?'#00c853':tP>0?'#f5c400':'#ff4455'}">${tP.toFixed(1)}%</td><td></td></tr>`;
   document.getElementById('tbodyPerfConsolidado').innerHTML=html;
 }
@@ -1325,19 +1341,20 @@ function renderDetallePerf(cliente) {
   actualizarBannerVigenciaPerf();
   const mes=MES_ACTIVO_PERF, puestos=Object.keys(TABLA_COSTOS_PERF);
   const fteActual=(CLIENTES_FTE_PERF[cliente]&&CLIENTES_FTE_PERF[cliente][mes])||{};
+  // INGRESOS_PERF y DIFERENCIAL_PERF en millones; TABLA_COSTOS_PERF en pesos enteros → /1.000.000
   const ingActual=(INGRESOS_PERF[cliente]&&INGRESOS_PERF[cliente][mes])||0;
   const difActual=(DIFERENCIAL_PERF[cliente]&&DIFERENCIAL_PERF[cliente][mes])||0;
   const ingEl=document.getElementById('ingresosEditablePerf');
-  if(ingEl) ingEl.value=ingActual?(ingActual*1000):'';
+  if(ingEl) ingEl.value=ingActual||'';
   const difEl=document.getElementById('diferencialPerfInput');
-  if(difEl) difEl.value=difActual?(difActual*1000):'';
+  if(difEl) difEl.value=difActual||'';
   const totalIngLabel=document.getElementById('totalIngresosPerf');
   if(totalIngLabel){
     const totalIng=ingActual+difActual;
-    totalIngLabel.textContent=totalIng>0?'Total: $'+totalIng.toFixed(2)+'k':'';
+    totalIngLabel.textContent=totalIng>0?'Total: '+fmtM(totalIng):'';
   }
   const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoPerf(p,mes)*fte;},0);
-  const totalCosto=totalCostoRaw/1000;
+  const totalCosto=totalCostoRaw/1000000; // pesos enteros → millones
   let html=puestos.map(puesto=>{
     const costoUnit=getCostoPuestoPerf(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=(costoUnit*fteVal)/1000;
     const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
@@ -1349,7 +1366,7 @@ function renderDetallePerf(cliente) {
       <td class="num">${fteVal>0?`<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>`:'<span style="color:#303030;font-size:11px">—</span>'}</td>
     </tr>`;
   }).join('');
-  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${getColCostoPerf(mes)}</td><td class="num" style="color:var(--yellow)">${fmtCosto(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
+  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${getColCostoPerf(mes)}</td><td class="num" style="color:var(--yellow)">${fmtM(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
   document.getElementById('tbodyPerfDetalle').innerHTML=html;
 }
 function setMesPerfDetalleActivo(mes,btn) {
@@ -1369,17 +1386,19 @@ function saveFTEPerf(cliente,mes,puesto,valor) {
   renderDetallePerf(cliente);
 }
 function saveIngresosPerf(cliente,mes,valor) {
-  const val=(parseFloat(valor)||0)/1000;
+  // Usuario ingresa en millones; guardamos en millones internamente, en miles en el Sheet
+  const val=parseFloat(valor)||0;
   if(!INGRESOS_PERF[cliente]) INGRESOS_PERF[cliente]={};
   INGRESOS_PERF[cliente][mes]=val;
-  postSheet('ingresos_perf',{cliente,mes,valor:val});
+  postSheet('ingresos_perf',{cliente,mes,valor:val*1000});
   renderDetallePerf(cliente);
 }
 function saveDiferencialPerf(cliente,mes,valor) {
-  const val=(parseFloat(valor)||0)/1000;
+  // Usuario ingresa en millones; guardamos en millones internamente, en miles en el Sheet
+  const val=parseFloat(valor)||0;
   if(!DIFERENCIAL_PERF[cliente]) DIFERENCIAL_PERF[cliente]={};
   DIFERENCIAL_PERF[cliente][mes]=val;
-  postSheet('diferencial_perf',{cliente,mes,valor:val});
+  postSheet('diferencial_perf',{cliente,mes,valor:val*1000});
   renderDetallePerf(cliente);
   // Actualizar consolidado si está visible
   const tab=document.getElementById('perf-consolidado');
@@ -1518,7 +1537,6 @@ function renderKPIsRent(rows) {
   const tCmb=rows.reduce((a,r)=>a+r.cmb,0), tCosto=rows.reduce((a,r)=>a+r.costoEq,0), tCM=rows.reduce((a,r)=>a+r.cm,0);
   const tInv=rows.reduce((a,r)=>a+(r.inv||0),0);
   const tPct=tInv>0?(tCM/tInv)*100:0;
-  const fmtM = v => '$' + v.toLocaleString('es-AR', {minimumFractionDigits:1, maximumFractionDigits:1}) + ' M';
   document.getElementById('kpisRent').innerHTML = `
     <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCmb)}</div><div class="kpi-sub">CMB del período (desde Control Comercial)</div><div class="kpi-accent" style="background:#4488ff"></div></div>
     <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
