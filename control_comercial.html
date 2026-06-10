@@ -62,8 +62,8 @@ body::before { content: ''; position: fixed; inset: 0; background-image: linear-
 .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text); }
 .section-sub { font-size: 11px; color: var(--text-muted); }
 
-.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
-table { width: 100%; border-collapse: collapse; }
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; margin-bottom: 12px; }
+table { width: 100%; min-width: 1100px; border-collapse: collapse; }
 thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
 th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); white-space: nowrap; }
 th.num { text-align: right; }
@@ -614,7 +614,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 /* ═══════════════════════════════════════════════════════════
    DATOS & CONFIGURACIÓN
 ═══════════════════════════════════════════════════════════ */
-const API_URL    = 'https://script.google.com/macros/s/AKfycbx3HFLHNkjeAhfKUGAF0D4IJ06hOWWg6gsjGm-0epn1hFjVXGlFQVKNuL5W5foLR-Tf-w/exec'; // Script Control Comercial
+const API_URL    = 'https://script.google.com/macros/s/AKfycbyJ7ziLiqqBqpld84Rjybve2ZCMIasb2SRUFu2hLAKPHhoazEyLuD3Sq0SRMPffuX22yQ/exec'; // Script Control Comercial
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsO0afw1YW55GkKAfA_6TxGFQvUmO5xYv6edvRpwLQRsZrlXd9q69nbccglQzcwXqmVg/exec'; // Script Rentabilidad (GET+POST)
 const WEBHOOK_URL = '';
 
