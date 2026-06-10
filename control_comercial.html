@@ -493,7 +493,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 
     <div class="ranking-grid">
       <div class="rank-card">
-        <div class="rank-card-title">Ranking · CM $ (mayor a menor)</div>
+        <div class="rank-card-title">Ranking · CMO $ (mayor a menor)</div>
         <div id="rankingPerfCM"></div>
       </div>
       <div class="rank-card">
@@ -1299,9 +1299,17 @@ function renderPerfConsolidado(rows) {
 }
 function renderRankingPerf(rows) {
   const medals=['🥇','🥈','🥉'];
-  const byCM=[...rows].sort((a,b)=>b.cm-a.cm), byPct=[...rows].sort((a,b)=>b.cmPct-a.cmPct);
-  document.getElementById('rankingPerfCM').innerHTML=byCM.map((r,i)=>{const d=DIRECTORES_PERF[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cm>=0?'#00c853':'#ff4455'}">$${(r.cm/1000).toFixed(2)}M</div></div>`;}).join('');
-  document.getElementById('rankingPerfPct').innerHTML=byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'}">${r.cmPct.toFixed(1)}%</div></div>`).join('');
+  // Aplicar OH al momento del render igual que la tabla
+  const rowsDisplay = rows.map(r => {
+    const costoD = ohActivoPerf ? r.costoEq*(1+OH_PERF) : r.costoEq;
+    const cmD    = r.ingresos - costoD;
+    const pctD   = r.ingresos>0 ? (cmD/r.ingresos)*100 : 0;
+    return {...r, cmD, pctD};
+  });
+  const byCM  = [...rowsDisplay].sort((a,b)=>b.cmD-a.cmD);
+  const byPct = [...rowsDisplay].sort((a,b)=>b.pctD-a.pctD);
+  document.getElementById('rankingPerfCM').innerHTML=byCM.map((r,i)=>{const d=DIRECTORES_PERF[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cmD>=0?'#00c853':'#ff4455'}">${fmtM(r.cmD)}</div></div>`;}).join('');
+  document.getElementById('rankingPerfPct').innerHTML=byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>=40?'#00c853':r.pctD>=20?'#aa44ff':r.pctD>=5?'#f5c400':'#ff4455'}">${r.pctD.toFixed(1)}%</div></div>`).join('');
 }
 let chartPerfInstance=null;
 function renderChartPerf(rows) {
@@ -1311,13 +1319,13 @@ function renderChartPerf(rows) {
   chartPerfInstance=new Chart(document.getElementById('chartPerf'),{
     type:'bar',
     data:{labels,datasets:[
-      {label:'Ingresos',data:rows.map(r=>parseFloat((r.ingresos/1000).toFixed(1))),backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
-      {label:'Costo',   data:rows.map(r=>parseFloat((r.costoEq/1000).toFixed(1))),  backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
-      {label:'CM $',    data:rows.map(r=>parseFloat((r.cm/1000).toFixed(1))),        backgroundColor:'rgba(0,200,83,0.65)', borderColor:'#00c853',borderWidth:1,borderRadius:4},
+      {label:'Fee',         data:rows.map(r=>parseFloat(r.ingresos.toFixed(2))),backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
+      {label:'Costo Equipo', data:rows.map(r=>parseFloat((ohActivoPerf?r.costoEq*(1+OH_PERF):r.costoEq).toFixed(2))),backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
+      {label:'CMO $',        data:rows.map(r=>parseFloat((r.ingresos-(ohActivoPerf?r.costoEq*(1+OH_PERF):r.costoEq)).toFixed(2))),backgroundColor:'rgba(0,200,83,0.65)',borderColor:'#00c853',borderWidth:1,borderRadius:4},
     ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#aaa',font:{family:'Poppins',size:11}}}},
       scales:{x:{ticks:{color:'#606060',font:{family:'Poppins',size:11}},grid:{color:'rgba(255,255,255,0.03)'}},
-              y:{ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>'$'+v+'M'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+              y:{ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>'$'+v+' M'},grid:{color:'rgba(255,255,255,0.05)'}}}}
   });
 }
 function renderClienteSelectorPerf() {
