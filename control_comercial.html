@@ -353,7 +353,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
         <span class="filter-label">Mes de análisis</span>
-        <div id="mesSelectorRent" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+        <div id="mesSelectorRent" style="display:none"></div>
       </div>
 
       <div class="kpis" id="kpisRent"></div>
@@ -1511,20 +1511,11 @@ function getInvEquipoCliente(nombre) {
 
 /* RENTABILIDAD - render */
 function renderMesSelector() {
-  const cont = document.getElementById('mesSelectorRent');
-  if (!cont) return;
-  cont.innerHTML = MESES_2026.map(m =>
-    `<button class="dir-btn${m===MES_ACTIVO?' active':''}" onclick="setMesActivo('${m}',this)">${m}</button>`
-  ).join('');
+  // Selector oculto — siempre Total
+  MES_ACTIVO = 'Total';
 }
 function setMesActivo(mes, btn) {
-  MES_ACTIVO = mes;
-  document.querySelectorAll('#mesSelectorRent .dir-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  const rows = calcRentabilidad(mes);
-  renderKPIsRent(rows); renderConsolidado(rows); renderRanking(rows);
-  setTimeout(() => renderChart(rows), 60);
-  actualizarBannerVigencia();
+  // No-op — siempre Total
 }
 function actualizarBannerVigencia() {
   const col = getColCosto(MES_ACTIVO);
@@ -1579,9 +1570,17 @@ function renderConsolidado(rows) {
 }
 function renderRanking(rows) {
   const medals=['🥇','🥈','🥉'];
-  const byCM=[...rows].sort((a,b)=>b.cm-a.cm), byPct=[...rows].sort((a,b)=>b.cmPct-a.cmPct);
-  document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cm>=0?'#00c853':'#ff4455'}">${'$'+r.cm.toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1})+' M'}</div></div>`;}).join('');
-  document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.cmPct>=40?'#00c853':r.cmPct>=20?'#aa44ff':r.cmPct>=5?'#f5c400':'#ff4455'}">${r.cmPct.toFixed(1)}%</div></div>`).join('');
+  // Aplicar OH al momento del render
+  const rowsD = rows.map(r => {
+    const costoD = ohActivoEquipo ? r.costoEq*(1+OH_EQUIPO) : r.costoEq;
+    const cmD    = r.cmb - costoD;
+    const pctD   = r.inv>0 ? (cmD/r.inv)*100 : 0;
+    return {...r, cmD, pctD};
+  });
+  const byCM  = [...rowsD].sort((a,b)=>b.cmD-a.cmD);
+  const byPct = [...rowsD].sort((a,b)=>b.pctD-a.pctD);
+  document.getElementById('rankingCM').innerHTML = byCM.map((r,i)=>{const d=DIRECTORES[r.nombre]||{};return`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name"><div class="client-dot" style="background:${d.color||'#606060'};display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle"></div>${r.nombre}</div><div class="rank-val" style="color:${r.cmD>=0?'#00c853':'#ff4455'}">${fmtM(r.cmD)}</div></div>`;}).join('');
+  document.getElementById('rankingPct').innerHTML = byPct.map((r,i)=>`<div class="rank-item"><div class="rank-num">${medals[i]||(i+1)}</div><div class="rank-name">${r.nombre}</div><div class="rank-val" style="color:${r.pctD>=40?'#00c853':r.pctD>=20?'#aa44ff':r.pctD>=5?'#f5c400':'#ff4455'}">${r.pctD.toFixed(1)}%</div></div>`).join('');
 }
 function renderChart(rows) {
   if (!rows) rows = calcRentabilidad(MES_ACTIVO);
@@ -1590,13 +1589,13 @@ function renderChart(rows) {
   chartRentInstance = new Chart(document.getElementById('chartRent'), {
     type:'bar',
     data:{ labels, datasets:[
-      {label:'CMB',data:rows.map(r=>parseFloat(r.ingresos.toFixed(1))),backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
-      {label:'Costo Equipo',  data:rows.map(r=>parseFloat(r.costoEq.toFixed(1))), backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
-      {label:'CM $',          data:rows.map(r=>parseFloat(r.cm.toFixed(1))),       backgroundColor:'rgba(0,200,83,0.65)', borderColor:'#00c853',borderWidth:1,borderRadius:4},
+      {label:'CMB',         data:rows.map(r=>parseFloat(r.cmb.toFixed(2))), backgroundColor:'rgba(68,136,255,0.7)',borderColor:'#4488ff',borderWidth:1,borderRadius:4},
+      {label:'Costo Equipo', data:rows.map(r=>parseFloat((ohActivoEquipo?r.costoEq*(1+OH_EQUIPO):r.costoEq).toFixed(2))), backgroundColor:'rgba(245,196,0,0.65)',borderColor:'#f5c400',borderWidth:1,borderRadius:4},
+      {label:'CMO $',        data:rows.map(r=>parseFloat((r.cmb-(ohActivoEquipo?r.costoEq*(1+OH_EQUIPO):r.costoEq)).toFixed(2))), backgroundColor:'rgba(0,200,83,0.65)',borderColor:'#00c853',borderWidth:1,borderRadius:4},
     ]},
     options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{ticks:{color:'#606060',font:{family:'Poppins',size:11}},grid:{color:'rgba(255,255,255,0.03)'}},
-              y:{ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>'$'+v+'k'},grid:{color:'rgba(255,255,255,0.05)'}}}}
+              y:{ticks:{color:'#606060',font:{family:'Poppins',size:11},callback:v=>'$'+v+' M'},grid:{color:'rgba(255,255,255,0.05)'}}}}
   });
 }
 
