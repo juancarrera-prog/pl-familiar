@@ -1364,13 +1364,13 @@ function renderDetallePerf(cliente) {
   const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuestoPerf(p,mes)*fte;},0);
   const totalCosto=totalCostoRaw/1000000; // pesos enteros → millones
   let html=puestos.map(puesto=>{
-    const costoUnit=getCostoPuestoPerf(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=(costoUnit*fteVal)/1000;
+    const costoUnit=getCostoPuestoPerf(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=(costoUnit*fteVal)/1000000;
     const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
     return `<tr style="${rowStyle}">
       <td style="font-weight:500;font-size:13px">${puesto}</td>
       <td class="num"><input type="number" class="fte-inline-input" value="${fteVal?(fteVal*100).toFixed(2):''}" placeholder="100" min="0" step="0.01" onchange="saveFTEPerf('${cliente}','${mes}','${puesto}',this.value)"></td>
       <td class="num" style="color:var(--yellow);font-size:12px">${fmtCosto(costoUnit)}</td>
-      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtCosto(costoMes):'—'}</td>
+      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtM(costoMes):'—'}</td>
       <td class="num">${fteVal>0?`<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>`:'<span style="color:#303030;font-size:11px">—</span>'}</td>
     </tr>`;
   }).join('');
@@ -1640,19 +1640,19 @@ function renderDetalle(cliente) {
   if(invEl) invEl.value=invActual?(invActual*1000):'';
   const ingEl=document.getElementById('ingresosEditable');
   if(ingEl) ingEl.value=ingActual?(ingActual*1000):'';
-  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuesto(p,mes)*fte;},0);const totalCosto=totalCostoRaw/1000;
+  const totalCostoRaw=puestos.reduce((acc,p)=>{const fte=fteActual[p]||0;return acc+getCostoPuesto(p,mes)*fte;},0);const totalCosto=totalCostoRaw/1000000;
   let html=puestos.map(puesto=>{
-    const costoUnit=getCostoPuesto(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=(costoUnit*fteVal)/1000;
+    const costoUnit=getCostoPuesto(puesto,mes), fteVal=fteActual[puesto]||0, costoMes=(costoUnit*fteVal)/1000000;
     const pcTot=totalCosto>0?(costoMes/totalCosto)*100:0, rowStyle=fteVal>0?'':'opacity:0.35';
     return `<tr style="${rowStyle}">
       <td style="font-weight:500;font-size:13px">${puesto}</td>
       <td class="num"><input type="number" class="fte-inline-input" value="${fteVal?(fteVal*100).toFixed(2):''}" placeholder="370.39" min="0" step="0.01" onchange="saveFTE('${cliente}','${mes}','${puesto}',this.value)" title="FTE ${puesto} en ${mes}"></td>
       <td class="num" style="color:var(--yellow);font-size:12px">${fmtCosto(costoUnit)}</td>
-      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtCosto(costoMes):'—'}</td>
+      <td class="num" style="color:${fteVal>0?'#f0f0f0':'#404040'};font-size:12px">${fteVal>0?fmtM(costoMes):'—'}</td>
       <td class="num">${fteVal>0?`<div class="cm-bar-wrap"><div class="cm-bar-bg"><div class="cm-bar-fill" style="width:${Math.min(pcTot,100).toFixed(0)}%;background:var(--purple)"></div></div><span style="min-width:36px;text-align:right;color:#aaa;font-size:11px">${pcTot.toFixed(1)}%</span></div>`:'<span style="color:#303030;font-size:11px">—</span>'}</td>
     </tr>`;
   }).join('');
-  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${colCosto}</td><td class="num" style="color:var(--yellow)">${fmtCosto(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
+  html+=`<tr class="total-row"><td colspan="2">TOTAL - ${cliente} - ${mes}</td><td style="color:var(--text-muted);font-size:11px">Col: ${colCosto}</td><td class="num" style="color:var(--yellow)">${fmtM(totalCosto)}</td><td class="num" style="color:#aaa">100%</td></tr>`;
   document.getElementById('tbodyDetalle').innerHTML = html;
 }
 function saveFTE(cliente, mes, puesto, valor) {
