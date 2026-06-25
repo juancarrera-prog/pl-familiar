@@ -1517,12 +1517,17 @@ function renderRentabilidadCompleto() {
   actualizarBannerVigencia();
 }
 function renderKPIsRent(rows) {
-  const tCmb=rows.reduce((a,r)=>a+r.cmb,0), tCosto=rows.reduce((a,r)=>a+r.costoEq,0), tCM=rows.reduce((a,r)=>a+r.cm,0);
-  const tInv=rows.reduce((a,r)=>a+(r.inv||0),0);
-  const tPct=tInv>0?(tCM/tInv)*100:0;
+  const tCmb  = rows.reduce((a,r)=>a+r.cmb, 0);
+  const tInv  = rows.reduce((a,r)=>a+(r.inv||0), 0);
+  // Aplicar OH igual que la tabla
+  const tCosto = ohActivoEquipo
+    ? rows.reduce((a,r)=>a+r.costoEq*(1+OH_EQUIPO), 0)
+    : rows.reduce((a,r)=>a+r.costoEq, 0);
+  const tCM  = tCmb - tCosto;
+  const tPct = tInv>0 ? (tCM/tInv)*100 : 0;
   document.getElementById('kpisRent').innerHTML = `
     <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCmb)}</div><div class="kpi-sub">CMB del período (desde Control Comercial)</div><div class="kpi-accent" style="background:#4488ff"></div></div>
-    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania${ohActivoEquipo?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
     <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">CMB − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
     <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO $ / Inv. Período</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
 }
