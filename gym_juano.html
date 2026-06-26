@@ -617,6 +617,15 @@
     <button class="btn primary" onclick="savePeso()" style="align-self:flex-end;padding:9px 20px">Guardar</button>
   </div>
 
+  <p class="section-title">Evolución</p>
+  <div class="card" style="padding:16px">
+    <div style="display:flex;gap:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:50%;background:#44ffcc"></div><span style="font-size:12px;color:#888">Peso (kg)</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:50%;background:#44bbff"></div><span style="font-size:12px;color:#888">Cintura (cm)</span></div>
+    </div>
+    <canvas id="chart-peso" height="200"></canvas>
+  </div>
+
   <p class="section-title">Historial</p>
   <div id="peso-list"></div>
   <div style="height:20px"></div>
@@ -774,6 +783,7 @@ function savePeso() {
   document.getElementById('inp-peso').value = '';
   document.getElementById('inp-cintura').value = '';
   renderPeso();
+  if (typeof renderChart === 'function') renderChart();
 }
 renderPeso();
 
@@ -900,5 +910,94 @@ function resetTimer() {
 buildDots();
 renderTimer();
 </script>
-</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+let chartPeso = null;
+
+function renderChart() {
+  const sorted = [...pesoLog].sort((a,b) => a.fecha.localeCompare(b.fecha));
+  const labels = sorted.map(r => { const f=r.fecha.split('-'); return `${f[2]}/${f[1]}`; });
+  const pesos  = sorted.map(r => r.peso);
+  const cinturas = sorted.map(r => r.cintura || null);
+
+  const ctx = document.getElementById('chart-peso').getContext('2d');
+
+  if (chartPeso) chartPeso.destroy();
+
+  chartPeso = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Peso (kg)',
+          data: pesos,
+          borderColor: '#44ffcc',
+          backgroundColor: 'rgba(68,255,204,0.08)',
+          pointBackgroundColor: '#44ffcc',
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.3,
+          fill: true,
+          yAxisID: 'yPeso',
+        },
+        {
+          label: 'Cintura (cm)',
+          data: cinturas,
+          borderColor: '#44bbff',
+          backgroundColor: 'rgba(68,187,255,0.08)',
+          pointBackgroundColor: '#44bbff',
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.3,
+          fill: true,
+          yAxisID: 'yCintura',
+          spanGaps: true,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1a1a',
+          borderColor: '#2a2a2a',
+          borderWidth: 1,
+          titleColor: '#888',
+          bodyColor: '#f0f0f0',
+          padding: 10,
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: '#1e1e1e' },
+          ticks: { color: '#555', font: { size: 11 } }
+        },
+        yPeso: {
+          position: 'left',
+          grid: { color: '#1e1e1e' },
+          ticks: { color: '#44ffcc', font: { size: 11 }, callback: v => v + ' kg' },
+        },
+        yCintura: {
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { color: '#44bbff', font: { size: 11 }, callback: v => v + ' cm' },
+        }
+      }
+    }
+  });
+}
+
+// Re-render chart when tab is opened
+document.querySelectorAll('.nav-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    if (t.textContent.trim() === 'Peso') setTimeout(renderChart, 50);
+  });
+});
+
+// Init
+renderChart();
+</script>
 </html>
