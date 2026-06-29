@@ -6,416 +6,144 @@
 <title>Juano Gym</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap');
-
   :root {
-    --bg: #0a0a0a;
-    --bg2: #111111;
-    --bg3: #1a1a1a;
-    --card: #161616;
-    --border: #2a2a2a;
-    --border2: #333;
-    --text: #f0f0f0;
-    --text2: #888;
-    --text3: #555;
-    --accent: #e8ff47;
-    --accent2: #c8dd30;
-    --red: #ff4444;
-    --green: #44ff88;
-    --orange: #ff8844;
-    --blue: #4488ff;
-    --radius: 12px;
-    --radius-sm: 8px;
+    --bg:#0a0a0a; --bg2:#111111; --bg3:#1a1a1a; --card:#161616;
+    --border:#2a2a2a; --border2:#333; --text:#f0f0f0; --text2:#888; --text3:#555;
+    --accent:#e8ff47; --accent2:#c8dd30; --red:#ff4444; --green:#44ff88;
+    --orange:#ff8844; --blue:#4488ff; --purple:#bb44ff; --cyan:#44ffcc;
+    --radius:12px; --radius-sm:8px;
   }
-
-  * { margin:0; padding:0; box-sizing:border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
 
   /* HEADER */
-  .app-header {
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .app-logo {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-  }
-  .app-logo span { color: var(--accent); }
-  .header-badge {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 12px;
-    color: var(--text2);
-  }
+  .app-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .app-logo{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;letter-spacing:-0.5px;}
+  .app-logo span{color:var(--accent);}
+  .header-badge{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--text2);}
 
-  /* NAV TABS */
-  .nav-tabs {
-    display: flex;
-    gap: 4px;
-    padding: 12px 16px;
-    background: var(--bg2);
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .nav-tabs::-webkit-scrollbar { display: none; }
-  .nav-tab {
-    padding: 7px 16px;
-    border-radius: 20px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--text2);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all .15s;
-    font-family: 'Inter', sans-serif;
-  }
-  .nav-tab.active {
-    background: var(--accent);
-    color: #0a0a0a;
-    font-weight: 600;
-  }
-  .nav-tab:not(.active):hover {
-    border-color: var(--border2);
-    color: var(--text);
-  }
+  /* NAV */
+  .nav-tabs{display:flex;gap:4px;padding:10px 14px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+  .nav-tabs::-webkit-scrollbar{display:none;}
+  .nav-tab{padding:7px 14px;border-radius:20px;border:1px solid transparent;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:'Inter',sans-serif;}
+  .nav-tab.active{background:var(--accent);color:#0a0a0a;font-weight:600;}
+  .nav-tab:not(.active):hover{border-color:var(--border2);color:var(--text);}
 
   /* VIEWS */
-  .view { display: none; padding: 16px; max-width: 680px; margin: 0 auto; }
-  .view.active { display: block; }
+  .view{display:none;padding:14px;max-width:680px;margin:0 auto;}
+  .view.active{display:block;}
+
+  /* RUTINAS NAV */
+  .rutinas-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .rut-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;}
+  .rut-btn.active{color:#0a0a0a;font-weight:700;}
+  .rut-btn.fb{} .rut-btn.fb.active{background:#e8ff47;border-color:#e8ff47;}
+  .rut-btn.pi.active{background:#ff4444;border-color:#ff4444;}
+  .rut-btn.ts.active{background:#4488ff;border-color:#4488ff;}
 
   /* SECTION TITLE */
-  .section-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin: 20px 0 10px;
-  }
-  .section-title:first-child { margin-top: 4px; }
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin:18px 0 8px;}
+  .section-title:first-child{margin-top:2px;}
 
   /* CARD */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-  .card-header {
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid var(--border);
-  }
-  .card-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: var(--radius-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-  .card-icon.yellow { background: rgba(232,255,71,.12); }
-  .card-icon.red { background: rgba(255,68,68,.12); }
-  .card-icon.blue { background: rgba(68,136,255,.12); }
-  .card-icon.green { background: rgba(68,255,136,.12); }
-  .card-icon.orange { background: rgba(255,136,68,.12); }
-  .card-title { font-size: 14px; font-weight: 600; }
-  .card-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-  .card-badge {
-    margin-left: auto;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 11px;
-    color: var(--text2);
-    white-space: nowrap;
-  }
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;}
+  .card-header{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+  .card-icon{width:34px;height:34px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+  .card-icon.yellow{background:rgba(232,255,71,.12);}
+  .card-icon.red{background:rgba(255,68,68,.12);}
+  .card-icon.blue{background:rgba(68,136,255,.12);}
+  .card-icon.green{background:rgba(68,255,136,.12);}
+  .card-icon.orange{background:rgba(255,136,68,.12);}
+  .card-icon.purple{background:rgba(187,68,255,.12);}
+  .card-title{font-size:14px;font-weight:600;}
+  .card-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+  .card-badge{margin-left:auto;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--text2);white-space:nowrap;}
 
   /* EXERCISE ROW */
-  .ex-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    transition: background .1s;
-  }
-  .ex-row:last-child { border-bottom: none; }
-  .ex-row:hover { background: var(--bg3); }
-  .ex-illus {
-    width: 56px;
-    height: 56px;
-    border-radius: var(--radius-sm);
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-  .ex-illus img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; transition: opacity .3s; }
-  .ex-info { flex: 1; min-width: 0; }
-  .ex-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
-  .ex-detail { font-size: 12px; color: var(--text2); }
-  .ex-sets {
-    text-align: right;
-    flex-shrink: 0;
-  }
-  .ex-sets strong { font-size: 15px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; color: var(--accent); }
-  .ex-sets span { font-size: 11px; color: var(--text3); display: block; }
+  .ex-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border);transition:background .1s;}
+  .ex-row:last-child{border-bottom:none;}
+  .ex-row:hover{background:var(--bg3);}
+  .ex-num{width:22px;height:22px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--text3);flex-shrink:0;}
+  .ex-info{flex:1;min-width:0;}
+  .ex-name{font-size:14px;font-weight:500;margin-bottom:2px;}
+  .ex-detail{font-size:11px;color:var(--text2);}
+  .ex-right{text-align:right;flex-shrink:0;}
+  .ex-right strong{font-size:14px;font-weight:700;font-family:'Space Grotesk',sans-serif;color:var(--accent);display:block;}
+  .ex-right span{font-size:10px;color:var(--text3);}
+  .tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;margin-left:6px;vertical-align:middle;}
+  .tag-super{background:rgba(187,68,255,.15);color:#bb44ff;}
+  .tag-calor{background:rgba(255,136,68,.15);color:#ff8844;}
+  .tag-core{background:rgba(68,136,255,.15);color:#4488ff;}
 
-  /* TIP BOX */
-  .tip {
-    background: rgba(232,255,71,.05);
-    border: 1px solid rgba(232,255,71,.15);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    font-size: 13px;
-    color: var(--text2);
-    margin-bottom: 12px;
-    line-height: 1.5;
-  }
-  .tip strong { color: var(--accent); }
+  /* TIP */
+  .tip{background:rgba(232,255,71,.05);border:1px solid rgba(232,255,71,.15);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5;}
+  .tip strong{color:var(--accent);}
+  .tip-blue{background:rgba(68,136,255,.05);border-color:rgba(68,136,255,.2);color:var(--text2);}
+  .tip-blue strong{color:#4488ff;}
 
-  /* TIMER VIEW */
-  .timer-hero {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px 20px 20px;
-    text-align: center;
-    margin-bottom: 12px;
-  }
-  .timer-phase { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-  .timer-exname {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-  .timer-sets-info { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
-  .timer-clock {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 72px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: -2px;
-    line-height: 1;
-    margin-bottom: 8px;
-    transition: color .3s;
-  }
-  .timer-clock.rest { color: var(--blue); }
-  .timer-clock.warning { color: var(--orange); }
-  .timer-next { font-size: 12px; color: var(--text3); margin-bottom: 20px; min-height: 18px; }
-  .timer-progress {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    margin: 0 0 20px;
-    overflow: hidden;
-  }
-  .timer-progress-bar { height: 100%; background: var(--accent); border-radius: 2px; transition: width .9s linear; }
-  .timer-progress-bar.rest { background: var(--blue); }
-  .timer-btn-row { display: flex; gap: 8px; justify-content: center; }
-  .btn {
-    padding: 10px 22px;
-    border-radius: 30px;
-    border: 1px solid var(--border2);
-    background: var(--bg3);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    transition: all .15s;
-  }
-  .btn:hover { border-color: var(--text2); }
-  .btn.primary { background: var(--accent); color: #0a0a0a; border-color: transparent; }
-  .btn.primary:hover { background: var(--accent2); }
-  .btn.danger { border-color: rgba(255,68,68,.3); color: var(--red); }
+  /* SEMANA GRID */
+  .week-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+  .week-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;}
+  .week-card.gym{border-color:rgba(232,255,71,.3);}
+  .week-card.walk{border-color:rgba(68,136,255,.3);}
+  .week-card h3{font-size:13px;font-weight:600;margin-bottom:3px;}
+  .week-card p{font-size:11px;color:var(--text2);}
+  .week-card .dot{width:8px;height:8px;border-radius:50%;margin:0 auto 8px;}
+  .week-card.gym .dot{background:var(--accent);}
+  .week-card.walk .dot{background:var(--blue);}
+  .week-card.rest .dot{background:var(--border2);}
 
-  /* STEP DOTS */
-  .step-dots { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
-  .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); transition: all .2s; }
-  .step-dot.done { background: var(--text3); }
-  .step-dot.active { background: var(--accent); transform: scale(1.3); }
+  /* CHECKLIST */
+  .checklist{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+  .check-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;user-select:none;}
+  .check-item:last-child{border-bottom:none;}
+  .check-item:hover{background:var(--bg3);}
+  .check-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;color:transparent;font-size:13px;}
+  .check-box.on{background:var(--accent);border-color:var(--accent);color:#0a0a0a;}
+  .check-text{font-size:13px;transition:color .2s;}
+  .check-text.done{color:var(--text3);text-decoration:line-through;}
 
-  /* ILLUS PANEL */
-  .illus-panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    margin-bottom: 12px;
-  }
-  .illus-panel svg { flex-shrink: 0; }
-  .illus-panel-info { flex: 1; }
-  .illus-panel-info h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-  .illus-panel-info p { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  /* PESO */
+  .peso-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+  .field-group{flex:1;min-width:110px;}
+  .field-group label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;}
+  .field-group input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border .15s;}
+  .field-group input:focus{border-color:var(--accent);}
+  .log-list{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+  .log-item{display:flex;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border);gap:10px;}
+  .log-item:last-child{border-bottom:none;}
+  .log-date{font-size:12px;color:var(--text2);flex:1;}
+  .log-panza{font-size:12px;color:var(--text2);}
+  .log-peso{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;}
+  .log-peso span{font-size:12px;font-weight:400;color:var(--text2);}
+  .log-delta{font-size:12px;font-weight:600;}
+  .log-delta.up{color:var(--orange);}
+  .log-delta.down{color:var(--cyan);}
+  .log-delta.eq{color:var(--text3);}
 
-  /* SEMANA VIEW */
-  .week-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-  .week-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px;
-    text-align: center;
-  }
-  .week-card.gym { border-color: rgba(232,255,71,.3); }
-  .week-card.walk { border-color: rgba(68,136,255,.3); }
-  .week-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
-  .week-card p { font-size: 11px; color: var(--text2); }
-  .week-card .dot { width: 8px; height: 8px; border-radius: 50%; margin: 0 auto 8px; }
-  .week-card.gym .dot { background: var(--accent); }
-  .week-card.walk .dot { background: var(--blue); }
-  .week-card.rest .dot { background: var(--border2); }
+  /* BTN */
+  .btn{padding:9px 20px;border-radius:30px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;}
+  .btn:hover{border-color:var(--text2);}
+  .btn.primary{background:var(--accent);color:#0a0a0a;border-color:transparent;}
+  .btn.primary:hover{background:var(--accent2);}
 
-  .checklist { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .check-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 13px 16px;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    transition: background .1s;
-    user-select: none;
-  }
-  .check-item:last-child { border-bottom: none; }
-  .check-item:hover { background: var(--bg3); }
-  .check-box {
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
-    border: 1.5px solid var(--border2);
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all .2s;
-    color: transparent;
-    font-size: 13px;
-  }
-  .check-box.on { background: var(--accent); border-color: var(--accent); color: #0a0a0a; }
-  .check-text { font-size: 13px; transition: color .2s; }
-  .check-text.done { color: var(--text3); text-decoration: line-through; }
+  /* MODAL */
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:flex-end;justify-content:center;}
+  .modal.open{display:flex;}
+  .modal-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-width:680px;padding:20px;max-height:80vh;overflow-y:auto;}
+  .modal-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px;}
+  .modal-sub{font-size:13px;color:var(--text2);margin-bottom:14px;}
+  .modal-tips{font-size:13px;color:var(--text2);line-height:1.8;}
+  .modal-tips li{margin-left:16px;margin-bottom:4px;}
+  .modal-close{float:right;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;}
+  .modal-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:13px;}
+  .modal-table th{text-align:left;color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:1px;padding:6px 8px;border-bottom:1px solid var(--border);}
+  .modal-table td{padding:8px 8px;border-bottom:1px solid var(--border);color:var(--text2);}
+  .modal-table td:first-child{color:var(--text);font-weight:500;}
+  .modal-table tr:last-child td{border-bottom:none;}
 
-  /* PESO LOG */
-  .peso-form {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 10px;
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-    flex-wrap: wrap;
-  }
-  .field-group { flex: 1; min-width: 120px; }
-  .field-group label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px; }
-  .field-group input {
-    width: 100%;
-    background: var(--bg3);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius-sm);
-    padding: 8px 12px;
-    color: var(--text);
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    outline: none;
-    transition: border .15s;
-  }
-  .field-group input:focus { border-color: var(--accent); }
-
-  .log-list { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .log-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    gap: 12px;
-  }
-  .log-item:last-child { border-bottom: none; }
-  .log-date { font-size: 12px; color: var(--text2); flex: 1; }
-  .log-peso { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; }
-  .log-peso span { font-size: 12px; font-weight: 400; color: var(--text2); }
-  .log-delta { font-size: 12px; font-weight: 600; }
-  .log-delta.up { color: var(--orange); }
-  .log-delta.down { color: var(--green); }
-  .log-delta.eq { color: var(--text3); }
-  .log-cintura { font-size: 12px; color: var(--text2); }
-
-  /* EMPTY STATE */
-  .empty { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 13px; }
-
-  /* MODAL OVERLAY */
-  .modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.85);
-    z-index: 200;
-    align-items: flex-end;
-    justify-content: center;
-  }
-  .modal.open { display: flex; }
-  .modal-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius) var(--radius) 0 0;
-    width: 100%;
-    max-width: 680px;
-    padding: 20px;
-    max-height: 85vh;
-    overflow-y: auto;
-  }
-  .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
-  .modal-illus { display: flex; justify-content: center; margin-bottom: 16px; }
-  .modal-tips { font-size: 13px; color: var(--text2); line-height: 1.7; }
-  .modal-tips li { margin-left: 16px; margin-bottom: 4px; }
-  .modal-close { float: right; background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 4px 14px; font-size: 12px; color: var(--text2); cursor: pointer; font-family: 'Inter', sans-serif; }
-
-  /* RESPONSIVE */
-  @media (max-width: 480px) {
-    .timer-clock { font-size: 56px; }
-    .ex-illus { width: 48px; height: 48px; }
-    .week-grid { grid-template-columns: repeat(2, 1fr); }
+  @media(max-width:480px){
+    .week-grid{grid-template-columns:repeat(2,1fr);}
   }
 </style>
 </head>
@@ -425,203 +153,223 @@
   <div class="app-logo">JUANO<span>GYM</span></div>
   <div class="header-badge" id="hdr-fecha"></div>
 </div>
-
 <div class="nav-tabs">
-  <button class="nav-tab active" onclick="showView('rutina')">Rutina</button>
-  <button class="nav-tab" onclick="showView('timer')">Timer</button>
-  <button class="nav-tab" onclick="showView('semana')">Semana</button>
-  <button class="nav-tab" onclick="showView('peso')">Peso</button>
+  <button class="nav-tab active" onclick="showView('rutinas',this)">Rutinas</button>
+  <button class="nav-tab" onclick="showView('semana',this)">Semana</button>
+  <button class="nav-tab" onclick="showView('peso',this)">Peso</button>
 </div>
 
-<!-- ==================== RUTINA ==================== -->
-<div id="view-rutina" class="view active">
-  <div class="tip"><strong>Esta semana:</strong> Calistenia en casa para despertar el cuerpo. Foco en técnica, no en cansarte. Semana que viene: gym.</div>
+<!-- ==================== RUTINAS ==================== -->
+<div id="view-rutinas" class="view active">
+  <div class="tip"><strong>Tu plan:</strong> 3 días/semana (L-M-V al mediodía, máx 60 min). Rotación: Full Body → Pierna → Full Body/Tren Superior. Progresión cada 2-3 semanas.</div>
 
-  <p class="section-title">Calentamiento · 3–4 min</p>
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon yellow">🔥</div>
-      <div><div class="card-title">Calentamiento</div><div class="card-sub">Sin pausa entre ejercicios</div></div>
-      <div class="card-badge">Siempre</div>
+  <div class="rutinas-nav">
+    <button class="rut-btn fb active" onclick="showRutina('fb1',this)">Full Body 1</button>
+    <button class="rut-btn fb" onclick="showRutina('fb2',this)">Full Body 2</button>
+    <button class="rut-btn fb" onclick="showRutina('fb3',this)">Full Body 3</button>
+    <button class="rut-btn pi" onclick="showRutina('pi1',this)">Pierna 1</button>
+    <button class="rut-btn ts" onclick="showRutina('ts1',this)">Tren Superior 1</button>
+  </div>
+
+  <!-- FULL BODY 1 -->
+  <div id="rut-fb1" class="rutina-view">
+    <p class="section-title">Entrada en calor · Movilidad · Superserie x3 rondas</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon orange">🔥</div><div><div class="card-title">Movilidad</div><div class="card-sub">3 rondas sin pausa entre ejercicios</div></div><div class="card-badge">Calor</div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Estiramiento de la Cobra</div><div class="ex-detail">Cobra Stretch · activa columna lumbar</div></div><div class="ex-right"><strong>30"</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Estiramiento caderas 90/90</div><div class="ex-detail">Hips 90/90 Stretch · movilidad de cadera</div></div><div class="ex-right"><strong>30"</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Estiramiento Flexor de Cadera</div><div class="ex-detail">Half Kneeling Hip Flexor Stretch</div></div><div class="ex-right"><strong>20"</strong><span>30" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('marcha')">
-      <div class="ex-illus" id="il-marcha"></div>
-      <div class="ex-info"><div class="ex-name">Marcha en el lugar</div><div class="ex-detail">Rodillas arriba, brazos activos</div></div>
-      <div class="ex-sets"><strong>1'</strong><span>continuo</span></div>
+
+    <p class="section-title">Zona Media · Superserie x3 rondas</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Core</div><div class="card-sub">Preparamos el core antes de levantar</div></div><div class="card-badge">Superserie</div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Plancha Corporal</div><div class="ex-detail">Core y lumbar activados</div></div><div class="ex-right"><strong>45"</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Twist Soviético con Disco</div><div class="ex-detail">10-15 reps por lado</div></div><div class="ex-right"><strong>×15</strong><span>60" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('hombros')">
-      <div class="ex-illus" id="il-hombros"></div>
-      <div class="ex-info"><div class="ex-name">Círculos de hombros</div><div class="ex-detail">Adelante y atrás, amplitud máxima</div></div>
-      <div class="ex-sets"><strong>30"</strong><span>× lado</span></div>
+
+    <p class="section-title">Tren Inferior</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon red">🦵</div><div><div class="card-title">Piernas</div><div class="card-sub">Empezamos con el grupo muscular más grande</div></div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Sentadilla con Barra Smith</div><div class="ex-detail">Pies al ancho de hombros · profundidad completa</div></div><div class="ex-right"><strong>3×8-10</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Camilla de Isquiotibiales</div><div class="ex-detail">Curl acostado · bajada controlada</div></div><div class="ex-right"><strong>3×10-12</strong><span>90" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('inchworm')">
-      <div class="ex-illus" id="il-inchworm"></div>
-      <div class="ex-info"><div class="ex-name">Inchworm</div><div class="ex-detail">Caminás con manos al piso y volvés</div></div>
-      <div class="ex-sets"><strong>5</strong><span>reps lentas</span></div>
+
+    <p class="section-title">Tren Superior — Push</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon yellow">💪</div><div><div class="card-title">Pecho · Tríceps · Hombros</div><div class="card-sub">Empuje horizontal e inclinado</div></div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Press Inclinado en Barra Smith</div><div class="ex-detail">45° · pecho alto · codos a 75°</div></div><div class="ex-right"><strong>3×8-10</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Press Plano en Máquina</div><div class="ex-detail">Rango completo · apretá pecho al tope</div></div><div class="ex-right"><strong>3×10-12</strong><span>90" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Trícep en Polea</div><div class="ex-detail">Pushdown · codos fijos · bajada total</div></div><div class="ex-right"><strong>3×12-15</strong><span>90" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">4</div><div class="ex-info"><div class="ex-name">Vuelos Laterales con Mancuernas</div><div class="ex-detail">Hombros · codos levemente flexionados</div></div><div class="ex-right"><strong>3×12-15</strong><span>90" desc</span></div></div>
     </div>
   </div>
 
-  <p class="section-title">Bloque A · Core</p>
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon blue">⚡</div>
-      <div><div class="card-title">Core</div><div class="card-sub">Superserie · 3 series · 45" descanso</div></div>
+  <!-- FULL BODY 2 -->
+  <div id="rut-fb2" class="rutina-view" style="display:none">
+    <p class="section-title">Entrada en calor · Movilidad · Superserie x3 rondas</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon orange">🔥</div><div><div class="card-title">Movilidad</div><div class="card-sub">Foco en hombros para este entrenamiento</div></div><div class="card-badge">Calor</div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Movilidad Completa de Hombro</div><div class="ex-detail">Circles + pendulum + rotaciones</div></div><div class="ex-right"><strong>×10</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">90/90 Movilidad Cadera</div><div class="ex-detail">10 reps cada lado</div></div><div class="ex-right"><strong>×10CDU</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Estiramiento Flexor de Cadera</div><div class="ex-detail">Half Kneeling Hip Flexor Stretch</div></div><div class="ex-right"><strong>20"</strong><span>30" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('plancha')">
-      <div class="ex-illus" id="il-plancha"></div>
-      <div class="ex-info"><div class="ex-name">Plancha</div><div class="ex-detail">Cuerpo recto, ombligo adentro</div></div>
-      <div class="ex-sets"><strong>3×35"</strong><span>plank</span></div>
+
+    <p class="section-title">Tren Inferior</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon red">🦵</div><div><div class="card-title">Piernas</div><div class="card-sub">Unilateral para corregir asimetrías</div></div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Prensa Unilateral</div><div class="ex-detail">Una pierna a la vez · pie al centro</div></div><div class="ex-right"><strong>3×8-10</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Camilla de Cuádriceps</div><div class="ex-detail">Extensión · bajada de 3 segundos</div></div><div class="ex-right"><strong>3×12-15</strong><span>90" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('crunches')">
-      <div class="ex-illus" id="il-crunches"></div>
-      <div class="ex-info"><div class="ex-name">Crunches</div><div class="ex-detail">Controlado, no jalés el cuello</div></div>
-      <div class="ex-sets"><strong>3×15</strong><span>reps</span></div>
+
+    <p class="section-title">Tren Superior — Pull</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon green">🏋️</div><div><div class="card-title">Espalda · Bíceps · Deltoides posterior</div><div class="card-sub">Tracción vertical y horizontal</div></div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Dorsalera</div><div class="ex-detail">Lat pulldown · codos abajo y atrás</div></div><div class="ex-right"><strong>3×10-12</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Remo Gironda</div><div class="ex-detail">Pecho en banco · codos bien atrás</div></div><div class="ex-right"><strong>3×10-12</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Bícep Martillo con Mancuernas</div><div class="ex-detail">Neutro · codo fijo · sube lento</div></div><div class="ex-right"><strong>3×10-12</strong><span>90" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">4</div><div class="ex-info"><div class="ex-name">Vuelos Posteriores con Mancuernas</div><div class="ex-detail">Inclinado · deltoides posterior</div></div><div class="ex-right"><strong>3×12-15</strong><span>90" desc</span></div></div>
     </div>
   </div>
 
-  <p class="section-title">Bloque B · Piernas y glúteos</p>
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon red">🦵</div>
-      <div><div class="card-title">Piernas</div><div class="card-sub">Superserie · 3 series · 60" descanso</div></div>
+  <!-- FULL BODY 3 -->
+  <div id="rut-fb3" class="rutina-view" style="display:none">
+    <p class="section-title">Entrada en calor · Movilidad · Superserie x3 rondas</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon orange">🔥</div><div><div class="card-title">Movilidad</div><div class="card-sub">Hombros + cadera + cadena posterior</div></div><div class="card-badge">Calor</div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Movilidad Completa de Hombro</div><div class="ex-detail">Circles completos</div></div><div class="ex-right"><strong>×12</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">90/90 Movilidad Cadera</div><div class="ex-detail">Flow completo cada lado</div></div><div class="ex-right"><strong>×10CDU</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Estiramiento Flexor de Cadera</div><div class="ex-detail">Half Kneeling</div></div><div class="ex-right"><strong>20"</strong><span>0" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('squat')">
-      <div class="ex-illus" id="il-squat"></div>
-      <div class="ex-info"><div class="ex-name">Sentadilla libre</div><div class="ex-detail">Pies al ancho de hombros, rodillas afuera</div></div>
-      <div class="ex-sets"><strong>3×20</strong><span>reps</span></div>
+
+    <p class="section-title">Zona Media · Superserie x3 rondas</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Core</div><div class="card-sub">Rotación + estabilización</div></div><div class="card-badge">Superserie</div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Twist en Banco Declinado</div><div class="ex-detail">Rotación completa · pies fijos</div></div><div class="ex-right"><strong>×15-20</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Plancha Alta Toco y Toco</div><div class="ex-detail">Plancha en manos · tocá hombro alterno</div></div><div class="ex-right"><strong>×10CDU</strong><span>60" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('glute')">
-      <div class="ex-illus" id="il-glute"></div>
-      <div class="ex-info"><div class="ex-name">Puente de glúteos</div><div class="ex-detail">Apretá arriba, bajá lento</div></div>
-      <div class="ex-sets"><strong>3×20</strong><span>reps</span></div>
+
+    <p class="section-title">Tren Inferior</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon red">🦵</div><div><div class="card-title">Piernas</div><div class="card-sub">Prensa + unilateral</div></div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Prensa</div><div class="ex-detail">Bilateral · rango completo</div></div><div class="ex-right"><strong>3×8-10</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Sentadilla Búlgara con Mancuernas</div><div class="ex-detail">Pie trasero elevado · rodilla baja sin tocar</div></div><div class="ex-right"><strong>3×8-10</strong><span>90" desc</span></div></div>
+    </div>
+
+    <p class="section-title">Tren Superior</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon yellow">💪</div><div><div class="card-title">Hombros · Espalda · Bíceps · Tríceps</div><div class="card-sub">Superseries para densidad de entrenamiento</div></div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Press de Hombro con Mancuernas</div><div class="ex-detail">Sentado · neutro o pronado</div></div><div class="ex-right"><strong>3×8-10</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Remo Unilateral con Mancuerna <span class="tag tag-super">Superserie</span></div><div class="ex-detail">Apoyo en banco · codo bien atrás</div></div><div class="ex-right"><strong>×8-10</strong><span>20" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Vuelos Laterales con Mancuernas <span class="tag tag-super">Superserie</span></div><div class="ex-detail">Codos levemente flexionados · no balanceés</div></div><div class="ex-right"><strong>×10-12</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">4</div><div class="ex-info"><div class="ex-name">Trícep Pushdown <span class="tag tag-super">Superserie</span></div><div class="ex-detail">Polea · codos fijos</div></div><div class="ex-right"><strong>×12-15</strong><span>15" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">5</div><div class="ex-info"><div class="ex-name">Bícep en Cable <span class="tag tag-super">Superserie</span></div><div class="ex-detail">Curl en polea baja · codo fijo</div></div><div class="ex-right"><strong>×10-12</strong><span>90" desc</span></div></div>
     </div>
   </div>
 
-  <p class="section-title">Bloque C · Pecho y tríceps</p>
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon orange">💪</div>
-      <div><div class="card-title">Pecho</div><div class="card-sub">Superserie · 3 series · 60" descanso</div></div>
+  <!-- PIERNA 1 -->
+  <div id="rut-pi1" class="rutina-view" style="display:none">
+    <div class="tip tip-blue"><strong>Día de pierna completo.</strong> El más exigente. Hidratate bien antes. No saltees el calentamiento o te va a doler.</div>
+    <p class="section-title">Entrada en calor · Movilidad · Superserie x3 rondas</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon orange">🔥</div><div><div class="card-title">Movilidad de cadera y columna</div><div class="card-sub">3 rondas sin pausa</div></div><div class="card-badge">Calor</div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Estiramiento de la Cobra</div><div class="ex-detail">Cobra Stretch · abrí el pecho</div></div><div class="ex-right"><strong>30"</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Estiramiento caderas 90/90</div><div class="ex-detail">Hips 90/90 · abrí bien la cadera</div></div><div class="ex-right"><strong>30"</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Estiramiento Flexor de Cadera</div><div class="ex-detail">Half Kneeling Hip Flexor Stretch</div></div><div class="ex-right"><strong>20"</strong><span>30" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('flexiones')">
-      <div class="ex-illus" id="il-flexiones"></div>
-      <div class="ex-info"><div class="ex-name">Flexiones</div><div class="ex-detail">Con rodillas si hace falta, técnica primero</div></div>
-      <div class="ex-sets"><strong>3×máx</strong><span>reps</span></div>
+
+    <p class="section-title">Zona Media · Superserie x3 rondas</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon blue">⚡</div><div><div class="card-title">Core antes de piernas</div><div class="card-sub">Protegemos la lumbar para lo que viene</div></div><div class="card-badge">Superserie</div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Ruedita Abdominal</div><div class="ex-detail">Ab wheel · extendé hasta donde llegués</div></div><div class="ex-right"><strong>×10-12</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Twist Soviético con Disco</div><div class="ex-detail">10-15 reps por lado · pies levantados</div></div><div class="ex-right"><strong>×10-15</strong><span>60" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('dips')">
-      <div class="ex-illus" id="il-dips"></div>
-      <div class="ex-info"><div class="ex-name">Dips en silla</div><div class="ex-detail">Silla firme, codos atrás</div></div>
-      <div class="ex-sets"><strong>3×12</strong><span>reps</span></div>
+
+    <p class="section-title">Trabajo Principal — Piernas</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon red">🔥🦵</div><div><div class="card-title">Pierna Completa</div><div class="card-sub">Isquios → cuádriceps → glúteos → gemelos</div></div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Camilla de Isquiotibiales</div><div class="ex-detail">Curl acostado · bajada lenta de 3"</div></div><div class="ex-right"><strong>3×10-12</strong><span>90" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Sentadilla con Barra Smith</div><div class="ex-detail">Profundidad completa · rodillas afuera</div></div><div class="ex-right"><strong>3×8-10</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Prensa Unilateral</div><div class="ex-detail">Una pierna · pie al centro de la plataforma</div></div><div class="ex-right"><strong>3×10-12</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">4</div><div class="ex-info"><div class="ex-name">Camilla de Cuádriceps</div><div class="ex-detail">Extensión · pausa 1" arriba</div></div><div class="ex-right"><strong>3×10-12</strong><span>90" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">5</div><div class="ex-info"><div class="ex-name">Gemelos en Prensa</div><div class="ex-detail">Talón abajo completo · punta arriba completo</div></div><div class="ex-right"><strong>3×12-15</strong><span>90" desc</span></div></div>
     </div>
   </div>
 
-  <p class="section-title">Bloque D · Hombros y bíceps</p>
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon green">🙌</div>
-      <div><div class="card-title">Hombros</div><div class="card-sub">Superserie · 2–3 series · 45" descanso</div></div>
+  <!-- TREN SUPERIOR 1 -->
+  <div id="rut-ts1" class="rutina-view" style="display:none">
+    <p class="section-title">Entrada en calor · Movilidad · Superserie x3 rondas</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon orange">🔥</div><div><div class="card-title">Preparación de hombros</div><div class="card-sub">Crítico antes de press y dorsalera</div></div><div class="card-badge">Calor</div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Movilidad Completa de Hombro</div><div class="ex-detail">Circles + pendulum</div></div><div class="ex-right"><strong>×10</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Face Pull</div><div class="ex-detail">Polea · codos arriba · manguito rotador</div></div><div class="ex-right"><strong>×15</strong><span>0" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Dominadas Colgado Pasivas</div><div class="ex-detail">Solo colgarte · descomprime columna</div></div><div class="ex-right"><strong>30"</strong><span>60" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('pica')">
-      <div class="ex-illus" id="il-pica"></div>
-      <div class="ex-info"><div class="ex-name">Flexiones en pica</div><div class="ex-detail">Culo arriba formando triángulo</div></div>
-      <div class="ex-sets"><strong>3×10</strong><span>reps</span></div>
+
+    <p class="section-title">Trabajo Principal — Push</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon yellow">💪</div><div><div class="card-title">Pecho · Hombros</div><div class="card-sub">Empuje inclinado y plano</div></div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Press Inclinado en Barra Smith</div><div class="ex-detail">45° · escápulas apretadas · codos 75°</div></div><div class="ex-right"><strong>3×8-10</strong><span>120" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Press Plano en Máquina <span class="tag tag-super">Superserie</span></div><div class="ex-detail">Rango completo</div></div><div class="ex-right"><strong>×10-12</strong><span>15" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Remo Gironda <span class="tag tag-super">Superserie</span></div><div class="ex-detail">Pecho en banco inclinado · codos bien atrás</div></div><div class="ex-right"><strong>×10-12</strong><span>120" desc</span></div></div>
     </div>
-    <div class="ex-row" onclick="openModal('curl')">
-      <div class="ex-illus" id="il-curl"></div>
-      <div class="ex-info"><div class="ex-name">Curl de bíceps</div><div class="ex-detail">Botella de 1.5L · movimiento limpio</div></div>
-      <div class="ex-sets"><strong>3×15</strong><span>reps</span></div>
+
+    <p class="section-title">Trabajo Principal — Pull + Aislamiento</p>
+    <div class="card">
+      <div class="card-header"><div class="card-icon green">🏋️</div><div><div class="card-title">Espalda · Bíceps · Tríceps · Hombros</div><div class="card-sub">Superseries finales</div></div></div>
+      <div class="ex-row"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Dorsalera con Agarre Triángulo</div><div class="ex-detail">Lat pulldown neutro · codos atrás y abajo</div></div><div class="ex-right"><strong>3×10-12</strong><span>90" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Press Francés con Mancuernas <span class="tag tag-super">Superserie</span></div><div class="ex-detail">Codos fijos · bajá detrás de la cabeza</div></div><div class="ex-right"><strong>×10-12</strong><span>15" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Bícep con Mancuernas en Banco 45° <span class="tag tag-super">Superserie</span></div><div class="ex-detail">Estiramiento máximo en la bajada</div></div><div class="ex-right"><strong>×10-12</strong><span>90" desc</span></div></div>
+      <div class="ex-row"><div class="ex-num">4</div><div class="ex-info"><div class="ex-name">Vuelos Laterales con Mancuernas</div><div class="ex-detail">Codos levemente flexionados · sin impulso</div></div><div class="ex-right"><strong>3×10-12</strong><span>90" desc</span></div></div>
     </div>
   </div>
 
-  <p class="section-title">Cierre · 2 min</p>
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon yellow">🧘</div>
-      <div><div class="card-title">Estiramiento</div><div class="card-sub">No saltear, ayuda a recuperar</div></div>
-    </div>
-    <div class="ex-row" onclick="openModal('estcuad')">
-      <div class="ex-illus" id="il-estcuad"></div>
-      <div class="ex-info"><div class="ex-name">Estiramiento de cuádriceps</div><div class="ex-detail">De pie, talón al glúteo</div></div>
-      <div class="ex-sets"><strong>30"</strong><span>× lado</span></div>
-    </div>
-    <div class="ex-row" onclick="openModal('estpecho')">
-      <div class="ex-illus" id="il-estpecho"></div>
-      <div class="ex-info"><div class="ex-name">Estiramiento de pecho</div><div class="ex-detail">Brazo apoyado en pared, giro suave</div></div>
-      <div class="ex-sets"><strong>30"</strong><span>× lado</span></div>
-    </div>
-  </div>
   <div style="height:20px"></div>
-</div>
-
-<!-- ==================== TIMER ==================== -->
-<div id="view-timer" class="view">
-  <div class="timer-hero">
-    <div class="timer-phase" id="t-phase">Listo para arrancar</div>
-    <div class="timer-exname" id="t-exname">—</div>
-    <div class="timer-sets-info" id="t-setsinfo"></div>
-    <div class="timer-clock" id="t-clock">00:00</div>
-    <div class="timer-next" id="t-next"></div>
-    <div class="timer-progress"><div class="timer-progress-bar" id="t-bar" style="width:100%"></div></div>
-    <div class="step-dots" id="t-dots"></div>
-    <div class="timer-btn-row">
-      <button class="btn danger" onclick="resetTimer()">↺ Reset</button>
-      <button class="btn primary" id="t-btn" onclick="timerAction()">▶ Arrancar</button>
-    </div>
-  </div>
-  <div class="tip" id="t-tip" style="display:none"></div>
 </div>
 
 <!-- ==================== SEMANA ==================== -->
 <div id="view-semana" class="view">
-  <p class="section-title">Esta semana · Previa al gym</p>
+  <div class="tip"><strong>Rotación sugerida:</strong> Lunes FB1 → Miércoles Pierna → Viernes FB2 o Tren Superior. Cada 2-3 semanas rotás al siguiente Full Body.</div>
+  <p class="section-title">Esta semana</p>
   <div class="week-grid">
-    <div class="week-card gym"><div class="dot"></div><h3>Lunes</h3><p>Rutina calistenia</p></div>
-    <div class="week-card rest"><div class="dot"></div><h3>Martes</h3><p>Caminata 20 min</p></div>
-    <div class="week-card gym"><div class="dot"></div><h3>Miércoles</h3><p>Rutina calistenia</p></div>
-    <div class="week-card rest"><div class="dot"></div><h3>Jueves</h3><p>Descanso activo</p></div>
-    <div class="week-card gym"><div class="dot"></div><h3>Viernes</h3><p>Rutina calistenia</p></div>
-    <div class="week-card walk"><div class="dot"></div><h3>Sábado</h3><p>Caminata larga</p></div>
+    <div class="week-card gym"><div class="dot"></div><h3>Lunes</h3><p id="lunes-label">Full Body 1</p></div>
+    <div class="week-card rest"><div class="dot"></div><h3>Martes</h3><p>10.000 pasos</p></div>
+    <div class="week-card gym" style="border-color:rgba(255,68,68,.3)"><div class="dot" style="background:#ff4444"></div><h3>Miércoles</h3><p id="mierc-label">Pierna 1</p></div>
+    <div class="week-card rest"><div class="dot"></div><h3>Jueves</h3><p>10.000 pasos</p></div>
+    <div class="week-card gym" style="border-color:rgba(68,136,255,.3)"><div class="dot" style="background:#4488ff"></div><h3>Viernes</h3><p id="vier-label">Full Body 2</p></div>
+    <div class="week-card walk"><div class="dot"></div><h3>Finde</h3><p>Caminata larga + descanso</p></div>
   </div>
 
   <p class="section-title">Checklist del día</p>
-  <div class="checklist" id="checklist">
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Rutina completa (15–20 min)</span></div>
+  <div class="checklist">
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Entrenamiento completo (60 min)</span></div>
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Desayuno con proteína (huevos + yogurt)</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Caminata del día</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Hidratación (agua durante el día)</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">10.000 pasos del día</span></div>
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Colación proteica (shake o barrita ENA)</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Creatina tomada</span></div>
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Sin ultraprocesados al almuerzo</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">10.000 pasos completados</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Hidratación (2L de agua)</span></div>
   </div>
   <div style="height:20px"></div>
 </div>
 
 <!-- ==================== PESO ==================== -->
 <div id="view-peso" class="view">
-  <div class="tip"><strong>Meta:</strong> De 76 kg → 72–73 kg. Cintura: de 93 cm → 85–88 cm. Pesarte en ayunas, siempre el mismo día (sugerido: lunes).</div>
+  <div class="tip"><strong>Meta:</strong> 75.1 kg → 71-72 kg · Panza: 93 cm → 85-88 cm. Medite en ayunas, siempre el mismo día (sugerido: lunes).</div>
 
   <p class="section-title">Registrar</p>
   <div class="peso-form">
-    <div class="field-group">
-      <label>Fecha</label>
-      <input type="date" id="inp-fecha">
-    </div>
-    <div class="field-group">
-      <label>Peso (kg)</label>
-      <input type="number" step="0.1" placeholder="76.0" id="inp-peso">
-    </div>
-    <div class="field-group">
-      <label>Cintura (cm)</label>
-      <input type="number" step="0.5" placeholder="93" id="inp-cintura">
-    </div>
-    <button class="btn primary" onclick="savePeso()" style="align-self:flex-end;padding:9px 20px">Guardar</button>
+    <div class="field-group"><label>Fecha</label><input type="date" id="inp-fecha"></div>
+    <div class="field-group"><label>Peso (kg)</label><input type="number" step="0.1" placeholder="75.1" id="inp-peso"></div>
+    <div class="field-group"><label>Panza (cm)</label><input type="number" step="0.5" placeholder="93" id="inp-cintura"></div>
+    <button class="btn primary" onclick="savePeso()" style="align-self:flex-end">Guardar</button>
   </div>
 
   <p class="section-title">Evolución</p>
-  <div class="card" style="padding:16px">
-    <div style="display:flex;gap:16px;margin-bottom:12px">
+  <div class="card" style="padding:14px">
+    <div style="display:flex;gap:16px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:50%;background:#44ffcc"></div><span style="font-size:12px;color:#888">Peso (kg)</span></div>
-      <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:50%;background:#44bbff"></div><span style="font-size:12px;color:#888">Cintura (cm)</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:50%;background:#44bbff"></div><span style="font-size:12px;color:#888">Panza (cm)</span></div>
     </div>
     <canvas id="chart-peso" height="200"></canvas>
   </div>
@@ -631,107 +379,32 @@
   <div style="height:20px"></div>
 </div>
 
-<!-- ==================== MODAL ==================== -->
-<div class="modal" id="modal" onclick="closeModal(event)">
-  <div class="modal-card">
-    <button class="modal-close" onclick="closeModalDirect()">Cerrar</button>
-    <div class="modal-title" id="m-title"></div>
-    <div class="modal-sub" id="m-sub"></div>
-    <div class="modal-illus" id="m-illus"></div>
-    <ul class="modal-tips" id="m-tips"></ul>
-  </div>
-</div>
-
 <script>
-// ============ NAV ============
-function showView(id) {
+// NAV
+function showView(id, el) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('view-'+id).classList.add('active');
-  event.target.classList.add('active');
+  el.classList.add('active');
+  if (id === 'peso') setTimeout(renderChart, 50);
 }
 
-// ============ DATE ============
+// RUTINAS SELECTOR
+function showRutina(id, el) {
+  document.querySelectorAll('.rutina-view').forEach(r => r.style.display='none');
+  document.getElementById('rut-'+id).style.display='block';
+  document.querySelectorAll('.rut-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// DATE HEADER
 const today = new Date();
 const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 document.getElementById('hdr-fecha').textContent = days[today.getDay()] + ' ' + today.getDate() + ' ' + months[today.getMonth()];
 document.getElementById('inp-fecha').value = today.toISOString().slice(0,10);
 
-// ============ ILLUSTRATIONS — fotos reales (free-exercise-db, dominio público) ============
-const BASE = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/';
-// Foto por ejercicio: [img_pos1, img_pos2]
-const exPhotos = {
-  marcha:    ['Bodyweight_Walking_Lunge/0.jpg','Bodyweight_Walking_Lunge/1.jpg'],
-  hombros:   ['Shoulder_Circles/0.jpg','Shoulder_Circles/0.jpg'],
-  inchworm:  ['Inchworm/0.jpg','Inchworm/1.jpg'],
-  plancha:   ['Plank/0.jpg','Plank/1.jpg'],
-  crunches:  ['Crunches/0.jpg','Crunches/1.jpg'],
-  squat:     ['Bodyweight_Squat/0.jpg','Bodyweight_Squat/1.jpg'],
-  glute:     ['Single_Leg_Glute_Bridge/0.jpg','Single_Leg_Glute_Bridge/1.jpg'],
-  flexiones: ['Pushups/0.jpg','Pushups/1.jpg'],
-  dips:      ['Bench_Dips/0.jpg','Bench_Dips/1.jpg'],
-  pica:      ['Pike_Push-up/0.jpg','Pushups/0.jpg'],
-  curl:      ['Dumbbell_Bicep_Curl/0.jpg','Dumbbell_Bicep_Curl/1.jpg'],
-  estcuad:   ['Quad_Stretch/0.jpg','Quad_Stretch/0.jpg'],
-  estpecho:  ['Behind_Head_Chest_Stretch/0.jpg','Behind_Head_Chest_Stretch/0.jpg'],
-};
-
-// Render photos in rows — flip between pos1/pos2 every 1.5s
-Object.keys(exPhotos).forEach(k => {
-  const el = document.getElementById('il-'+k);
-  if (!el) return;
-  const [p0, p1] = exPhotos[k];
-  const img = document.createElement('img');
-  img.src = BASE + p0;
-  img.alt = k;
-  img.loading = 'lazy';
-  el.appendChild(img);
-  let tog = false;
-  setInterval(() => {
-    tog = !tog;
-    img.src = BASE + (tog ? p1 : p0);
-  }, 1500);
-});
-
-// ============ MODAL DATA ============
-const modalData = {
-  marcha:    { title:'Marcha en el lugar', sub:'Calentamiento · 1 minuto', imgs:['Bodyweight_Walking_Lunge/0.jpg','Bodyweight_Walking_Lunge/1.jpg'], tips:['Levantá las rodillas hasta la altura de la cadera','Mové los brazos alternados como al correr','Ritmo moderado, no te apures','Mantené la espalda recta y la vista al frente'] },
-  hombros:   { title:'Círculos de hombros', sub:'Calentamiento · 30" por lado', imgs:['Shoulder_Circles/0.jpg','Shoulder_Circles/0.jpg'], tips:['Hacé círculos lentos y amplios hacia adelante','Luego invertí el sentido hacia atrás','Dejá caer los hombros antes de empezar','Podés hacerlo sentado o de pie'] },
-  inchworm:  { title:'Inchworm', sub:'Calentamiento · 5 reps lentas', imgs:['Inchworm/0.jpg','Inchworm/1.jpg'], tips:['De pie, bajás las manos al piso lentamente','Caminás con las manos hasta posición de plancha','Volvés caminando con los pies hacia las manos','Sin apuro, activá la cadena posterior'] },
-  plancha:   { title:'Plancha', sub:'Bloque A · 3 × 35 segundos', imgs:['Plank/0.jpg','Plank/1.jpg'], tips:['Apoyás antebrazos y pies (o rodillas si empezás)','Cuerpo como una tabla recta: ni culo arriba ni abajo','Ombligo adentro, glúteos activos','Respirá normal. Si te temblás, está bien: aguantá'] },
-  crunches:  { title:'Crunches', sub:'Bloque A · 3 × 15 reps', imgs:['Crunches/0.jpg','Crunches/1.jpg'], tips:['Acostado, rodillas flexionadas, pies apoyados','Manos detrás de la cabeza o cruzadas al pecho','Subís solo los hombros del piso, no la espalda baja','Controlá la bajada, no te dejes caer'] },
-  squat:     { title:'Sentadilla libre', sub:'Bloque B · 3 × 20 reps', imgs:['Bodyweight_Squat/0.jpg','Bodyweight_Squat/1.jpg'], tips:['Pies al ancho de hombros, puntas levemente afuera','Bajás como si fueras a sentarte en una silla','Rodillas van hacia afuera, no adentro','Talones pegados al piso siempre'] },
-  glute:     { title:'Puente de glúteos', sub:'Bloque B · 3 × 20 reps', imgs:['Single_Leg_Glute_Bridge/0.jpg','Single_Leg_Glute_Bridge/1.jpg'], tips:['Acostado, rodillas dobladas, pies apoyados','Empujás las caderas hacia arriba apretando los glúteos','Bajás lento sin tocar el piso y volvés','Para progresar: una pierna a la vez'] },
-  flexiones: { title:'Flexiones', sub:'Bloque C · 3 × máximas reps', imgs:['Pushups/0.jpg','Pushups/1.jpg'], tips:['Si no podés completas, apoyá rodillas: igual vale','Manos al ancho de hombros o un poco más','Pecho casi toca el piso en cada rep','Cuerpo recto, ombligo adentro, sin arquear la espalda'] },
-  dips:      { title:'Dips en silla', sub:'Bloque C · 3 × 12 reps', imgs:['Bench_Dips/0.jpg','Bench_Dips/1.jpg'], tips:['Manos en el borde de una silla firme','Pies apoyados al frente, piernas casi rectas','Bajás doblando codos hacia atrás (no afuera)','Para progresar: elevá los pies en otra silla'] },
-  pica:      { title:'Flexiones en pica', sub:'Bloque D · 3 × 10 reps', imgs:['Pushups/0.jpg','Pushups/1.jpg'], tips:['Desde posición de plancha, llevás el culo bien arriba','Quedás como un triángulo invertido','Flexionás codos acercando cabeza al piso','Ataca más hombros que pecho. Difícil al principio: normal'] },
-  curl:      { title:'Curl de bíceps', sub:'Bloque D · 3 × 15 reps', imgs:['Dumbbell_Bicep_Curl/0.jpg','Dumbbell_Bicep_Curl/1.jpg'], tips:['Botella de 1.5L de agua = 1.5 kg, suficiente ahora','Codo fijo al costado del cuerpo','Subís la botella lento, bajás más lento aún','Si tenés mancuerna en casa, usala directamente'] },
-  estcuad:   { title:'Estiramiento de cuádriceps', sub:'Cierre · 30" por lado', imgs:['Quad_Stretch/0.jpg','Quad_Stretch/0.jpg'], tips:['De pie, doblás una rodilla y agarrás el tobillo','Talón al glúteo, rodillas juntas','Agarrarte de una pared si perdés el equilibrio','No forzar: llevá hasta donde sentís tirón suave'] },
-  estpecho:  { title:'Estiramiento de pecho', sub:'Cierre · 30" por lado', imgs:['Behind_Head_Chest_Stretch/0.jpg','Behind_Head_Chest_Stretch/0.jpg'], tips:['Apoyás el antebrazo vertical en una pared','Girás el cuerpo hacia el lado contrario','Sentís el tirón en el pecho y hombro anterior','Respirá profundo y aflojá con cada exhalación'] },
-};
-
-function openModal(key) {
-  const d = modalData[key];
-  if (!d) return;
-  document.getElementById('m-title').textContent = d.title;
-  document.getElementById('m-sub').textContent = d.sub;
-  // Modal: two images side by side
-  document.getElementById('m-illus').innerHTML = `
-    <div style="display:flex;gap:8px;justify-content:center">
-      <img src="${BASE+d.imgs[0]}" alt="inicio" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid #2a2a2a">
-      <img src="${BASE+d.imgs[1]}" alt="fin" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid #2a2a2a">
-    </div>`;
-  document.getElementById('m-tips').innerHTML = d.tips.map(t => `<li>${t}</li>`).join('');
-  document.getElementById('modal').classList.add('open');
-}
-
-// placeholder para que no rompa referencias anteriores a illus
-const illus = {};
-
-function closeModal(e) { if (e.target === document.getElementById('modal')) closeModalDirect(); }
-function closeModalDirect() { document.getElementById('modal').classList.remove('open'); }
-// ============ CHECKLIST ============
+// CHECKLIST
 function toggleCheck(row) {
   const box = row.querySelector('.check-box');
   const txt = row.querySelector('.check-text');
@@ -739,32 +412,30 @@ function toggleCheck(row) {
   txt.classList.toggle('done');
 }
 
-// ============ PESO ============
+// PESO
 let pesoLog = JSON.parse(localStorage.getItem('jg_peso') || '[]');
-// Seed con dato inicial
 if (pesoLog.length === 0) {
-  pesoLog.push({ fecha:'2026-06-26', peso:76.0, cintura:93 });
+  pesoLog.push({ fecha:'2026-06-26', peso:75.1, cintura:93 });
   localStorage.setItem('jg_peso', JSON.stringify(pesoLog));
 }
 
 function renderPeso() {
   const el = document.getElementById('peso-list');
-  if (!pesoLog.length) { el.innerHTML = '<div class="empty">Todavía no hay registros. Pesate en ayunas y cargá acá.</div>'; return; }
+  if (!pesoLog.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:#555;font-size:13px">Sin registros todavía.</div>'; return; }
   const sorted = [...pesoLog].sort((a,b) => b.fecha.localeCompare(a.fecha));
-  el.innerHTML = '<div class="log-list">' + sorted.map((r, i) => {
+  el.innerHTML = '<div class="log-list">' + sorted.map((r,i) => {
     const prev = sorted[i+1];
     let delta = '';
     if (prev) {
       const d = (r.peso - prev.peso).toFixed(1);
       const cls = d > 0 ? 'up' : d < 0 ? 'down' : 'eq';
       const sign = d > 0 ? '+' : '';
-      delta = `<span class="log-delta ${cls}">${sign}${d} kg</span>`;
+      delta = `<span class="log-delta ${cls}">${sign}${d}</span>`;
     }
     const fd = r.fecha.split('-');
-    const label = `${fd[2]}/${fd[1]}`;
     return `<div class="log-item">
-      <div class="log-date">${label}</div>
-      <div class="log-cintura">${r.cintura ? r.cintura + ' cm' : ''}</div>
+      <div class="log-date">${fd[2]}/${fd[1]}</div>
+      <div class="log-panza">${r.cintura ? r.cintura+' cm' : ''}</div>
       ${delta}
       <div class="log-peso">${r.peso}<span> kg</span></div>
     </div>`;
@@ -777,8 +448,8 @@ function savePeso() {
   const cintura = parseFloat(document.getElementById('inp-cintura').value) || null;
   if (!fecha || isNaN(peso)) return;
   const idx = pesoLog.findIndex(r => r.fecha === fecha);
-  if (idx >= 0) pesoLog[idx] = { fecha, peso, cintura };
-  else pesoLog.push({ fecha, peso, cintura });
+  if (idx >= 0) pesoLog[idx] = {fecha, peso, cintura};
+  else pesoLog.push({fecha, peso, cintura});
   localStorage.setItem('jg_peso', JSON.stringify(pesoLog));
   document.getElementById('inp-peso').value = '';
   document.getElementById('inp-cintura').value = '';
@@ -786,218 +457,43 @@ function savePeso() {
   if (typeof renderChart === 'function') renderChart();
 }
 renderPeso();
-
-// ============ TIMER ============
-const seq = [
-  { name:'Marcha en el lugar', phase:'Calentamiento', dur:60, type:'ex' },
-  { name:'Círculos de hombros', phase:'Calentamiento', dur:60, type:'ex' },
-  { name:'Inchworm', phase:'Calentamiento', dur:40, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Plancha', dur:20, type:'rest' },
-  { name:'Plancha', phase:'Core · Serie 1', dur:35, type:'ex' },
-  { name:'Crunches', phase:'Core · Serie 1', dur:30, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Serie 2', dur:45, type:'rest' },
-  { name:'Plancha', phase:'Core · Serie 2', dur:35, type:'ex' },
-  { name:'Crunches', phase:'Core · Serie 2', dur:30, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Serie 3', dur:45, type:'rest' },
-  { name:'Plancha', phase:'Core · Serie 3', dur:35, type:'ex' },
-  { name:'Crunches', phase:'Core · Serie 3', dur:30, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Sentadillas', dur:60, type:'rest' },
-  { name:'Sentadilla libre', phase:'Piernas · Serie 1', dur:40, type:'ex' },
-  { name:'Puente de glúteos', phase:'Piernas · Serie 1', dur:40, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Serie 2', dur:60, type:'rest' },
-  { name:'Sentadilla libre', phase:'Piernas · Serie 2', dur:40, type:'ex' },
-  { name:'Puente de glúteos', phase:'Piernas · Serie 2', dur:40, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Serie 3', dur:60, type:'rest' },
-  { name:'Sentadilla libre', phase:'Piernas · Serie 3', dur:40, type:'ex' },
-  { name:'Puente de glúteos', phase:'Piernas · Serie 3', dur:40, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Flexiones', dur:60, type:'rest' },
-  { name:'Flexiones', phase:'Pecho · Serie 1', dur:40, type:'ex' },
-  { name:'Dips en silla', phase:'Pecho · Serie 1', dur:35, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Serie 2', dur:60, type:'rest' },
-  { name:'Flexiones', phase:'Pecho · Serie 2', dur:40, type:'ex' },
-  { name:'Dips en silla', phase:'Pecho · Serie 2', dur:35, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Serie 3', dur:60, type:'rest' },
-  { name:'Flexiones', phase:'Pecho · Serie 3', dur:40, type:'ex' },
-  { name:'Dips en silla', phase:'Pecho · Serie 3', dur:35, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Flexiones pica', dur:45, type:'rest' },
-  { name:'Flexiones en pica', phase:'Hombros · Serie 1', dur:35, type:'ex' },
-  { name:'Curl de bíceps', phase:'Hombros · Serie 1', dur:35, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Serie 2', dur:45, type:'rest' },
-  { name:'Flexiones en pica', phase:'Hombros · Serie 2', dur:35, type:'ex' },
-  { name:'Curl de bíceps', phase:'Hombros · Serie 2', dur:35, type:'ex' },
-  { name:'Descanso', phase:'Próximo: Estiramiento', dur:30, type:'rest' },
-  { name:'Estiramiento final', phase:'Cierre', dur:120, type:'ex' },
-];
-
-let cur = 0, rem = 0, totalDur = 0, interval = null, running = false;
-
-function buildDots() {
-  const exItems = seq.filter(s => s.type === 'ex');
-  document.getElementById('t-dots').innerHTML = exItems.map((_, i) => `<div class="step-dot" id="dot-${i}"></div>`).join('');
-}
-
-function updateDots() {
-  let exIdx = 0;
-  seq.slice(0, cur).forEach(s => { if (s.type === 'ex') exIdx++; });
-  document.querySelectorAll('.step-dot').forEach((d, i) => {
-    d.classList.remove('done','active');
-    if (i < exIdx) d.classList.add('done');
-    else if (i === exIdx && seq[cur] && seq[cur].type === 'ex') d.classList.add('active');
-  });
-}
-
-function fmt(s) { return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
-
-function renderTimer() {
-  const s = seq[cur];
-  if (!s) {
-    document.getElementById('t-clock').textContent = '¡Listo!';
-    document.getElementById('t-exname').textContent = 'Entrenamiento terminado 💪';
-    document.getElementById('t-phase').textContent = '';
-    document.getElementById('t-setsinfo').textContent = '';
-    document.getElementById('t-next').textContent = '';
-    document.getElementById('t-btn').textContent = '↺ Reiniciar';
-    document.getElementById('t-bar').style.width = '100%';
-    document.getElementById('t-bar').classList.remove('rest');
-    return;
-  }
-  const clock = document.getElementById('t-clock');
-  clock.textContent = fmt(rem);
-  clock.className = 'timer-clock' + (s.type === 'rest' ? ' rest' : rem <= 5 ? ' warning' : '');
-  document.getElementById('t-exname').textContent = s.type === 'rest' ? 'Descansá' : s.name;
-  document.getElementById('t-phase').textContent = s.phase;
-  document.getElementById('t-setsinfo').textContent = s.type === 'rest' ? (seq[cur+1] ? 'Próximo: ' + seq[cur+1].name : '') : '';
-  document.getElementById('t-next').textContent = '';
-  const bar = document.getElementById('t-bar');
-  bar.style.width = Math.round((rem / totalDur) * 100) + '%';
-  bar.classList.toggle('rest', s.type === 'rest');
-  updateDots();
-}
-
-function nextStep() {
-  cur++;
-  if (cur < seq.length) { totalDur = seq[cur].dur; rem = totalDur; }
-  else { clearInterval(interval); running = false; document.getElementById('t-btn').textContent = '↺ Reiniciar'; }
-  renderTimer();
-}
-
-function timerAction() {
-  if (cur >= seq.length) { resetTimer(); return; }
-  if (!running) {
-    if (cur === 0 && rem === 0) { totalDur = seq[0].dur; rem = totalDur; }
-    running = true;
-    document.getElementById('t-btn').textContent = '⏭ Siguiente';
-    interval = setInterval(() => { rem--; if (rem <= 0) nextStep(); else renderTimer(); }, 1000);
-  } else {
-    nextStep();
-  }
-}
-
-function resetTimer() {
-  clearInterval(interval); running = false; cur = 0; rem = 0; totalDur = 0;
-  document.getElementById('t-btn').textContent = '▶ Arrancar';
-  document.getElementById('t-clock').textContent = '00:00';
-  document.getElementById('t-clock').className = 'timer-clock';
-  document.getElementById('t-exname').textContent = '—';
-  document.getElementById('t-phase').textContent = 'Listo para arrancar';
-  document.getElementById('t-setsinfo').textContent = '';
-  document.getElementById('t-next').textContent = '';
-  document.getElementById('t-bar').style.width = '100%';
-  document.getElementById('t-bar').classList.remove('rest');
-  updateDots();
-}
-
-buildDots();
-renderTimer();
 </script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 let chartPeso = null;
-
 function renderChart() {
   const sorted = [...pesoLog].sort((a,b) => a.fecha.localeCompare(b.fecha));
   const labels = sorted.map(r => { const f=r.fecha.split('-'); return `${f[2]}/${f[1]}`; });
-  const pesos  = sorted.map(r => r.peso);
+  const pesos = sorted.map(r => r.peso);
   const cinturas = sorted.map(r => r.cintura || null);
-
   const ctx = document.getElementById('chart-peso').getContext('2d');
-
   if (chartPeso) chartPeso.destroy();
-
   chartPeso = new Chart(ctx, {
-    type: 'line',
-    data: {
+    type:'line',
+    data:{
       labels,
-      datasets: [
-        {
-          label: 'Peso (kg)',
-          data: pesos,
-          borderColor: '#44ffcc',
-          backgroundColor: 'rgba(68,255,204,0.08)',
-          pointBackgroundColor: '#44ffcc',
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          tension: 0.3,
-          fill: true,
-          yAxisID: 'yPeso',
-        },
-        {
-          label: 'Cintura (cm)',
-          data: cinturas,
-          borderColor: '#44bbff',
-          backgroundColor: 'rgba(68,187,255,0.08)',
-          pointBackgroundColor: '#44bbff',
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          tension: 0.3,
-          fill: true,
-          yAxisID: 'yCintura',
-          spanGaps: true,
-        }
+      datasets:[
+        {label:'Peso (kg)',data:pesos,borderColor:'#44ffcc',backgroundColor:'rgba(68,255,204,.08)',pointBackgroundColor:'#44ffcc',pointRadius:5,tension:0.3,fill:true,yAxisID:'yPeso'},
+        {label:'Panza (cm)',data:cinturas,borderColor:'#44bbff',backgroundColor:'rgba(68,187,255,.08)',pointBackgroundColor:'#44bbff',pointRadius:5,tension:0.3,fill:true,yAxisID:'yCintura',spanGaps:true}
       ]
     },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1a1a1a',
-          borderColor: '#2a2a2a',
-          borderWidth: 1,
-          titleColor: '#888',
-          bodyColor: '#f0f0f0',
-          padding: 10,
-        }
+    options:{
+      responsive:true,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#1a1a1a',borderColor:'#2a2a2a',borderWidth:1,titleColor:'#888',bodyColor:'#f0f0f0',padding:10}
       },
-      scales: {
-        x: {
-          grid: { color: '#1e1e1e' },
-          ticks: { color: '#555', font: { size: 11 } }
-        },
-        yPeso: {
-          position: 'left',
-          grid: { color: '#1e1e1e' },
-          ticks: { color: '#44ffcc', font: { size: 11 }, callback: v => v + ' kg' },
-        },
-        yCintura: {
-          position: 'right',
-          grid: { drawOnChartArea: false },
-          ticks: { color: '#44bbff', font: { size: 11 }, callback: v => v + ' cm' },
-        }
+      scales:{
+        x:{grid:{color:'#1e1e1e'},ticks:{color:'#555',font:{size:11}}},
+        yPeso:{position:'left',grid:{color:'#1e1e1e'},ticks:{color:'#44ffcc',font:{size:11},callback:v=>v+' kg'}},
+        yCintura:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#44bbff',font:{size:11},callback:v=>v+' cm'}}
       }
     }
   });
 }
-
-// Re-render chart when tab is opened
-document.querySelectorAll('.nav-tab').forEach(t => {
-  t.addEventListener('click', () => {
-    if (t.textContent.trim() === 'Peso') setTimeout(renderChart, 50);
-  });
-});
-
-// Init
 renderChart();
 </script>
+</body>
 </html>
