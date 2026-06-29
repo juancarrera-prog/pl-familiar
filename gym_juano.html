@@ -1120,8 +1120,21 @@ function renderPeso(){
     const prev=sorted[i+1];let delta='';
     if(prev){const d=(r.peso-prev.peso).toFixed(1);const cls=d>0?'up':'down';const sign=d>0?'+':'';delta=`<span class="log-delta ${cls}">${sign}${d}</span>`;}
     const fd=r.fecha.split('-');
-    return `<div class="log-item"><div class="log-date">${fd[2]}/${fd[1]}</div><div class="log-panza">${r.cintura?r.cintura+' cm':''}</div>${delta}<div class="log-peso">${r.peso}<span> kg</span></div></div>`;
+    return `<div class="log-item">
+      <div class="log-date">${fd[2]}/${fd[1]}</div>
+      <div class="log-panza">${r.cintura?r.cintura+' cm':''}</div>
+      ${delta}
+      <div class="log-peso">${r.peso}<span> kg</span></div>
+      <button onclick="deletePeso('${r.fecha}')" style="background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;color:var(--text3);font-size:16px;line-height:1;transition:color .15s" onmouseover="this.style.color='#ff4444'" onmouseout="this.style.color='var(--text3)'">🗑</button>
+    </div>`;
   }).join('')+'</div>';
+}
+
+function deletePeso(fecha){
+  pesoLog=pesoLog.filter(r=>r.fecha!==fecha);
+  localStorage.setItem('jg_peso',JSON.stringify(pesoLog));
+  renderPeso();
+  if(typeof renderChart==='function')renderChart();
 }
 
 function savePeso(){
