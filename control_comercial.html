@@ -1245,14 +1245,17 @@ function setMesActivoPerf(mes,btn) {
   actualizarBannerVigenciaPerf();
 }
 function renderKPIsPerf(rows) {
-  const tIng=rows.reduce((a,r)=>a+r.ingresos,0), tCosto=rows.reduce((a,r)=>a+r.costoEq,0);
-  const tCM=rows.reduce((a,r)=>a+r.cm,0);
-  // CMO% = CMO$ / Fee total
-  const tPct=tIng>0?(tCM/tIng)*100:0, tFTE=rows.reduce((a,r)=>a+r.fte,0);
+  const tIng  = rows.reduce((a,r)=>a+r.ingresos, 0);
+  // Aplicar OH igual que la tabla
+  const tCosto = ohActivoPerf
+    ? rows.reduce((a,r)=>a+r.costoEq*(1+OH_PERF), 0)
+    : rows.reduce((a,r)=>a+r.costoEq, 0);
+  const tCM  = tIng - tCosto;
+  const tPct = tIng>0 ? (tCM/tIng)*100 : 0;
   document.getElementById('kpisPerf').innerHTML=`
     <div class="kpi"><div class="kpi-label">Fees</div><div class="kpi-value" style="font-size:26px">${fmtM(tIng)}</div><div class="kpi-sub">Fee facturado al cliente</div><div class="kpi-accent" style="background:#4488ff"></div></div>
-    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
-    <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">Ingresos Netos − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
+    <div class="kpi"><div class="kpi-label">Costo Equipo Total</div><div class="kpi-value" style="font-size:26px">${fmtM(tCosto)}</div><div class="kpi-sub">FTE x Costo Compania${ohActivoPerf?' (con OH)':''}</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
+    <div class="kpi"><div class="kpi-label">CMO Total</div><div class="kpi-value" style="font-size:26px;color:${tCM>=0?'#00c853':'#ff4455'}">${fmtM(tCM)}</div><div class="kpi-sub">Fee − Costo Equipo</div><div class="kpi-accent" style="background:var(--green)"></div></div>
     <div class="kpi"><div class="kpi-label">CMO % Promedio</div><div class="kpi-value" style="font-size:26px;color:${tPct>=20?'#00c853':tPct>=5?'#f5c400':'#ff4455'}">${tPct.toFixed(1)}%</div><div class="kpi-sub">CMO $ / Fee Total</div><div class="kpi-accent" style="background:var(--purple)"></div></div>`;
 }
 function renderPerfConsolidado(rows) {
