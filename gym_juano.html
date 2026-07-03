@@ -151,6 +151,58 @@
   .hist-delta.down{color:var(--orange);}
   .empty-hist{text-align:center;padding:30px 20px;color:var(--text3);font-size:13px;}
 
+  /* TIMER DE DESCANSO */
+  .timer-pill{display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none;}
+  .timer-pill .ex-meta-time{color:var(--cyan);text-decoration:underline dotted;font-weight:600;}
+  .rest-timer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;flex-direction:column;align-items:center;justify-content:center;}
+  .rest-timer-overlay.open{display:flex;}
+  .rest-timer-exname{font-size:15px;color:var(--text2);margin-bottom:8px;text-align:center;padding:0 20px;}
+  .rest-timer-clock{font-family:'Space Grotesk',sans-serif;font-size:96px;font-weight:700;color:var(--accent);letter-spacing:-4px;line-height:1;transition:color .3s;}
+  .rest-timer-clock.warning{color:var(--orange);}
+  .rest-timer-clock.done{color:var(--green);}
+  .rest-timer-label{font-size:14px;color:var(--text3);margin-top:8px;margin-bottom:32px;}
+  .rest-timer-bar{width:260px;height:4px;background:var(--border2);border-radius:2px;margin-bottom:36px;}
+  .rest-timer-bar-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .9s linear;}
+  .rest-timer-btns{display:flex;gap:12px;}
+  .rest-timer-btn{padding:12px 28px;border-radius:30px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+  .rest-timer-btn.primary{background:var(--accent);color:#0a0a0a;border-color:transparent;}
+
+  /* LOG DE SESIÓN */
+  .log-session-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;}
+  .log-session-title{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .log-session-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+  .log-field{display:flex;flex-direction:column;gap:4px;}
+  .log-field label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;}
+  .log-field select,.log-field input,.log-field textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;}
+  .log-field select:focus,.log-field input:focus,.log-field textarea:focus{border-color:var(--accent);}
+  .log-field textarea{resize:none;height:60px;grid-column:1/-1;}
+  .energia-row{display:flex;gap:6px;margin-top:2px;}
+  .energia-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Space Grotesk',sans-serif;}
+  .energia-btn.active{background:var(--accent);color:#0a0a0a;border-color:var(--accent);}
+  .session-log-list{margin-top:12px;}
+  .session-log-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border);}
+  .session-log-fecha{font-size:12px;color:var(--text2);flex:1;}
+  .session-log-rutina{font-size:13px;font-weight:500;}
+  .session-log-energia{font-size:12px;}
+  .session-log-nota{font-size:11px;color:var(--text3);display:block;margin-top:2px;}
+
+  /* RACHA SEMANAL */
+  .racha-grid{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px;}
+  .racha-semana{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .racha-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:'Space Grotesk',sans-serif;}
+  .racha-circle.verde{background:rgba(68,255,136,.2);color:var(--green);border:1.5px solid var(--green);}
+  .racha-circle.amarillo{background:rgba(255,136,68,.15);color:var(--orange);border:1.5px solid var(--orange);}
+  .racha-circle.rojo{background:rgba(255,68,68,.1);color:var(--red);border:1.5px solid rgba(255,68,68,.4);}
+  .racha-circle.vacio{background:var(--bg3);color:var(--text3);border:1.5px solid var(--border2);}
+  .racha-label{font-size:10px;color:var(--text3);}
+
+  /* STATS */
+  .stats-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .stats-kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
+  .stats-kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;}
+  .stats-kpi-val{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--accent);line-height:1;}
+  .stats-kpi-sub{font-size:11px;color:var(--text2);margin-top:3px;}
+
   @media(max-width:480px){
     .week-grid{grid-template-columns:repeat(2,1fr);}
     .ex-peso-input{width:56px;}
@@ -167,6 +219,7 @@
   <button class="nav-tab active" onclick="showView('rutinas',this)">Rutinas</button>
   <button class="nav-tab" onclick="showView('semana',this)">Semana</button>
   <button class="nav-tab" onclick="showView('peso',this)">Peso</button>
+  <button class="nav-tab" onclick="showView('stats',this)">Stats</button>
 </div>
 
 <!-- ==================== RUTINAS ==================== -->
@@ -930,6 +983,17 @@
 <!-- ==================== SEMANA ==================== -->
 <div id="view-semana" class="view">
   <div class="tip"><strong>Rotación sugerida:</strong> Lunes FB1 → Miércoles Pierna → Viernes FB2 o Tren Superior. Cada 2-3 semanas avanzás al siguiente FB.</div>
+
+  <p class="section-title">Racha de las últimas 8 semanas</p>
+  <div class="card" style="padding:14px">
+    <div class="racha-grid" id="racha-grid"></div>
+    <div style="display:flex;gap:14px;font-size:11px;color:var(--text3)">
+      <span style="color:var(--green)">● 3 sesiones</span>
+      <span style="color:var(--orange)">● 1-2 sesiones</span>
+      <span style="color:var(--red)">● 0 sesiones</span>
+    </div>
+  </div>
+
   <p class="section-title">Esta semana</p>
   <div class="week-grid">
     <div class="week-card" style="border-color:rgba(232,255,71,.3)"><div class="dot" style="background:#e8ff47;margin:0 auto 8px"></div><h3>Lunes</h3><p>Full Body 1</p></div>
@@ -939,6 +1003,7 @@
     <div class="week-card" style="border-color:rgba(68,136,255,.3)"><div class="dot" style="background:#4488ff;margin:0 auto 8px"></div><h3>Viernes</h3><p>Full Body 2</p></div>
     <div class="week-card" style="border-color:rgba(68,136,255,.2)"><div class="dot" style="background:#4488ff;opacity:.5;margin:0 auto 8px"></div><h3>Finde</h3><p>Caminata + descanso</p></div>
   </div>
+
   <p class="section-title">Checklist del día</p>
   <div class="checklist">
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Entrenamiento completo (60 min)</span></div>
@@ -949,6 +1014,41 @@
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">Sin ultraprocesados en el almuerzo</span></div>
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box">✓</div><span class="check-text">2 litros de agua</span></div>
   </div>
+
+  <p class="section-title">Registrar sesión de hoy</p>
+  <div class="log-session-card">
+    <div class="log-session-grid">
+      <div class="log-field">
+        <label>Rutina</label>
+        <select id="log-rutina">
+          <option value="">Seleccioná</option>
+          <option value="Full Body 1">Full Body 1</option>
+          <option value="Full Body 2">Full Body 2</option>
+          <option value="Full Body 3">Full Body 3</option>
+          <option value="Pierna 1">Pierna 1</option>
+          <option value="Tren Superior 1">Tren Superior 1</option>
+        </select>
+      </div>
+      <div class="log-field">
+        <label>Energía (1-5)</label>
+        <div class="energia-row" id="energia-row">
+          <button class="energia-btn" onclick="setEnergia(1)">1</button>
+          <button class="energia-btn" onclick="setEnergia(2)">2</button>
+          <button class="energia-btn" onclick="setEnergia(3)">3</button>
+          <button class="energia-btn" onclick="setEnergia(4)">4</button>
+          <button class="energia-btn" onclick="setEnergia(5)">5</button>
+        </div>
+      </div>
+      <div class="log-field" style="grid-column:1/-1">
+        <label>Nota libre (opcional)</label>
+        <textarea id="log-nota" placeholder="Cómo te sentiste, algo que quieras recordar..."></textarea>
+      </div>
+    </div>
+    <button class="btn primary" onclick="saveSession()" style="width:100%">Guardar sesión</button>
+  </div>
+
+  <p class="section-title">Últimas sesiones</p>
+  <div id="session-log-list"></div>
   <div style="height:20px"></div>
 </div>
 
@@ -976,6 +1076,38 @@
   <div style="height:20px"></div>
 </div>
 
+<!-- ==================== STATS ==================== -->
+<div id="view-stats" class="view">
+  <div class="stats-kpi-grid" id="stats-kpis"></div>
+
+  <p class="section-title">Mejor progreso de peso por ejercicio</p>
+  <div class="card" id="stats-top-ex" style="overflow:hidden"></div>
+
+  <p class="section-title">Evolución de ejercicio</p>
+  <div class="card" style="padding:14px">
+    <div style="margin-bottom:10px">
+      <select id="stats-ex-select" onchange="renderExChart()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;width:100%">
+        <option value="">Seleccioná un ejercicio</option>
+      </select>
+    </div>
+    <canvas id="chart-ex" height="180" style="display:none"></canvas>
+    <div id="chart-ex-empty" style="text-align:center;padding:30px;color:var(--text3);font-size:13px">Seleccioná un ejercicio para ver su evolución</div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+
+<!-- TIMER OVERLAY -->
+<div class="rest-timer-overlay" id="rest-overlay">
+  <div class="rest-timer-exname" id="rt-exname"></div>
+  <div class="rest-timer-clock" id="rt-clock">00:00</div>
+  <div class="rest-timer-label" id="rt-label">Descansá</div>
+  <div class="rest-timer-bar"><div class="rest-timer-bar-fill" id="rt-bar" style="width:100%"></div></div>
+  <div class="rest-timer-btns">
+    <button class="rest-timer-btn" onclick="closeRestTimer()">Cerrar</button>
+    <button class="rest-timer-btn primary" onclick="skipRestTimer()">Listo, seguimos ▶</button>
+  </div>
+</div>
+
 <!-- MODAL HISTORIAL EJERCICIO -->
 <div class="modal" id="modal-hist" onclick="closeModalOutside(event)">
   <div class="modal-card">
@@ -994,6 +1126,8 @@ function showView(id,el){
   document.getElementById('view-'+id).classList.add('active');
   el.classList.add('active');
   if(id==='peso') setTimeout(renderChart,50);
+  if(id==='semana') setTimeout(renderRacha,50);
+  if(id==='stats') setTimeout(renderStats,50);
 }
 
 // RUTINA SELECTOR
@@ -1152,11 +1286,155 @@ function savePeso(){
 }
 renderPeso();
 loadPesosEx();
+
+// ====== TIMER DE DESCANSO ======
+let rtInterval=null, rtTotal=0, rtRem=0;
+
+function startRestTimer(segundos, exNombre){
+  clearInterval(rtInterval);
+  rtTotal=segundos; rtRem=segundos;
+  document.getElementById('rt-exname').textContent='Después de: '+exNombre;
+  document.getElementById('rt-label').textContent='Descansá';
+  document.getElementById('rest-overlay').classList.add('open');
+  updateRestTimerDisplay();
+  rtInterval=setInterval(()=>{
+    rtRem--;
+    if(rtRem<=0){clearInterval(rtInterval);rtDone();}
+    else updateRestTimerDisplay();
+  },1000);
+}
+
+function updateRestTimerDisplay(){
+  const m=Math.floor(rtRem/60), s=rtRem%60;
+  const cl=document.getElementById('rt-clock');
+  cl.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  cl.className='rest-timer-clock'+(rtRem<=5?' warning':'');
+  document.getElementById('rt-bar').style.width=Math.round((rtRem/rtTotal)*100)+'%';
+}
+
+function rtDone(){
+  const cl=document.getElementById('rt-clock');
+  cl.textContent='¡Ya!';
+  cl.className='rest-timer-clock done';
+  document.getElementById('rt-label').textContent='A seguir 💪';
+  document.getElementById('rt-bar').style.width='0%';
+  if(navigator.vibrate) navigator.vibrate([200,100,200]);
+}
+
+function closeRestTimer(){clearInterval(rtInterval);document.getElementById('rest-overlay').classList.remove('open');}
+function skipRestTimer(){closeRestTimer();}
+
+// Inyectar timer trigger en cada ex-meta al cargar
+function injectTimerTriggers(){
+  document.querySelectorAll('.ex-meta').forEach(meta=>{
+    const span=meta.querySelector('span');
+    if(!span) return;
+    const text=span.textContent;
+    const match=text.match(/(\d+)"\s*desc/);
+    if(!match) return;
+    const secs=parseInt(match[1]);
+    const exRow=meta.closest('.ex-row');
+    const exName=exRow?.querySelector('.ex-name')?.textContent||'ejercicio';
+    const btn=document.createElement('button');
+    btn.textContent='⏱ '+match[0];
+    btn.style.cssText='background:rgba(68,255,204,.1);border:1px solid rgba(68,255,204,.3);border-radius:20px;padding:2px 10px;color:#44ffcc;font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;';
+    btn.onclick=(e)=>{e.stopPropagation();startRestTimer(secs,exName);};
+    meta.appendChild(btn);
+  });
+}
+
+// ====== LOG DE SESIÓN ======
+let sessionLog=JSON.parse(localStorage.getItem('jg_sessions')||'[]');
+let selectedEnergia=0;
+
+function setEnergia(n){
+  selectedEnergia=n;
+  document.querySelectorAll('.energia-btn').forEach((b,i)=>{
+    b.classList.toggle('active',i+1<=n);
+  });
+}
+
+function saveSession(){
+  const rutina=document.getElementById('log-rutina').value;
+  const nota=document.getElementById('log-nota').value.trim();
+  if(!rutina){alert('Seleccioná la rutina que hiciste');return;}
+  const fecha=today.toISOString().slice(0,10);
+  sessionLog.push({fecha,rutina,energia:selectedEnergia||null,nota:nota||null});
+  localStorage.setItem('jg_sessions',JSON.stringify(sessionLog));
+  document.getElementById('log-rutina').value='';
+  document.getElementById('log-nota').value='';
+  setEnergia(0);
+  renderSessionLog();
+  renderRacha();
+  alert('Sesión guardada 💪');
+}
+
+function deleteSession(idx){
+  sessionLog.splice(idx,1);
+  localStorage.setItem('jg_sessions',JSON.stringify(sessionLog));
+  renderSessionLog();
+  renderRacha();
+}
+
+const energiaEmoji=['','😴','😐','💪','🔥','⚡'];
+
+function renderSessionLog(){
+  const el=document.getElementById('session-log-list');
+  if(!sessionLog.length){el.innerHTML='<div style="padding:16px;text-align:center;color:#555;font-size:13px">Registrá tu primera sesión arriba</div>';return;}
+  const sorted=[...sessionLog].map((s,i)=>({...s,_i:i})).sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,10);
+  el.innerHTML='<div class="log-list">'+sorted.map(s=>{
+    const fd=s.fecha.split('-');
+    const em=s.energia?energiaEmoji[s.energia]:'';
+    return `<div class="session-log-item">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="session-log-fecha">${fd[2]}/${fd[1]}</span>
+          <span class="session-log-rutina">${s.rutina}</span>
+          <span class="session-log-energia">${em}</span>
+        </div>
+        ${s.nota?`<span class="session-log-nota">${s.nota}</span>`:''}
+      </div>
+      <button onclick="deleteSession(${s._i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px" onmouseover="this.style.color='#ff4444'" onmouseout="this.style.color='var(--text3)'">🗑</button>
+    </div>`;
+  }).join('')+'</div>';
+}
+renderSessionLog();
+
+// ====== RACHA SEMANAL ======
+function getWeekKey(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  const jan4=new Date(d.getFullYear(),0,4);
+  const w=Math.ceil(((d-jan4)/86400000+jan4.getDay()+1)/7);
+  return d.getFullYear()+'W'+String(w).padStart(2,'0');
+}
+
+function renderRacha(){
+  const el=document.getElementById('racha-grid');
+  if(!el) return;
+  const now=new Date();
+  const weeks=[];
+  for(let i=7;i>=0;i--){
+    const d=new Date(now);
+    d.setDate(d.getDate()-i*7);
+    const key=getWeekKey(d.toISOString().slice(0,10));
+    const label='S-'+i;
+    weeks.push({key,label:i===0?'Esta':i===1?'Ant':'S-'+i});
+  }
+  const sessByWeek={};
+  sessionLog.forEach(s=>{const k=getWeekKey(s.fecha);sessByWeek[k]=(sessByWeek[k]||0)+1;});
+  el.innerHTML=weeks.map(w=>{
+    const n=sessByWeek[w.key]||0;
+    const cls=n>=3?'verde':n>=1?'amarillo':w.key===getWeekKey(now.toISOString().slice(0,10))?'vacio':'rojo';
+    return `<div class="racha-semana"><div class="racha-circle ${cls}">${n}</div><div class="racha-label">${w.label}</div></div>`;
+  }).join('');
+}
+renderRacha();
+
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-let chartPeso=null;
+let chartPeso=null, chartEx=null;
 function renderChart(){
   const sorted=[...pesoLog].sort((a,b)=>a.fecha.localeCompare(b.fecha));
   const canvas=document.getElementById('chart-peso');
@@ -1186,6 +1464,126 @@ function renderChart(){
   });
 }
 renderChart();
+
+// ====== STATS ======
+const EX_NAMES={
+  'sentadilla-barra-smith':'Sentadilla Barra Smith','camilla-isquio':'Camilla Isquiotibiales',
+  'press-inclinado-smith':'Press Inclinado Smith','press-plano-maquina':'Press Plano Máquina',
+  'tricep-polea':'Trícep Polea','vuelos-laterales':'Vuelos Laterales','prensa-unilateral':'Prensa Unilateral',
+  'camilla-cuadriceps':'Camilla Cuádriceps','dorsalera':'Dorsalera','remo-gironda':'Remo Gironda',
+  'remo-en-t':'Remo en T','bicep-martillo':'Bícep Martillo','vuelos-posteriores':'Vuelos Posteriores',
+  'prensa-bilateral':'Prensa Bilateral','bulgara-mancuernas':'Sentadilla Búlgara',
+  'press-hombro-mancuernas':'Press Hombro Mancuernas','remo-unilateral':'Remo Unilateral',
+  'bicep-cable':'Bícep Cable','gemelos-prensa':'Gemelos Prensa','twist-sovietico':'Twist Soviético',
+  'press-frances':'Press Francés','bicep-banco-45':'Bícep Banco 45°','vuelos-laterales-fb3':'Vuelos Laterales FB3',
+};
+
+function getAllExKeys(){return Object.keys(EX_NAMES);}
+
+function renderStats(){
+  // KPIs
+  const totalSessions=sessionLog.length;
+  const pesoInicial=pesoLog.length?[...pesoLog].sort((a,b)=>a.fecha.localeCompare(b.fecha))[0].peso:null;
+  const pesoActual=pesoLog.length?[...pesoLog].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0].peso:null;
+  const deltaPeso=pesoInicial&&pesoActual?(pesoActual-pesoInicial).toFixed(1):null;
+
+  // Racha actual
+  const now=new Date();
+  let rachaActual=0;
+  for(let i=0;i<52;i++){
+    const d=new Date(now); d.setDate(d.getDate()-i*7);
+    const k=getWeekKey(d.toISOString().slice(0,10));
+    const n=sessionLog.filter(s=>getWeekKey(s.fecha)===k).length;
+    if(n>0) rachaActual++; else if(i>0) break;
+  }
+
+  document.getElementById('stats-kpis').innerHTML=`
+    <div class="stats-kpi"><div class="stats-kpi-label">Sesiones totales</div><div class="stats-kpi-val">${totalSessions}</div><div class="stats-kpi-sub">desde que empezaste</div></div>
+    <div class="stats-kpi"><div class="stats-kpi-label">Racha de semanas</div><div class="stats-kpi-val">${rachaActual}</div><div class="stats-kpi-sub">${rachaActual>=3?'🔥 En racha':'seguí así'}</div></div>
+    <div class="stats-kpi"><div class="stats-kpi-label">Peso corporal</div><div class="stats-kpi-val" style="font-size:20px">${pesoActual?pesoActual+' kg':'—'}</div><div class="stats-kpi-sub">${deltaPeso?(deltaPeso>0?'+':'')+deltaPeso+' kg desde el inicio':'sin registros'}</div></div>
+    <div class="stats-kpi"><div class="stats-kpi-label">Próxima sesión</div><div class="stats-kpi-val" style="font-size:14px;padding-top:4px">${getNextRoutine()}</div><div class="stats-kpi-sub">según rotación</div></div>
+  `;
+
+  // Top ejercicios por progreso
+  const exProgress=[];
+  getAllExKeys().forEach(k=>{
+    const hist=JSON.parse(localStorage.getItem('jg_ex_'+k)||'[]').filter(h=>h.peso);
+    if(hist.length>=2){
+      const sorted=hist.sort((a,b)=>a.fecha.localeCompare(b.fecha));
+      const first=sorted[0].peso, last=sorted[sorted.length-1].peso;
+      const delta=last-first;
+      if(delta>0) exProgress.push({key:k,nombre:EX_NAMES[k]||k,delta,first,last,sessions:hist.length});
+    }
+  });
+  exProgress.sort((a,b)=>b.delta-a.delta);
+  const topEl=document.getElementById('stats-top-ex');
+  if(!exProgress.length){
+    topEl.innerHTML='<div style="padding:20px;text-align:center;color:#555;font-size:13px">Cargá pesos en las rutinas para ver tu progreso</div>';
+  } else {
+    topEl.innerHTML=exProgress.slice(0,5).map((ex,i)=>
+      `<div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:${i<4?'1px solid var(--border)':'none'}">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--text3);width:20px">${i+1}</div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:500">${ex.nombre}</div><div style="font-size:12px;color:var(--text2)">${ex.first} → ${ex.last} kg · ${ex.sessions} sesiones</div></div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--green)">+${ex.delta.toFixed(1)}</div>
+      </div>`
+    ).join('');
+  }
+
+  // Populate exercise selector
+  const sel=document.getElementById('stats-ex-select');
+  sel.innerHTML='<option value="">Seleccioná un ejercicio</option>';
+  getAllExKeys().forEach(k=>{
+    const hist=JSON.parse(localStorage.getItem('jg_ex_'+k)||'[]').filter(h=>h.peso);
+    if(hist.length>=1){
+      const opt=document.createElement('option');
+      opt.value=k; opt.textContent=EX_NAMES[k]||k;
+      sel.appendChild(opt);
+    }
+  });
+}
+
+function getNextRoutine(){
+  if(!sessionLog.length) return 'FB1';
+  const last=[...sessionLog].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0].rutina;
+  const rot=['Full Body 1','Pierna 1','Full Body 2','Tren Superior 1','Full Body 3'];
+  const idx=rot.indexOf(last);
+  return rot[(idx+1)%rot.length]||'Full Body 1';
+}
+
+function renderExChart(){
+  const key=document.getElementById('stats-ex-select').value;
+  const canvas=document.getElementById('chart-ex');
+  const empty=document.getElementById('chart-ex-empty');
+  if(!key){canvas.style.display='none';empty.style.display='block';return;}
+  const hist=JSON.parse(localStorage.getItem('jg_ex_'+key)||'[]').filter(h=>h.peso).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  if(!hist.length){canvas.style.display='none';empty.style.display='block';return;}
+  canvas.style.display='block';empty.style.display='none';
+  const labels=hist.map(h=>{const f=h.fecha.split('-');return `${f[2]}/${f[1]}`;});
+  const pesos=hist.map(h=>h.peso);
+  const ctx=canvas.getContext('2d');
+  if(chartEx)chartEx.destroy();
+  chartEx=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[{
+      label:'Peso (kg)',data:pesos,
+      borderColor:'#e8ff47',backgroundColor:'rgba(232,255,71,.06)',
+      pointBackgroundColor:pesos.map((p,i)=>p===Math.max(...pesos)?'#e8ff47':'#555'),
+      pointRadius:pesos.map((p,i)=>p===Math.max(...pesos)?7:4),
+      tension:0.2,fill:true
+    }]},
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1a',borderColor:'#2a2a2a',borderWidth:1,titleColor:'#888',bodyColor:'#f0f0f0',padding:10,callbacks:{label:ctx=>'Peso: '+ctx.raw+' kg'}}},
+      scales:{
+        x:{grid:{color:'#1e1e1e'},ticks:{color:'#555',font:{size:11}}},
+        y:{grid:{color:'#1e1e1e'},ticks:{color:'#e8ff47',font:{size:11},callback:v=>v+' kg'}}
+      }
+    }
+  });
+}
+
+// Init timers on load
+setTimeout(injectTimerTriggers, 300);
 </script>
 </body>
 </html>
