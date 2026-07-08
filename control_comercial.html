@@ -205,11 +205,11 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 .modal-saved-badge.show { display:flex; }
 
 <style>
-.gauge-grid{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start;margin-bottom:12px}
-.gauge-card{background:var(--surface);border:0.5px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;width:120px;max-width:120px}
-.cards-kpi{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0}
-.ck{background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:8px 10px;flex:1;min-width:90px;max-width:140px}
-.ck-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.gauge-section{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.gauge-grid{display:flex;flex-direction:row;gap:0;justify-content:center;width:100%;margin-bottom:4px}
+.cards-kpi{display:flex;flex-direction:row;gap:1px;width:100%;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden}
+.ck{background:var(--surface);padding:10px 14px;flex:1;min-width:80px}
+.ck-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
 .ck-val{font-size:13px;font-weight:500;color:var(--text)}
 </style>
 </style>
@@ -264,97 +264,191 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
     <div class="section-header">
       <div><div class="section-title">Total Agencia</div><div class="section-sub">Consolidado de todos los clientes · datos cargados en Sheet</div></div>
     </div>
-    <div class="kpis" id="kpisAgencia">
-    <div class="gauge-grid">
-      <div class="gauge-card">
-        <svg id="agGaugeVs" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador agGaugeVs">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
-        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
-      </svg>
-        <div id="agGaugeVsVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Vs Presupuesto</div>
+    <div id="kpisAgencia" style="display:flex;gap:0;margin-bottom:24px">
+  <div style="flex:1;padding:16px 16px;display:flex;flex-direction:column;align-items:center">
+      <div style="font-size:10px;font-weight:500;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;text-align:center">Total Agencia</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;width:100%">
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="agGaugeVs" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Vs Presup.">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="12" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="agGaugeVsVal" style="display:none">—</div>
+          <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-top:5px">Vs Presup.</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="agGaugeCmbPct" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="CMB %">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="12" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="agGaugeCmbPctVal" style="display:none">—</div>
+          <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-top:5px">CMB %</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="agGaugeVsCmb" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Vs CMB P.">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="12" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="agGaugeVsCmbVal" style="display:none">—</div>
+          <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-top:5px">Vs CMB P.</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="agGaugeCons" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Consumido">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="12" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="agGaugeConsVal" style="display:none">—</div>
+          <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-top:5px">Consumido</div>
+        </div>
       </div>
-      <div class="gauge-card">
-        <svg id="agGaugeCmbPct" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador agGaugeCmbPct">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
-        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
-      </svg>
-        <div id="agGaugeCmbPctVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">CMB %</div>
-      </div>
-      <div class="gauge-card">
-        <svg id="agGaugeVsCmb" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador agGaugeVsCmb">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
-        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
-      </svg>
-        <div id="agGaugeVsCmbVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Vs CMB Presup</div>
-      </div>
-      <div class="gauge-card">
-        <svg id="agGaugeCons" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador agGaugeCons">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
-        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
-      </svg>
-        <div id="agGaugeConsVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Consumido Anual</div>
+      <div style="display:flex;gap:1px;background:#1a1a1a;border-radius:7px;overflow:hidden;width:100%">
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Inversión</div>
+          <div id="agInv" style="font-size:12px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Presup.</div>
+          <div id="agPresup" style="font-size:12px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">P. Anual</div>
+          <div id="agPresupAnual" style="font-size:12px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CMB $</div>
+          <div id="agCmb" style="font-size:12px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CMB Pres.</div>
+          <div id="agCmbPresup" style="font-size:12px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
       </div>
     </div>
-    <div class="cards-kpi">
-      <div class="ck"><div class="ck-label">Inversión</div><div class="ck-val" id="agInv">—</div></div>
-      <div class="ck"><div class="ck-label">Presupuesto</div><div class="ck-val" id="agPresup">—</div></div>
-      <div class="ck"><div class="ck-label">Presup. Anual</div><div class="ck-val" id="agPresupAnual">—</div></div>
-      <div class="ck"><div class="ck-label">CMB $</div><div class="ck-val" id="agCmb">—</div></div>
-      <div class="ck"><div class="ck-label">CMB $ Presup</div><div class="ck-val" id="agCmbPresup">—</div></div>
+  <div style="width:1px;background:#222;margin:8px 0;flex-shrink:0"></div>
+  <div style="flex:1;padding:16px 16px;display:flex;flex-direction:column;align-items:center">
+      <div style="font-size:10px;font-weight:500;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;text-align:center">Big 7</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;width:100%">
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="b7GaugeVs" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Vs Presup.">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="12" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="b7GaugeVsVal" style="display:none">—</div>
+          <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-top:5px">Vs Presup.</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="b7GaugeCmbPct" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="CMB %">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="12" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="b7GaugeCmbPctVal" style="display:none">—</div>
+          <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-top:5px">CMB %</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="b7GaugeVsCmb" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Vs CMB P.">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="12" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="b7GaugeVsCmbVal" style="display:none">—</div>
+          <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-top:5px">Vs CMB P.</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="b7GaugeCons" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Consumido">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="12" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="b7GaugeConsVal" style="display:none">—</div>
+          <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin-top:5px">Consumido</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:1px;background:#1a1a1a;border-radius:7px;overflow:hidden;width:100%">
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Inversión</div>
+          <div id="b7Inv" style="font-size:12px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Presup.</div>
+          <div id="b7Presup" style="font-size:12px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">P. Anual</div>
+          <div id="b7PresupAnual" style="font-size:12px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CMB $</div>
+          <div id="b7Cmb" style="font-size:12px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:8px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CMB Pres.</div>
+          <div id="b7CmbPresup" style="font-size:12px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
       </div>
     </div>
-
-    <!-- BIG 7 -->
-    <div class="section-header" style="margin-top:32px">
-      <div><div class="section-title">Big 7</div><div class="section-sub">Inversión, presupuesto y CMB de los 7 clientes principales</div></div>
-    </div>
-    <div class="kpis">
-    <div class="gauge-grid">
-      <div class="gauge-card">
-        <svg id="b7GaugeVs" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador b7GaugeVs">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
-        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
-      </svg>
-        <div id="b7GaugeVsVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Vs Presupuesto</div>
-      </div>
-      <div class="gauge-card">
-        <svg id="b7GaugeCmbPct" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador b7GaugeCmbPct">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
-        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
-      </svg>
-        <div id="b7GaugeCmbPctVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">CMB %</div>
-      </div>
-      <div class="gauge-card">
-        <svg id="b7GaugeVsCmb" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador b7GaugeVsCmb">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
-        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
-      </svg>
-        <div id="b7GaugeVsCmbVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Vs CMB Presup</div>
-      </div>
-      <div class="gauge-card">
-        <svg id="b7GaugeCons" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador b7GaugeCons">
-        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
-        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
-      </svg>
-        <div id="b7GaugeConsVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Consumido Anual</div>
-      </div>
-    </div>
-    <div class="cards-kpi">
-      <div class="ck"><div class="ck-label">Inversión</div><div class="ck-val" id="b7Inv">—</div></div>
-      <div class="ck"><div class="ck-label">Presupuesto</div><div class="ck-val" id="b7Presup">—</div></div>
-      <div class="ck"><div class="ck-label">Presup. Anual</div><div class="ck-val" id="b7PresupAnual">—</div></div>
-      <div class="ck"><div class="ck-label">CMB $</div><div class="ck-val" id="b7Cmb">—</div></div>
-      <div class="ck"><div class="ck-label">CMB $ Presup</div><div class="ck-val" id="b7CmbPresup">—</div></div>
-      </div>
-    </div>
+</div>
 
     <div class="section-header">
       <div><div class="section-title">Clientes</div><div class="section-sub">Inversión, presupuesto y recursos por cliente</div></div>
@@ -947,13 +1041,16 @@ function renderKPIsComercial(clientes) {
   clientes.forEach(r => { tInv += parseFloat(r.inv)||0; tPresup += parseFloat(r.presup)||0; tCmb += parseFloat(r.cmb)||0; tCmbPresup += parseFloat(r.cmbPresup||0); });
   const avgVs = tPresup > 0 ? ((tInv - tPresup)/tPresup)*100 : 0;
   const dif = tInv - tPresup;
-  document.getElementById('kpiInv').textContent    = '$' + tInv.toFixed(1);
-  document.getElementById('kpiPresup').textContent = '$' + tPresup.toFixed(1);
-  document.getElementById('kpiVs').textContent     = (avgVs>0?'+':'') + avgVs.toFixed(1) + '%';
-  document.getElementById('kpiVs').style.color     = avgVs < -10 ? '#ff4455' : avgVs < 0 ? '#f5c400' : '#00c853';
-  document.getElementById('kpiDif').textContent    = (dif>=0?'+$':'-$') + Math.abs(dif).toFixed(1);
-  document.getElementById('kpiDif').style.color    = dif >= 0 ? '#00c853' : '#ff4455';
-  document.getElementById('kpiCmb').textContent    = '$' + tCmb.toFixed(1);
+  // IDs actualizados — Big7 ahora usa donuts con IDs b7*
+  const _set = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  const _setColor = (id, color) => { const e=document.getElementById(id); if(e) e.style.color=color; };
+  _set('kpiInv',    '$' + tInv.toFixed(1));
+  _set('kpiPresup', '$' + tPresup.toFixed(1));
+  _set('kpiVs',     (avgVs>0?'+':'') + avgVs.toFixed(1) + '%');
+  _setColor('kpiVs', avgVs < -10 ? '#ff4455' : avgVs < 0 ? '#f5c400' : '#00c853');
+  _set('kpiDif',    (dif>=0?'+$':'-$') + Math.abs(dif).toFixed(1));
+  _setColor('kpiDif', dif >= 0 ? '#00c853' : '#ff4455');
+  _set('kpiCmb',    '$' + tCmb.toFixed(1));
   if (document.getElementById('kpiCmbPresup')) {
     document.getElementById('kpiCmbPresup').textContent = tCmbPresup > 0 ? '$' + tCmbPresup.toFixed(1) : '—';
     const vsCmb = tCmbPresup > 0 ? ((tCmb - tCmbPresup) / tCmbPresup) * 100 : null;
@@ -969,15 +1066,22 @@ function renderKPIsComercial(clientes) {
     }
   }
 
-  // Render Big7 donuts
+  // Render Big7 donuts — usar variables disponibles en este scope
+  const b7vsPct = tPresup > 0 ? ((tInv - tPresup) / tPresup) * 100 : null;
+  const b7vsCmb = tCmbPresup > 0 ? ((tCmb - tCmbPresup) / tCmbPresup) * 100 : null;
+  const b7cmbPct = tInv > 0 ? (tCmb / tInv) * 100 : null;
+  const b7cons = clientes.length > 0
+    ? clientes.reduce((a,r) => a + (parseFloat(r.consumidoAnual)||0), 0) / clientes.length
+    : null;
+  const b7presupAnual = clientes.reduce((a,r) => a + (parseFloat(r.presupAnual)||0), 0);
   renderKPIsGauge({
     inv: tInv, presup: tPresup,
-    vs: vsPct!=null ? vsPct.toFixed(1) : null,
-    consumidoAnual: consumidoTotal!=null ? consumidoTotal.toFixed(1) : null,
-    presupAnual: tPresupAnual, cmb: tCmb,
-    cmbPct: tInv>0 ? ((tCmb/tInv)*100).toFixed(1)+'%' : null,
+    vs: b7vsPct!=null ? b7vsPct.toFixed(1) : null,
+    consumidoAnual: b7cons!=null ? b7cons.toFixed(1) : null,
+    presupAnual: b7presupAnual, cmb: tCmb,
+    cmbPct: b7cmbPct!=null ? b7cmbPct.toFixed(1)+'%' : null,
     cmbPresup: tCmbPresup,
-    vsCmb: vsCmb!=null ? vsCmb.toFixed(1)+'%' : null
+    vsCmb: b7vsCmb!=null ? b7vsCmb.toFixed(1)+'%' : null
   }, 'b7');
 
   const alertas = clientes.filter(r => { const v=parseFloat(String(r.vs||'').replace('%','').replace(',','.')); return !isNaN(v)&&v<-10; });
@@ -1053,18 +1157,24 @@ async function enviarAlertas() {
 function renderGauge(svgId, pct, color, negative) {
   const svg = document.getElementById(svgId);
   if (!svg) return;
-  const circ = 2 * Math.PI * 40;
+  // SVGs are 80x80, r=30, center=40,40
+  const r = 30, cx = 40;
+  const circ = 2 * Math.PI * r;
   const absPct = Math.min(Math.abs(isNaN(pct)?0:pct), 100);
   const dash = (absPct / 100) * circ;
   const offset = circ - dash;
   const arc = svg.querySelector('.gauge-arc');
+  const arcWrap = svg.querySelector('.gauge-arc-wrap');
   if (!arc) return;
   arc.setAttribute('stroke', color);
   arc.setAttribute('stroke-dasharray', circ.toFixed(1));
   arc.setAttribute('stroke-dashoffset', offset.toFixed(1));
-  // Negativo: arranca desde las 12 y va a la izquierda (rotación 90deg)
-  // Positivo: arranca desde las 12 y va a la derecha (rotación -90deg)
-  arc.setAttribute('transform', negative ? 'rotate(90 50 50)' : 'rotate(-90 50 50)');
+  // Positive: start at 12, go RIGHT → rotate(-90) around center
+  // Negative: start at 12, go LEFT → mirror + rotate(-90)
+  arc.setAttribute('transform', 'rotate(-90 40 40)');
+  if (arcWrap) {
+    arcWrap.setAttribute('transform', negative ? 'translate(80,0) scale(-1,1)' : '');
+  }
 }
 
 function getGaugeColor(val, type) {
@@ -1096,48 +1206,63 @@ function renderKPIsGauge(data, prefix) {
   setEl(prefix+'Cmb',    fmt(data.cmb));
   setEl(prefix+'CmbPresup', fmt(data.cmbPresup));
 
+  // Helper: set text inside SVG and color
+  const setGaugeText = (svgId, txt, color) => {
+    const svg = document.getElementById(svgId);
+    if (!svg) return;
+    const t = svg.querySelector('.gauge-val-text');
+    if (t) { t.textContent = txt; t.setAttribute('fill', color); }
+  };
+
   // Gauge: Vs Presup
   const vs = parseFloat(data.vs);
   const vsColor = getGaugeColor(vs, 'pct_deviation');
-  const vsNeg = vs < 0;
-  renderGauge(prefix+'GaugeVs', vs, vsColor, vsNeg);
-  const vsLbl = document.getElementById(prefix+'GaugeVsVal');
-  if(vsLbl){ vsLbl.textContent=fmtPct(vs); vsLbl.style.fill=vsColor; vsLbl.style.color=vsColor; }
+  renderGauge(prefix+'GaugeVs', vs, vsColor, vs < 0);
+  setGaugeText(prefix+'GaugeVs', fmtPct(vs), vsColor);
 
   // Gauge: CMB %
   const cmbP = parseFloat(String(data.cmbPct||'').replace('%',''));
   const cmbColor = getGaugeColor(cmbP, 'cmb_pct');
   renderGauge(prefix+'GaugeCmbPct', cmbP, cmbColor, false);
-  const cmbLbl = document.getElementById(prefix+'GaugeCmbPctVal');
-  if(cmbLbl){ cmbLbl.textContent=(isNaN(cmbP)?'—':cmbP.toFixed(1)+'%'); cmbLbl.style.fill=cmbColor; cmbLbl.style.color=cmbColor; }
+  setGaugeText(prefix+'GaugeCmbPct', isNaN(cmbP)?'—':cmbP.toFixed(1)+'%', cmbColor);
 
   // Gauge: Vs CMB Presup
   const vsCmb = parseFloat(String(data.vsCmb||'').replace('%','').replace(',','.'));
   const vsCmbColor = getGaugeColor(vsCmb, 'pct_deviation');
-  const vsCmbNeg = vsCmb < 0;
-  renderGauge(prefix+'GaugeVsCmb', vsCmb, vsCmbColor, vsCmbNeg);
-  const vsCmbLbl = document.getElementById(prefix+'GaugeVsCmbVal');
-  if(vsCmbLbl){ vsCmbLbl.textContent=fmtPct(vsCmb); vsCmbLbl.style.fill=vsCmbColor; vsCmbLbl.style.color=vsCmbColor; }
+  renderGauge(prefix+'GaugeVsCmb', vsCmb, vsCmbColor, vsCmb < 0);
+  setGaugeText(prefix+'GaugeVsCmb', fmtPct(vsCmb), vsCmbColor);
 
   // Gauge: Consumido Anual (siempre derecha, gris)
   const cons = parseFloat(data.consumidoAnual);
   renderGauge(prefix+'GaugeCons', cons, '#888780', false);
-  const consLbl = document.getElementById(prefix+'GaugeConsVal');
-  if(consLbl){ consLbl.textContent=(isNaN(cons)?'—':cons.toFixed(1)+'%'); }
+  setGaugeText(prefix+'GaugeCons', isNaN(cons)?'—':cons.toFixed(1)+'%', '#888780');
+}
+
+async function fetchConRetry(url, intentos=3, delay=1500) {
+  for (let i=0; i<intentos; i++) {
+    try {
+      const res = await fetch(url, { redirect: 'follow' });
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      return await res.json();
+    } catch(e) {
+      if (i < intentos-1) await new Promise(r => setTimeout(r, delay));
+      else throw e;
+    }
+  }
 }
 
 async function loadData() {
   // Control Comercial
   try {
-    const res = await fetch(API_URL, { redirect: 'follow' });
-    const raw = await res.json();
+    const raw = await fetchConRetry(API_URL);
     DATA = raw;
     if (raw.periodo) document.getElementById('periodoLabel').textContent = raw.periodo;
     renderTablas(raw);
     if (raw.agencia) renderKPIsAgencia(raw.agencia);
   } catch(e) {
-    document.getElementById('tbodyClientes').innerHTML = '<tr class="loading-row"><td colspan="15" style="color:#ff4455">No se pudo conectar.</td></tr>';
-    document.getElementById('tbodyBago').innerHTML     = '<tr class="loading-row"><td colspan="11" style="color:#ff4455">Error de conexion.</td></tr>';
+    console.error('loadData error:', e);
+    document.getElementById('tbodyClientes').innerHTML = '<tr class="loading-row"><td colspan="15" style="color:#ff4455">No se pudo conectar: '+e.message+'</td></tr>';
+    document.getElementById('tbodyBago').innerHTML     = '<tr class="loading-row"><td colspan="11" style="color:#ff4455">Error de conexion: '+e.message+'</td></tr>';
     document.getElementById('periodoLabel').textContent = 'Sin conexion';
   }
 
