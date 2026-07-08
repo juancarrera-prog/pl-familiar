@@ -203,6 +203,15 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 .modal-mes-btn.active { background:var(--red); border-color:var(--red); color:white; font-weight:600; }
 .modal-saved-badge { display:none; align-items:center; gap:6px; font-size:12px; color:var(--green); }
 .modal-saved-badge.show { display:flex; }
+
+<style>
+.gauge-grid{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start;margin-bottom:12px}
+.gauge-card{background:var(--surface);border:0.5px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;width:120px;max-width:120px}
+.cards-kpi{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0}
+.ck{background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:8px 10px;flex:1;min-width:90px;max-width:140px}
+.ck-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.ck-val{font-size:13px;font-weight:500;color:var(--text)}
+</style>
 </style>
 </head>
 <body>
@@ -256,15 +265,47 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <div><div class="section-title">Total Agencia</div><div class="section-sub">Consolidado de todos los clientes · datos cargados en Sheet</div></div>
     </div>
     <div class="kpis" id="kpisAgencia">
-      <div class="kpi"><div class="kpi-label">Inversión del Período</div><div class="kpi-value" id="agInv">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:var(--red)"></div></div>
-      <div class="kpi"><div class="kpi-label">Presupuesto del Período</div><div class="kpi-value" id="agPresup">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:#4444ff"></div></div>
-      <div class="kpi"><div class="kpi-label">Vs Presupuesto</div><div class="kpi-value" id="agVs">—</div><div class="kpi-sub">desvío del período</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
-      <div class="kpi"><div class="kpi-label">Consumido Anual</div><div class="kpi-value" id="agConsumido">—</div><div class="kpi-sub">% del presup. anual ejecutado</div><div class="kpi-accent" style="background:var(--green)"></div></div>
-      <div class="kpi"><div class="kpi-label">Presup. Anual</div><div class="kpi-value" id="agPresupAnual">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:#4444ff"></div></div>
-      <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" id="agCmb">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
-      <div class="kpi"><div class="kpi-label">CMB %</div><div class="kpi-value" id="agCmbPct">—</div><div class="kpi-sub">sobre inversión</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
-      <div class="kpi"><div class="kpi-label">CMB $ Presup</div><div class="kpi-value" id="agCmbPresup">—</div><div class="kpi-sub">CMB presupuestado</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
-      <div class="kpi"><div class="kpi-label">Vs CMB Presup</div><div class="kpi-value" id="agVsCmb">—</div><div class="kpi-sub">CMB real vs presupuestado</div><div class="kpi-accent" style="background:var(--red)"></div></div>
+    <div class="gauge-grid">
+      <div class="gauge-card">
+        <svg id="agGaugeVs" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador agGaugeVs">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
+        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
+      </svg>
+        <div id="agGaugeVsVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Vs Presupuesto</div>
+      </div>
+      <div class="gauge-card">
+        <svg id="agGaugeCmbPct" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador agGaugeCmbPct">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
+        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
+      </svg>
+        <div id="agGaugeCmbPctVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">CMB %</div>
+      </div>
+      <div class="gauge-card">
+        <svg id="agGaugeVsCmb" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador agGaugeVsCmb">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
+        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
+      </svg>
+        <div id="agGaugeVsCmbVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Vs CMB Presup</div>
+      </div>
+      <div class="gauge-card">
+        <svg id="agGaugeCons" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador agGaugeCons">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
+        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
+      </svg>
+        <div id="agGaugeConsVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Consumido Anual</div>
+      </div>
+    </div>
+    <div class="cards-kpi">
+      <div class="ck"><div class="ck-label">Inversión</div><div class="ck-val" id="agInv">—</div></div>
+      <div class="ck"><div class="ck-label">Presupuesto</div><div class="ck-val" id="agPresup">—</div></div>
+      <div class="ck"><div class="ck-label">Presup. Anual</div><div class="ck-val" id="agPresupAnual">—</div></div>
+      <div class="ck"><div class="ck-label">CMB $</div><div class="ck-val" id="agCmb">—</div></div>
+      <div class="ck"><div class="ck-label">CMB $ Presup</div><div class="ck-val" id="agCmbPresup">—</div></div>
+      </div>
     </div>
 
     <!-- BIG 7 -->
@@ -272,13 +313,47 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <div><div class="section-title">Big 7</div><div class="section-sub">Inversión, presupuesto y CMB de los 7 clientes principales</div></div>
     </div>
     <div class="kpis">
-      <div class="kpi" style="--a:var(--red)"><div class="kpi-label">Inversión del Período</div><div class="kpi-value" id="kpiInv">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:var(--red)"></div></div>
-      <div class="kpi"><div class="kpi-label">Presupuesto del Período</div><div class="kpi-value" id="kpiPresup">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:#4444ff"></div></div>
-      <div class="kpi"><div class="kpi-label">Vs Presupuesto</div><div class="kpi-value" id="kpiVs">—</div><div class="kpi-sub">desvío del período</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
-      <div class="kpi"><div class="kpi-label">Dif. Vs Presupuesto</div><div class="kpi-value" id="kpiDif">—</div><div class="kpi-sub">inversión vs presupuesto</div><div class="kpi-accent" style="background:var(--green)"></div></div>
-      <div class="kpi"><div class="kpi-label">CMB Total</div><div class="kpi-value" id="kpiCmb">—</div><div class="kpi-sub">en miles</div><div class="kpi-accent" style="background:var(--purple)"></div></div>
-      <div class="kpi"><div class="kpi-label">CMB $ Presup</div><div class="kpi-value" id="kpiCmbPresup">—</div><div class="kpi-sub">CMB presupuestado</div><div class="kpi-accent" style="background:var(--yellow)"></div></div>
-      <div class="kpi"><div class="kpi-label">Vs CMB Presup</div><div class="kpi-value" id="kpiVsCmbPct">—</div><div class="kpi-sub">CMB real vs presupuestado %</div><div class="kpi-accent" style="background:var(--red)"></div></div>
+    <div class="gauge-grid">
+      <div class="gauge-card">
+        <svg id="b7GaugeVs" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador b7GaugeVs">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
+        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
+      </svg>
+        <div id="b7GaugeVsVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Vs Presupuesto</div>
+      </div>
+      <div class="gauge-card">
+        <svg id="b7GaugeCmbPct" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador b7GaugeCmbPct">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
+        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
+      </svg>
+        <div id="b7GaugeCmbPctVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">CMB %</div>
+      </div>
+      <div class="gauge-card">
+        <svg id="b7GaugeVsCmb" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador b7GaugeVsCmb">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
+        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
+      </svg>
+        <div id="b7GaugeVsCmbVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Vs CMB Presup</div>
+      </div>
+      <div class="gauge-card">
+        <svg id="b7GaugeCons" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="indicador b7GaugeCons">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#2c2c2a" stroke-width="10"/>
+        <circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="#888780" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" transform="rotate(-90 50 50)"/>
+      </svg>
+        <div id="b7GaugeConsVal" style="font-size:15px;font-weight:500;margin-top:-4px;color:#888780">—</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Consumido Anual</div>
+      </div>
+    </div>
+    <div class="cards-kpi">
+      <div class="ck"><div class="ck-label">Inversión</div><div class="ck-val" id="b7Inv">—</div></div>
+      <div class="ck"><div class="ck-label">Presupuesto</div><div class="ck-val" id="b7Presup">—</div></div>
+      <div class="ck"><div class="ck-label">Presup. Anual</div><div class="ck-val" id="b7PresupAnual">—</div></div>
+      <div class="ck"><div class="ck-label">CMB $</div><div class="ck-val" id="b7Cmb">—</div></div>
+      <div class="ck"><div class="ck-label">CMB $ Presup</div><div class="ck-val" id="b7CmbPresup">—</div></div>
+      </div>
     </div>
 
     <div class="section-header">
@@ -864,33 +939,7 @@ function filtrarDirector(dir, btn) {
 
 function renderKPIsAgencia(ag) {
   if (!ag) return;
-  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
-  const setColor = (id, val, good, warn) => { const el=document.getElementById(id); if(!el) return; el.textContent=val; el.style.color = parseFloat(val)>=(good||0)?'#00c853':parseFloat(val)>=(warn||-5)?'#f5c400':'#ff4455'; };
-
-  set('agInv',    ag.inv    != null ? '$'+parseFloat(ag.inv).toFixed(1)    : '—');
-  set('agPresup', ag.presup != null ? '$'+parseFloat(ag.presup).toFixed(1) : '—');
-  set('agPresupAnual', ag.presupAnual != null ? '$'+parseFloat(ag.presupAnual).toFixed(1) : '—');
-  set('agCmb',    ag.cmb    != null ? '$'+parseFloat(ag.cmb).toFixed(1)    : '—');
-  set('agCmbPct', ag.cmbPct || '—');
-  set('agCmbPresup', ag.cmbPresup != null ? '$'+parseFloat(ag.cmbPresup).toFixed(1) : '—');
-
-  // Vs Presup con color
-  const vs = parseFloat(ag.vs);
-  const vsEl = document.getElementById('agVs');
-  if(vsEl){ vsEl.textContent=(vs>0?'+':'')+vs.toFixed(1)+'%'; vsEl.style.color=vs<-10?'#ff4455':vs<-5?'#f5c400':'#00c853'; }
-
-  // Consumido anual
-  const cons = parseFloat(ag.consumidoAnual);
-  const consEl = document.getElementById('agConsumido');
-  if(consEl){ consEl.textContent=(!isNaN(cons)?cons.toFixed(1):'—')+'%'; }
-
-  // Vs CMB Presup con color
-  const vsCmb = ag.vsCmb ? parseFloat(String(ag.vsCmb).replace('%','').replace(',','.')) : null;
-  const vsCmbEl = document.getElementById('agVsCmb');
-  if(vsCmbEl){
-    vsCmbEl.textContent = vsCmb!=null ? (vsCmb>=0?'+':'')+vsCmb.toFixed(1)+'%' : '—';
-    vsCmbEl.style.color = vsCmb==null?'':vsCmb>=0?'#00c853':'#ff4455';
-  }
+  renderKPIsGauge(ag, 'ag');
 }
 
 function renderKPIsComercial(clientes) {
@@ -919,6 +968,17 @@ function renderKPIsComercial(clientes) {
       vsCmbPctEl.style.color = vsCmb == null ? '' : vsCmb >= 0 ? '#00c853' : '#ff4455';
     }
   }
+
+  // Render Big7 donuts
+  renderKPIsGauge({
+    inv: tInv, presup: tPresup,
+    vs: vsPct!=null ? vsPct.toFixed(1) : null,
+    consumidoAnual: consumidoTotal!=null ? consumidoTotal.toFixed(1) : null,
+    presupAnual: tPresupAnual, cmb: tCmb,
+    cmbPct: tInv>0 ? ((tCmb/tInv)*100).toFixed(1)+'%' : null,
+    cmbPresup: tCmbPresup,
+    vsCmb: vsCmb!=null ? vsCmb.toFixed(1)+'%' : null
+  }, 'b7');
 
   const alertas = clientes.filter(r => { const v=parseFloat(String(r.vs||'').replace('%','').replace(',','.')); return !isNaN(v)&&v<-10; });
   const panel = document.getElementById('alertPanel');
@@ -987,6 +1047,83 @@ async function enviarAlertas() {
     await fetch(WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:msg,channel:'#mail-counter'})});
     alert('✅ Alertas enviadas a Slack');
   } catch(e) { alert('❌ Error al enviar: '+e.message); }
+}
+
+
+function renderGauge(svgId, pct, color, negative) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const circ = 2 * Math.PI * 40;
+  const absPct = Math.min(Math.abs(isNaN(pct)?0:pct), 100);
+  const dash = (absPct / 100) * circ;
+  const offset = circ - dash;
+  const arc = svg.querySelector('.gauge-arc');
+  if (!arc) return;
+  arc.setAttribute('stroke', color);
+  arc.setAttribute('stroke-dasharray', circ.toFixed(1));
+  arc.setAttribute('stroke-dashoffset', offset.toFixed(1));
+  // Negativo: arranca desde las 12 y va a la izquierda (rotación 90deg)
+  // Positivo: arranca desde las 12 y va a la derecha (rotación -90deg)
+  arc.setAttribute('transform', negative ? 'rotate(90 50 50)' : 'rotate(-90 50 50)');
+}
+
+function getGaugeColor(val, type) {
+  if (type === 'pct_deviation') {
+    // Vs Presup, Vs CMB Presup
+    const v = parseFloat(val);
+    if (isNaN(v)) return '#606060';
+    return v <= -10 ? '#ff4455' : v <= -1 ? '#f5c400' : '#00c853';
+  }
+  if (type === 'cmb_pct') {
+    const v = parseFloat(String(val).replace('%',''));
+    if (isNaN(v)) return '#606060';
+    return v <= 35 ? '#ff4455' : v <= 40 ? '#f5c400' : '#00c853';
+  }
+  if (type === 'consumido') return '#888780';
+  return '#888780';
+}
+
+function renderKPIsGauge(data, prefix) {
+  // data: {inv, presup, vs, consumidoAnual, presupAnual, cmb, cmbPct, cmbPresup, vsCmb}
+  const fmt = (v) => v != null ? '$' + parseFloat(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) : '—';
+  const fmtPct = (v) => v != null ? (parseFloat(v)>=0?'+':'')+parseFloat(v).toFixed(1)+'%' : '—';
+
+  // Cards
+  const setEl = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  setEl(prefix+'Inv',    fmt(data.inv));
+  setEl(prefix+'Presup', fmt(data.presup));
+  setEl(prefix+'PresupAnual', fmt(data.presupAnual));
+  setEl(prefix+'Cmb',    fmt(data.cmb));
+  setEl(prefix+'CmbPresup', fmt(data.cmbPresup));
+
+  // Gauge: Vs Presup
+  const vs = parseFloat(data.vs);
+  const vsColor = getGaugeColor(vs, 'pct_deviation');
+  const vsNeg = vs < 0;
+  renderGauge(prefix+'GaugeVs', vs, vsColor, vsNeg);
+  const vsLbl = document.getElementById(prefix+'GaugeVsVal');
+  if(vsLbl){ vsLbl.textContent=fmtPct(vs); vsLbl.style.fill=vsColor; vsLbl.style.color=vsColor; }
+
+  // Gauge: CMB %
+  const cmbP = parseFloat(String(data.cmbPct||'').replace('%',''));
+  const cmbColor = getGaugeColor(cmbP, 'cmb_pct');
+  renderGauge(prefix+'GaugeCmbPct', cmbP, cmbColor, false);
+  const cmbLbl = document.getElementById(prefix+'GaugeCmbPctVal');
+  if(cmbLbl){ cmbLbl.textContent=(isNaN(cmbP)?'—':cmbP.toFixed(1)+'%'); cmbLbl.style.fill=cmbColor; cmbLbl.style.color=cmbColor; }
+
+  // Gauge: Vs CMB Presup
+  const vsCmb = parseFloat(String(data.vsCmb||'').replace('%','').replace(',','.'));
+  const vsCmbColor = getGaugeColor(vsCmb, 'pct_deviation');
+  const vsCmbNeg = vsCmb < 0;
+  renderGauge(prefix+'GaugeVsCmb', vsCmb, vsCmbColor, vsCmbNeg);
+  const vsCmbLbl = document.getElementById(prefix+'GaugeVsCmbVal');
+  if(vsCmbLbl){ vsCmbLbl.textContent=fmtPct(vsCmb); vsCmbLbl.style.fill=vsCmbColor; vsCmbLbl.style.color=vsCmbColor; }
+
+  // Gauge: Consumido Anual (siempre derecha, gris)
+  const cons = parseFloat(data.consumidoAnual);
+  renderGauge(prefix+'GaugeCons', cons, '#888780', false);
+  const consLbl = document.getElementById(prefix+'GaugeConsVal');
+  if(consLbl){ consLbl.textContent=(isNaN(cons)?'—':cons.toFixed(1)+'%'); }
 }
 
 async function loadData() {
