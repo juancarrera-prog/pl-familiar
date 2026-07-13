@@ -531,7 +531,16 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         <button id="btnOHEquipo" onclick="toggleOH('equipo')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
       </div>
       <div class="section-header">
-        <div><div class="section-title">Tabla Consolidada · Rentabilidad</div><div class="section-sub">CMB = Venta Facturable + Honorarios + Fees − Compra Indirecta · CMO % = CMO $ / Inv. Período</div></div>
+        <div><div class="section-title">Tabla Consolidada · Rentabilidad</div><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="section-sub">CMB = Venta Facturable + Honorarios + Fees − Compra Indirecta · CMO % = CMO $ / Inv. Período</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#ff4455;flex-shrink:0"></div>CMO % ≤ 30%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#f5c400;flex-shrink:0"></div>30% – 35%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#00c853;flex-shrink:0"></div>&gt; 35%</div>
+        </div>
+      </div></div>
       </div>
       <div class="table-card">
         <table>
@@ -648,7 +657,16 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
       <button id="btnOHPerf" onclick="toggleOH('perf')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
     </div>
     <div class="section-header">
-      <div><div class="section-title">Tabla Consolidada · Performance</div><div class="section-sub">Fee − Costo de Equipo · CMO % = CMO $ / Fee</div></div>
+      <div><div class="section-title">Tabla Consolidada · Performance</div><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="section-sub">Fee − Costo de Equipo · CMO % = CMO $ / Fee</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#ff4455;flex-shrink:0"></div>CMO % ≤ 0%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#f5c400;flex-shrink:0"></div>0% – 25%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#00c853;flex-shrink:0"></div>≥ 25%</div>
+        </div>
+      </div></div>
     </div>
     <div class="table-card">
       <table>
