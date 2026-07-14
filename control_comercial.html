@@ -211,6 +211,78 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
 .ck{background:var(--surface);padding:10px 14px;flex:1;min-width:80px}
 .ck-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
 .ck-val{font-size:13px;font-weight:500;color:var(--text)}
+
+/* ── CHAT FLOTANTE IGNIS ── */
+#ignis-chat-btn {
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#e8001c,#ff4455);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(232,0,28,.4);
+  transition:transform .2s,box-shadow .2s;
+}
+#ignis-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(232,0,28,.6)}
+#ignis-chat-btn svg{width:26px;height:26px;fill:#fff}
+
+#ignis-chat-panel {
+  position:fixed;bottom:86px;right:24px;z-index:9998;
+  width:380px;max-height:520px;
+  background:#141414;border:1px solid #2a2a2a;border-radius:16px;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 8px 40px rgba(0,0,0,.7);
+  transform:scale(.95) translateY(10px);opacity:0;
+  pointer-events:none;transition:all .22s cubic-bezier(.4,0,.2,1);
+}
+#ignis-chat-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+
+#chat-header{
+  padding:14px 16px;background:#1a1a1a;border-bottom:1px solid #222;
+  display:flex;align-items:center;gap:10px;
+}
+#chat-header .ch-logo{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,#e8001c,#ff4455);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+#chat-header .ch-logo svg{width:18px;height:18px;fill:#fff}
+#chat-header .ch-info{flex:1}
+#chat-header .ch-name{font-size:13px;font-weight:600;color:#eee}
+#chat-header .ch-status{font-size:11px;color:#00c853;display:flex;align-items:center;gap:4px;margin-top:1px}
+#chat-header .ch-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#00c853;display:inline-block}
+#chat-header .ch-close{background:none;border:none;color:#555;cursor:pointer;font-size:18px;padding:2px 6px;border-radius:4px;transition:color .15s}
+#chat-header .ch-close:hover{color:#eee}
+
+#chat-messages{
+  flex:1;overflow-y:auto;padding:14px 14px 8px;
+  display:flex;flex-direction:column;gap:10px;
+  scrollbar-width:thin;scrollbar-color:#333 transparent;
+}
+.chat-msg{max-width:88%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.5}
+.chat-msg.assistant{background:#1e1e1e;color:#ddd;align-self:flex-start;border-bottom-left-radius:4px}
+.chat-msg.user{background:linear-gradient(135deg,#e8001c,#c20018);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-msg.typing{background:#1e1e1e;color:#666;align-self:flex-start;font-style:italic}
+
+#chat-input-row{
+  padding:10px 12px;border-top:1px solid #222;
+  display:flex;gap:8px;align-items:center;background:#141414;
+}
+#chat-input{
+  flex:1;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:10px;
+  padding:9px 12px;color:#eee;font-size:13px;outline:none;
+  font-family:inherit;resize:none;transition:border-color .15s;
+}
+#chat-input:focus{border-color:#e8001c}
+#chat-input::placeholder{color:#444}
+#chat-send{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,#e8001c,#c20018);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:opacity .15s;
+}
+#chat-send:hover{opacity:.85}
+#chat-send svg{width:16px;height:16px;fill:#fff}
+
 </style>
 </style>
 </head>
@@ -1276,6 +1348,130 @@ async function fetchConRetry(url, intentos=3, delay=1500) {
   }
 }
 
+
+// ── CHAT IGNIS ──
+let chatOpen = false;
+let chatHistory = [];
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('ignis-chat-panel').classList.toggle('open', chatOpen);
+  if (chatOpen) setTimeout(() => document.getElementById('chat-input').focus(), 200);
+}
+
+function buildContext() {
+  // Arma un snapshot de los datos actuales del dash para pasarle a Claude
+  const lines = [];
+  lines.push('Sos el asistente analítico del Control Comercial de Ignis Media Agency.');
+  lines.push('Respondés en español, de manera concisa y directa. El usuario es Juano (Juan Ignacio Carrera), Commercial Manager.');
+  lines.push('');
+  lines.push('=== ESTRUCTURA DEL DASHBOARD ===');
+  lines.push('3 secciones: Control Comercial (datos del Sheet), Clientes Big 7 (Branding), Performance.');
+  lines.push('');
+  lines.push('=== CLIENTES BIG 7 ===');
+  lines.push('Mechi: Bagó | Dani: Banco Patagonia, La Paulina, Pfizer | JP: McCain, Escorial, Universal Assistance');
+  lines.push('OH Equipo: 23% | Puestos: Accounts Director, SR Branding Coordinator, Branding Coordinator, SR Media Planner, JR Media Planner, SR Branding Analyst, Branding Assistant');
+  lines.push('CMO% Big 7 = CMO$ / Inv. Período | 🔴 ≤30% | 🟡 30-35% | 🟢 >35%');
+  lines.push('');
+  lines.push('=== PERFORMANCE ===');
+  lines.push('Clientes: ITBA, Parts Vu, Bagó, Banco Patagonia, Yamaha O.P., Violetta, Belgrano Day School, TH Marine, Hendel');
+  lines.push('OH Performance: 68% | Puestos: Performance MKT Manager/Coordinator/Specialist/Analyst');
+  lines.push('CMO% Performance = CMO$ / Fee | 🔴 ≤0% | 🟡 0-25% | 🟢 ≥25%');
+  lines.push('');
+  lines.push('=== DATOS ACTUALES DEL SHEET ===');
+
+  if (DATA && DATA.clientes) {
+    lines.push('CONTROL COMERCIAL - CLIENTES BIG 7:');
+    DATA.clientes.forEach(c => {
+      lines.push(`• ${c.nombre}: Inv $${parseFloat(c.inv||0).toFixed(1)}M | Presup $${parseFloat(c.presup||0).toFixed(1)}M | Vs Presup ${c.vs||'—'}% | CMB $${parseFloat(c.cmb||0).toFixed(1)}M | CMB% ${c.cmbPct||'—'} | Vs CMB Presup ${c.vsCmb||'—'} | FTE Act ${c.fteAct||'—'}`);
+    });
+  }
+  if (DATA && DATA.agencia) {
+    const ag = DATA.agencia;
+    lines.push(`TOTAL AGENCIA: Inv $${parseFloat(ag.inv||0).toFixed(1)}M | Presup $${parseFloat(ag.presup||0).toFixed(1)}M | Vs Presup ${ag.vs||'—'}% | CMB $${parseFloat(ag.cmb||0).toFixed(1)}M | CMB% ${ag.cmbPct||'—'} | Vs CMB Presup ${ag.vsCmb||'—'}`);
+  }
+  if (DATA && DATA.periodo) lines.push(`Período actual: ${DATA.periodo}`);
+
+  // Rentabilidad Big 7
+  const rowsRent = calcRentabilidad('Total');
+  if (rowsRent && rowsRent.length) {
+    lines.push('');
+    lines.push('RENTABILIDAD BIG 7 (Total acumulado):');
+    rowsRent.forEach(r => {
+      const costoOH = r.costoEq*(1+OH_EQUIPO);
+      const cmoOH = r.cmb - costoOH;
+      const pctOH = r.inv>0?(cmoOH/r.inv)*100:0;
+      lines.push(`• ${r.nombre}: CMB $${r.cmb.toFixed(2)}M | Costo Eq $${r.costoEq.toFixed(2)}M | CMO$ $${r.cm.toFixed(2)}M | CMO% ${r.cmPct.toFixed(1)}% | Con OH: CMO$ $${cmoOH.toFixed(2)}M CMO% ${pctOH.toFixed(1)}%`);
+    });
+  }
+
+  // Performance
+  const rowsPerf = calcRentabilidadPerf('Total');
+  if (rowsPerf && rowsPerf.length) {
+    lines.push('');
+    lines.push('PERFORMANCE (Total acumulado):');
+    rowsPerf.forEach(r => {
+      const costoOH = r.costoEq*(1+OH_PERF);
+      const cmoOH = r.ingresos - costoOH;
+      const pctOH = r.ingresos>0?(cmoOH/r.ingresos)*100:0;
+      lines.push(`• ${r.nombre}: Fee $${r.ingresos.toFixed(2)}M | Costo $${r.costoEq.toFixed(2)}M | CMO$ $${r.cm.toFixed(2)}M | CMO% ${r.cmPct.toFixed(1)}% | Con OH: CMO$ $${cmoOH.toFixed(2)}M CMO% ${pctOH.toFixed(1)}%`);
+    });
+  }
+
+  return lines.join('\n');
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  // Mostrar mensaje del usuario
+  appendMsg(msg, 'user');
+  chatHistory.push({ role: 'user', content: msg });
+
+  // Typing indicator
+  const typingEl = appendMsg('Escribiendo...', 'typing');
+
+  try {
+    const systemCtx = buildContext();
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: systemCtx,
+        messages: chatHistory
+      })
+    });
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'No pude procesar la respuesta.';
+
+    typingEl.remove();
+    appendMsg(reply, 'assistant');
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    // Limitar historial a últimos 10 mensajes
+    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+
+  } catch(e) {
+    typingEl.remove();
+    appendMsg('Error al conectar con el asistente. Intentá de nuevo.', 'assistant');
+  }
+}
+
+function appendMsg(text, type) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${type}`;
+  div.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
 async function loadData() {
   // Control Comercial
   try {
@@ -2226,5 +2422,898 @@ function cargarDatosComercialDesdeSheet(json) {
 /* INIT */
 loadData();
 </script>
+</body>
+</html><!-- CHAT FLOTANTE IGNIS -->
+<button id="ignis-chat-btn" onclick="toggleChat()" title="Asistente Ignis">
+  <img src="Captura de pantalla 2026-05-13 103522.png" alt="Ignis" style="width:32px;height:32px;object-fit:contain;border-radius:6px"/>
+</button>
+
+<div id="ignis-chat-panel">
+  <div id="chat-header">
+    <div class="ch-logo">
+      <img src="Captura de pantalla 2026-05-13 103522.png" alt="Ignis" style="width:28px;height:28px;object-fit:contain;border-radius:50%"/>
+    </div>
+    <div class="ch-info">
+      <div class="ch-name">Asistente Ignis</div>
+      <div class="ch-status">En línea · datos en vivo</div>
+    </div>
+    <button class="ch-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div id="chat-messages">
+    <div class="chat-msg assistant">¡Hola Juano! 👋 Soy tu asistente analítico del Control Comercial.<br><br>Puedo responderte sobre <strong>clientes, KPIs, CMO%, FTEs, Performance y Branding Big 7</strong> con los datos que tenés cargados.<br><br>Probá algo como: <em>"¿Qué cliente tiene el CMO% más alto?"</em> o <em>"¿Cuánto le falta a Bagó para llegar al presupuesto?"</em></div>
+  </div>
+  <div id="chat-input-row">
+    <input id="chat-input" type="text" placeholder="Preguntame sobre los datos..." onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button id="chat-send" onclick="sendChat()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+YPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control Comercial · Ignis</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0e; --surface: #161616; --surface2: #1f1f1f; --border: #2a2a2a;
+  --red: #e8001c; --red-soft: rgba(232,0,28,0.12);
+  --yellow: #f5c400; --yellow-soft: rgba(245,196,0,0.12);
+  --green: #00c853; --green-soft: rgba(0,200,83,0.10);
+  --purple: #aa44ff; --purple-soft: rgba(170,68,255,0.10);
+  --blue: #4488ff; --blue-soft: rgba(68,136,255,0.10);
+  --text: #f0f0f0; --text-muted: #606060; --radius: 14px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; font-size: 15px; min-height: 100vh; overflow-x: hidden; }
+body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(232,0,28,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,0,28,0.03) 1px,transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+.wrap { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px 60px; }
+
+/* HEADER */
+.header { display: flex; align-items: center; justify-content: space-between; padding: 28px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 0; gap: 16px; flex-wrap: wrap; }
+.header-left { display: flex; align-items: center; gap: 20px; }
+.logo-mark { width: 42px; height: 42px; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: #000; display: flex; align-items: center; justify-content: center; }
+.logo-mark img { width: 42px; height: 42px; object-fit: contain; }
+.header-title h1 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: var(--text); line-height: 1; }
+.header-title p { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+.header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.period-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 7px 14px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.period-badge span { color: var(--text); font-weight: 500; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+/* PAGE TABS */
+.page-tabs { display: flex; gap: 2px; margin: 20px 0 28px; border-bottom: 1px solid var(--border); }
+.page-tab { padding: 12px 24px; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px; margin-bottom: -1px; white-space: nowrap; }
+.page-tab:hover { color: var(--text); }
+.page-tab.active { color: var(--text); border-bottom-color: var(--red); font-weight: 600; }
+.page-tab .tab-badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; background: var(--red-soft); color: var(--red); border-radius: 50%; font-size: 10px; font-weight: 700; margin-left: 7px; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* SHARED COMPONENTS */
+.director-filter { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+.filter-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; margin-right: 4px; }
+.dir-btn { padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.dir-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.dir-btn.active { background: var(--red); border-color: var(--red); color: white; font-weight: 600; }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; position: relative; overflow: hidden; transition: border-color 0.2s; }
+.kpi:hover { border-color: var(--red); }
+.kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 10px; }
+.kpi-value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
+.kpi-sub { font-size: 11px; color: var(--text-muted); }
+.kpi-accent { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; margin-top: 32px; }
+.section-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--text); }
+.section-sub { font-size: 11px; color: var(--text-muted); }
+
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; margin-bottom: 12px; }
+table { width: 100%; min-width: 1100px; border-collapse: collapse; }
+thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
+th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); white-space: nowrap; }
+th.num { text-align: right; }
+td { padding: 12px 14px; border-bottom: 1px solid rgba(42,42,42,0.6); font-size: 13px; vertical-align: middle; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: none; }
+tbody tr { transition: background 0.15s; }
+tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.client-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.client-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.badge.red { background: var(--red-soft); color: #ff4455; }
+.badge.yellow { background: var(--yellow-soft); color: var(--yellow); }
+.badge.green { background: var(--green-soft); color: var(--green); }
+.badge.purple { background: var(--purple-soft); color: var(--purple); }
+.badge.blue { background: var(--blue-soft); color: var(--blue); }
+.badge.neutral { background: var(--surface2); color: var(--text-muted); }
+.progress-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.progress-bg { width: 80px; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.progress-fill.low { background: var(--green); }
+.progress-fill.mid { background: var(--yellow); }
+.progress-fill.high { background: var(--red); }
+.progress-pct { font-size: 12px; min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-muted); }
+.fte-delta { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+.fte-delta.up { color: var(--red); }
+.fte-delta.down { color: var(--green); }
+.fte-delta.flat { color: var(--text-muted); }
+.total-row td { background: var(--surface2) !important; font-weight: 700; border-top: 1px solid var(--border); font-size: 14px; }
+.loading-row td { text-align: center; color: var(--text-muted); padding: 40px; }
+.alert-panel { background: rgba(232,0,28,0.06); border: 1px solid rgba(232,0,28,0.2); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 28px; display: none; }
+.alert-panel.visible { display: block; }
+.alert-panel-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--red); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.alert-items { display: flex; flex-wrap: wrap; gap: 8px; }
+.alert-item { background: var(--red-soft); border: 1px solid rgba(232,0,28,0.2); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 13px; color: #ff4455; }
+.alert-item strong { color: white; }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
+.mini-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.mini-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 16px; }
+.dir-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.dir-row:last-child { border-bottom: none; }
+.dir-row-name { font-weight: 500; }
+.dir-row-clients { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.slack-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.slack-btn:hover { border-color: var(--green); color: var(--green); }
+
+/* ── RENTABILIDAD PAGE ── */
+.rent-section { margin-bottom: 32px; }
+.rent-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.rent-tab { padding: 8px 18px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.rent-tab:hover { border-color: var(--text-muted); color: var(--text); }
+.rent-tab.active { background: var(--purple); border-color: var(--purple); color: white; font-weight: 600; }
+
+.cm-bar-wrap { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.cm-bar-bg { width: 60px; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.cm-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+/* Tabla Costo Compañía maestra */
+.costo-cia-wrap { overflow-x: auto; }
+.costo-cia-wrap table th { min-width: 110px; }
+.costo-cia-wrap table td { min-width: 110px; }
+.puesto-col { min-width: 200px !important; font-weight: 500; }
+.costo-cell { font-variant-numeric: tabular-nums; font-size: 12px; color: #aaa; text-align: right; padding: 10px 14px; }
+.costo-cell.vigente { color: var(--yellow); font-weight: 600; }
+.costo-cell.editable { cursor: pointer; transition: background 0.15s; }
+.costo-cell.editable:hover { background: rgba(255,255,255,0.04); }
+.fte-inline-input { background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text); font-family:'Poppins',sans-serif; font-size:12px; width:62px; text-align:right; outline:none; padding:2px 4px; }
+.fte-inline-input:focus { border-bottom-color:var(--purple); }
+.fte-inline-input::placeholder { color:#404040; }
+.cell-input { background: transparent; border: none; border-bottom: 1px solid var(--red); color: var(--text); font-family: 'Poppins', sans-serif; font-size: 12px; width: 100%; text-align: right; outline: none; padding: 2px 0; }
+.mes-header { text-align: right; white-space: nowrap; }
+.mes-header.vigente-col { color: var(--yellow) !important; }
+
+/* Detalle por cliente */
+.cliente-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.cli-btn { padding: 7px 16px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+.cli-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.cli-btn.active { border-color: transparent; color: white; font-weight: 600; }
+
+/* Ranking visual */
+.ranking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.rank-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+.rank-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 14px; }
+.rank-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.rank-item:last-child { border-bottom: none; }
+.rank-num { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--text-muted); min-width: 26px; }
+.rank-name { flex: 1; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.rank-val { font-size: 13px; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* Chart wrapper */
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; font-size: 11px; color: var(--text-muted); }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* Info banner vigencia */
+.vigencia-banner { display: flex; align-items: center; gap: 12px; background: rgba(245,196,0,0.07); border: 1px solid rgba(245,196,0,0.2); border-radius: var(--radius-sm); padding: 10px 16px; margin-bottom: 20px; font-size: 12px; color: var(--yellow); }
+.vigencia-banner strong { color: #ffe066; }
+
+/* Botones acción */
+.btn-action { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.btn-action:hover { border-color: var(--red); color: var(--red); }
+.btn-action.primary { background: var(--red); border-color: var(--red); color: white; }
+.btn-action.primary:hover { opacity: 0.85; }
+
+@media (max-width: 768px) {
+  .bottom-grid, .ranking-grid { grid-template-columns: 1fr; }
+  .kpis { grid-template-columns: repeat(2,1fr); }
+  table { font-size: 12px; }
+  th,td { padding: 8px 10px; }
+  .progress-bg { width: 50px; }
+  .page-tab { padding: 10px 14px; font-size: 12px; }
+}
+
+/* ── MODAL CARGA DATOS ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:1000; display:none; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); width:100%; max-width:860px; max-height:90vh; overflow-y:auto; padding:28px 32px; position:relative; }
+.modal-box::-webkit-scrollbar { width:6px; } .modal-box::-webkit-scrollbar-track { background:transparent; } .modal-box::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+.modal-title { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; margin-bottom:4px; }
+.modal-sub { font-size:12px; color:var(--text-muted); margin-bottom:24px; }
+.modal-close { position:absolute; top:18px; right:20px; background:transparent; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; line-height:1; }
+.modal-close:hover { color:var(--text); }
+.modal-section { margin-bottom:28px; }
+.modal-section-title { font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:1.5px; color:var(--red); margin-bottom:14px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.modal-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
+.modal-field { display:flex; flex-direction:column; gap:4px; }
+.modal-field label { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); font-weight:600; }
+.modal-field input { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 10px; color:var(--text); font-family:'Poppins',sans-serif; font-size:13px; outline:none; transition:border-color .2s; }
+.modal-field input:focus { border-color:var(--red); }
+.modal-client-header { display:flex; align-items:center; gap:8px; font-weight:600; font-size:13px; margin-bottom:10px; margin-top:18px; }
+.modal-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; padding-top:18px; border-top:1px solid var(--border); }
+.modal-mes-selector { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; }
+.modal-mes-btn { padding:6px 14px; border-radius:100px; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-family:'Poppins',sans-serif; font-size:11px; font-weight:500; cursor:pointer; transition:all .2s; }
+.modal-mes-btn:hover { border-color:var(--text-muted); color:var(--text); }
+.modal-mes-btn.active { background:var(--red); border-color:var(--red); color:white; font-weight:600; }
+.modal-saved-badge { display:none; align-items:center; gap:6px; font-size:12px; color:var(--green); }
+.modal-saved-badge.show { display:flex; }
+
+<style>
+.gauge-section{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.gauge-grid{display:flex;flex-direction:row;gap:0;justify-content:center;width:100%;margin-bottom:4px}
+.cards-kpi{display:flex;flex-direction:row;gap:1px;width:100%;background:rgba(255,255,255,0.06);border-radius:8px;overflow:hidden}
+.ck{background:var(--surface);padding:10px 14px;flex:1;min-width:80px}
+.ck-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.ck-val{font-size:13px;font-weight:500;color:var(--text)}
+
+/* ── CHAT FLOTANTE IGNIS ── */
+#ignis-chat-btn {
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#e8001c,#ff4455);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(232,0,28,.4);
+  transition:transform .2s,box-shadow .2s;
+}
+#ignis-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(232,0,28,.6)}
+#ignis-chat-btn svg{width:26px;height:26px;fill:#fff}
+
+#ignis-chat-panel {
+  position:fixed;bottom:86px;right:24px;z-index:9998;
+  width:380px;max-height:520px;
+  background:#141414;border:1px solid #2a2a2a;border-radius:16px;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 8px 40px rgba(0,0,0,.7);
+  transform:scale(.95) translateY(10px);opacity:0;
+  pointer-events:none;transition:all .22s cubic-bezier(.4,0,.2,1);
+}
+#ignis-chat-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+
+#chat-header{
+  padding:14px 16px;background:#1a1a1a;border-bottom:1px solid #222;
+  display:flex;align-items:center;gap:10px;
+}
+#chat-header .ch-logo{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,#e8001c,#ff4455);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+#chat-header .ch-logo svg{width:18px;height:18px;fill:#fff}
+#chat-header .ch-info{flex:1}
+#chat-header .ch-name{font-size:13px;font-weight:600;color:#eee}
+#chat-header .ch-status{font-size:11px;color:#00c853;display:flex;align-items:center;gap:4px;margin-top:1px}
+#chat-header .ch-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#00c853;display:inline-block}
+#chat-header .ch-close{background:none;border:none;color:#555;cursor:pointer;font-size:18px;padding:2px 6px;border-radius:4px;transition:color .15s}
+#chat-header .ch-close:hover{color:#eee}
+
+#chat-messages{
+  flex:1;overflow-y:auto;padding:14px 14px 8px;
+  display:flex;flex-direction:column;gap:10px;
+  scrollbar-width:thin;scrollbar-color:#333 transparent;
+}
+.chat-msg{max-width:88%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.5}
+.chat-msg.assistant{background:#1e1e1e;color:#ddd;align-self:flex-start;border-bottom-left-radius:4px}
+.chat-msg.user{background:linear-gradient(135deg,#e8001c,#c20018);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-msg.typing{background:#1e1e1e;color:#666;align-self:flex-start;font-style:italic}
+
+#chat-input-row{
+  padding:10px 12px;border-top:1px solid #222;
+  display:flex;gap:8px;align-items:center;background:#141414;
+}
+#chat-input{
+  flex:1;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:10px;
+  padding:9px 12px;color:#eee;font-size:13px;outline:none;
+  font-family:inherit;resize:none;transition:border-color .15s;
+}
+#chat-input:focus{border-color:#e8001c}
+#chat-input::placeholder{color:#444}
+#chat-send{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,#e8001c,#c20018);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:opacity .15s;
+}
+#chat-send:hover{opacity:.85}
+#chat-send svg{width:16px;height:16px;fill:#fff}
+
+</style>
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-mark"><img src="Captura de pantalla 2026-05-13 103522.png" alt="Ignis"></div>
+      <div class="header-title">
+        <h1>Control Comercial</h1>
+        <p>Ignis Media Agency · Dashboard de gestión</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="period-badge">
+        <div class="live-dot"></div>
+        Período: <span id="periodoLabel">Cargando...</span>
+      </div>
+      <button class="slack-btn" onclick="enviarAlertas()">📣 Enviar alertas Slack</button>
+    </div>
+  </div>
+
+  <!-- PAGE TABS -->
+  <div class="page-tabs">
+    <button class="page-tab active" onclick="switchPage('comercial', this)">📊 Control Comercial</button>
+    <button class="page-tab" onclick="switchPage('rentabilidad', this)">👥 Clientes Big 7 <span class="tab-badge" id="alertBadge" style="display:none">!</span></button>
+    <button class="page-tab" onclick="switchPage('performance', this)">🚀 Performance</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- PAGE 1: CONTROL COMERCIAL                 -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="page active" id="page-comercial">
+
+    <div class="director-filter">
+      <span class="filter-label">Director</span>
+      <button class="dir-btn active" onclick="filtrarDirector('todos', this)">Todos</button>
+      <button class="dir-btn" onclick="filtrarDirector('mechi', this)">🔴 Mechi · Bagó</button>
+      <button class="dir-btn" onclick="filtrarDirector('dani', this)">🔵 Dani · BP / LP / Pfizer</button>
+      <button class="dir-btn" onclick="filtrarDirector('jp', this)">🟢 JP · McCain / Escorial / UA</button>
+    </div>
+
+    <div class="alert-panel" id="alertPanel">
+      <div class="alert-panel-title">⚠️ Clientes con desvío mayor al -10%</div>
+      <div class="alert-items" id="alertItems"></div>
+    </div>
+
+    <!-- TOTAL AGENCIA — va primero -->
+    <div class="section-header">
+      <div><div class="section-title">Total Agencia</div><div class="section-sub">Consolidado de todos los clientes · datos cargados en Sheet</div></div>
+    </div>
+    <div id="kpisAgencia" style="display:flex;gap:0;margin-bottom:24px">
+  <div style="flex:1;padding:16px 16px;display:flex;flex-direction:column;align-items:center">
+      <div style="font-size:13px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;text-align:center">Total Agencia</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;width:100%">
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="agGaugeVs" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Vs Presup.">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="14" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="agGaugeVsVal" style="display:none">—</div>
+          <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.6px;margin-top:7px">Vs Presup.</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="agGaugeCmbPct" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="CMB %">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="14" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="agGaugeCmbPctVal" style="display:none">—</div>
+          <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.6px;margin-top:7px">CMB %</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="agGaugeVsCmb" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Vs CMB P.">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="14" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="agGaugeVsCmbVal" style="display:none">—</div>
+          <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.6px;margin-top:7px">Vs CMB P.</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="agGaugeCons" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Consumido">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="14" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="agGaugeConsVal" style="display:none">—</div>
+          <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.6px;margin-top:7px">Consumido</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:1px;background:#1a1a1a;border-radius:7px;overflow:hidden;width:100%">
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Inversión</div>
+          <div id="agInv" style="font-size:14px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Presup.</div>
+          <div id="agPresup" style="font-size:14px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">P. Anual</div>
+          <div id="agPresupAnual" style="font-size:14px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CMB $</div>
+          <div id="agCmb" style="font-size:14px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CMB Pres.</div>
+          <div id="agCmbPresup" style="font-size:14px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+      </div>
+    </div>
+  <div style="width:1px;background:#222;margin:8px 0;flex-shrink:0"></div>
+  <div style="flex:1;padding:16px 16px;display:flex;flex-direction:column;align-items:center">
+      <div style="font-size:13px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;text-align:center">Big 7</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;width:100%">
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="b7GaugeVs" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Vs Presup.">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="14" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="b7GaugeVsVal" style="display:none">—</div>
+          <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.6px;margin-top:7px">Vs Presup.</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="b7GaugeCmbPct" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="CMB %">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="14" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="b7GaugeCmbPctVal" style="display:none">—</div>
+          <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.6px;margin-top:7px">CMB %</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="b7GaugeVsCmb" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Vs CMB P.">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="14" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="b7GaugeVsCmbVal" style="display:none">—</div>
+          <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.6px;margin-top:7px">Vs CMB P.</div>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+          <svg id="b7GaugeCons" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="Consumido">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#222" stroke-width="7"/>
+            <g class="gauge-arc-wrap">
+              <circle class="gauge-arc" cx="40" cy="40" r="30" fill="none" stroke="#555"
+                stroke-width="7" stroke-linecap="round"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                transform="rotate(-90 40 40)"/>
+            </g>
+            <text class="gauge-val-text" x="40" y="44" text-anchor="middle"
+              font-size="14" font-weight="500" fill="#888"
+              font-family="'Poppins',system-ui,sans-serif">—</text>
+          </svg>
+          <div id="b7GaugeConsVal" style="display:none">—</div>
+          <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.6px;margin-top:7px">Consumido</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:1px;background:#1a1a1a;border-radius:7px;overflow:hidden;width:100%">
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Inversión</div>
+          <div id="b7Inv" style="font-size:14px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Presup.</div>
+          <div id="b7Presup" style="font-size:14px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">P. Anual</div>
+          <div id="b7PresupAnual" style="font-size:14px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CMB $</div>
+          <div id="b7Cmb" style="font-size:14px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+        <div style="flex:1;background:#111;padding:9px 8px;text-align:center;min-width:0">
+          <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CMB Pres.</div>
+          <div id="b7CmbPresup" style="font-size:14px;font-weight:500;color:#ddd;white-space:nowrap">—</div>
+        </div>
+      </div>
+    </div>
+</div>
+
+    <div class="section-header">
+      <div><div class="section-title">Clientes</div><div class="section-sub">Inversión, presupuesto y recursos por cliente</div></div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th>Cliente</th><th>Director</th>
+          <th class="num">Inv. Período</th><th class="num">Presup. Período</th>
+          <th>Vs Presup.</th><th>Consumido Anual</th>
+          <th class="num">Presup. Anual</th><th class="num">CMB $</th><th class="num">CMB %</th>
+            <th class="num">CMB $ Presup</th>
+            <th class="num">Vs CMB Presup</th>
+            <th class="num">FTE Ant.</th><th class="num">FTE Act.</th>
+          <th>Vs Mes</th><th class="num">FTE Total</th>
+        </tr></thead>
+        <tbody id="tbodyClientes"><tr class="loading-row"><td colspan="15">Cargando datos...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="section-header" id="bagoSection">
+      <div><div class="section-title">Unidades de Negocio · Bagó</div><div class="section-sub">Detalle por marca</div></div>
+    </div>
+    <div class="table-card" id="bagoCard">
+      <table>
+        <thead><tr>
+          <th>Marca</th>
+          <th class="num">Inv. Período</th><th class="num">Presup. Período</th>
+          <th>Vs Presup.</th><th>Consumido Anual</th>
+          <th class="num">Presup. Anual</th><th class="num">SOI Bagó</th>
+          <th class="num">FTE Ant.</th><th class="num">FTE Act.</th>
+          <th>Vs Mes</th><th class="num">FTE Total</th>
+        </tr></thead>
+        <tbody id="tbodyBago"><tr class="loading-row"><td colspan="11">Cargando datos...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="bottom-grid">
+      <div class="mini-card">
+        <div class="mini-card-title">Directores · Big Seven</div>
+        <div class="dir-row"><div><div class="dir-row-name">🔴 Mercedes Silva (Mechi)</div><div class="dir-row-clients">Bagó (cuenta total + marcas)</div></div></div>
+        <div class="dir-row"><div><div class="dir-row-name">🔵 Daniela Kravanja (Dani)</div><div class="dir-row-clients">Banco Patagonia · La Paulina · Pfizer</div></div></div>
+        <div class="dir-row"><div><div class="dir-row-name">🟢 Juan Pablo Echeverría (JP)</div><div class="dir-row-clients">McCain · Escorial · Universal Assistance</div></div></div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Umbrales de Alerta</div>
+        <div class="dir-row"><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--red);font-size:18px">●</span><div><div class="dir-row-name">Desvío crítico</div><div class="dir-row-clients">Vs Presup. menor a -10%</div></div></div><div class="badge red">Alerta</div></div>
+        <div class="dir-row"><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--yellow);font-size:18px">●</span><div><div class="dir-row-name">Desvío moderado</div><div class="dir-row-clients">Vs Presup. entre -5% y -10%</div></div></div><div class="badge yellow">Atención</div></div>
+        <div class="dir-row"><div style="display:flex;align-items:center;gap:10px"><span style="color:var(--green);font-size:18px">●</span><div><div class="dir-row-name">En objetivo</div><div class="dir-row-clients">Vs Presup. mayor a -5%</div></div></div><div class="badge green">OK</div></div>
+      </div>
+    </div>
+
+
+  </div><!-- /page-comercial -->
+
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- PAGE 2: RENTABILIDAD DE EQUIPO            -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="page" id="page-rentabilidad">
+
+    <!-- Sub-tabs -->
+    <div class="rent-tabs">
+      <button class="rent-tab active" onclick="switchRentTab('consolidado', this)">📊 Consolidado por Cliente</button>
+      <button class="rent-tab" onclick="switchRentTab('detalle', this)">🔍 Detalle por Cliente</button>
+      <button class="rent-tab" onclick="switchRentTab('costos', this)">💼 Tabla Costo Compañía</button>
+    </div>
+
+    <!-- ── SUB-TAB: CONSOLIDADO ── -->
+    <div id="rent-consolidado" class="rent-section">
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <span class="filter-label">Mes de análisis</span>
+        <div id="mesSelectorRent" style="display:none"></div>
+      </div>
+
+      <div class="kpis" id="kpisRent"></div>
+
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button id="btnOHEquipo" onclick="toggleOH('equipo')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
+      </div>
+      <div class="section-header">
+        <div><div class="section-title">Tabla Consolidada · Rentabilidad</div><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="section-sub">CMB = Venta Facturable + Honorarios + Fees − Compra Indirecta · CMO % = CMO $ / Inv. Período</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#ff4455;flex-shrink:0"></div>CMO % ≤ 30%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#f5c400;flex-shrink:0"></div>30% – 35%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#00c853;flex-shrink:0"></div>&gt; 35%</div>
+        </div>
+      </div></div>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead><tr>
+            <th>Cliente</th>
+            <th class="num">CMB</th>
+            <th class="num">Costo Equipo</th>
+            <th class="num">CMO $</th>
+            <th class="num">CMO %</th>
+            <th>Con OH</th>
+          </tr></thead>
+          <tbody id="tbodyConsolidado"></tbody>
+        </table>
+      </div>
+
+      <div class="ranking-grid">
+        <div class="rank-card">
+          <div class="rank-card-title">Ranking · CM $ (mayor a menor)</div>
+          <div id="rankingCM"></div>
+        </div>
+        <div class="rank-card">
+          <div class="rank-card-title">Ranking · CMO % (mayor a menor)</div>
+          <div id="rankingPct"></div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-sq" style="background:#4488ff"></span>CMB</span>
+          <span class="legend-item"><span class="legend-sq" style="background:#f5c400"></span>Costo Equipo</span>
+          <span class="legend-item"><span class="legend-sq" style="background:#00c853"></span>CM $</span>
+        </div>
+        <div style="position:relative;width:100%;height:270px">
+          <canvas id="chartRent" role="img" aria-label="Gráfico comparativo ingresos, costo equipo y CM por cliente"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SUB-TAB: DETALLE ── -->
+    <div id="rent-detalle" class="rent-section" style="display:none">
+      <div class="cliente-selector" id="clienteSelector"></div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <span class="filter-label">Mes</span>
+        <div id="mesSelectorDetalle" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+        <div class="vigencia-banner" style="flex:1;min-width:240px;margin-bottom:0">
+          <span>⚡</span>
+          <span>Costo Cía. aplicado: columna <strong id="vigenciaMes">—</strong></span>
+        </div>
+
+      </div>
+
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">
+        Editá el FTE de cada puesto directamente en la tabla. Cero o vacío = no asignado a este cliente.
+      </div>
+      <div class="table-card">
+        <table>
+          <thead><tr>
+            <th>Puesto</th>
+            <th class="num">FTE</th>
+            <th class="num">Costo Cía.</th>
+            <th class="num">Costo Mensual</th>
+            <th class="num">% del total</th>
+          </tr></thead>
+          <tbody id="tbodyDetalle"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── SUB-TAB: TABLA COSTO CIA ── -->
+    <div id="rent-costos" class="rent-section" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="section-title" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px">Tabla Maestra · Costo Compañía</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Actualizá los valores cuando RRHH te pase el nuevo print · Hacé click en cualquier celda para editar</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-action" onclick="agregarMes()">+ Nuevo mes RRHH</button>
+          <button class="btn-action primary" onclick="guardarCostos()">✓ Guardar y recalcular</button>
+        </div>
+      </div>
+      <div class="vigencia-banner">
+        <span>⚡</span>
+        <span>Columna activa: <strong id="colVigenteLabel">—</strong> · Es la última con datos cargados y se usa para el cálculo actual</span>
+      </div>
+      <div class="table-card costo-cia-wrap">
+        <table id="tablaCostoCia">
+          <thead id="headCostoCia"></thead>
+          <tbody id="bodyCostoCia"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /page-rentabilidad -->
+
+<div id="page-performance" class="page">
+  <div class="rent-tabs">
+    <button class="rent-tab active" onclick="switchPerfTab('perf-consolidado',this)">📊 Consolidado por Cliente</button>
+    <button class="rent-tab" onclick="switchPerfTab('perf-detalle',this)">🔍 Detalle por Cliente</button>
+    <button class="rent-tab" onclick="switchPerfTab('perf-costos',this)">💼 Tabla Costo Compañía</button>
+  </div>
+
+  <div id="perf-consolidado" class="rent-section" style="display:block">
+    <div class="mes-selector-row">
+      <span class="mes-label">MES DE ANÁLISIS</span>
+      <div id="mesSelectorPerf" class="mes-btns"></div>
+    </div>
+    <div id="kpisPerf" class="kpis"></div>
+
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button id="btnOHPerf" onclick="toggleOH('perf')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 18px;color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.5px">Con OH</button>
+    </div>
+    <div class="section-header">
+      <div><div class="section-title">Tabla Consolidada · Performance</div><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="section-sub">Fee − Costo de Equipo · CMO % = CMO $ / Fee</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#ff4455;flex-shrink:0"></div>CMO % ≤ 0%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#f5c400;flex-shrink:0"></div>0% – 25%</div>
+          <div style="width:1px;height:12px;background:#333"></div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:#666;white-space:nowrap"><div style="width:8px;height:8px;border-radius:50%;background:#00c853;flex-shrink:0"></div>≥ 25%</div>
+        </div>
+      </div></div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th>Cliente</th><th class="num">Fee</th><th class="num">Costo Equipo</th>
+          <th class="num">CMO $</th><th class="num">CMO %</th><th>Con OH</th>
+        </tr></thead>
+        <tbody id="tbodyPerfConsolidado"></tbody>
+      </table>
+    </div>
+
+    <div class="ranking-grid">
+      <div class="rank-card">
+        <div class="rank-card-title">Ranking · CMO $ (mayor a menor)</div>
+        <div id="rankingPerfCM"></div>
+      </div>
+      <div class="rank-card">
+        <div class="rank-card-title">Ranking · CMO % (mayor a menor)</div>
+        <div id="rankingPerfPct"></div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-sq" style="background:#4488ff"></span>CMB</span>
+        <span class="legend-item"><span class="legend-sq" style="background:#f5c400"></span>Costo Equipo</span>
+        <span class="legend-item"><span class="legend-sq" style="background:#00c853"></span>CM $</span>
+      </div>
+      <div style="position:relative;width:100%;height:270px">
+        <canvas id="chartPerf"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="perf-detalle" class="rent-section" style="display:none">
+    <div class="mes-selector-row">
+      <span class="mes-label">MES DE ANÁLISIS</span>
+      <div id="mesSelectorPerfDetalle" class="mes-btns"></div>
+    </div>
+    <div id="clienteSelectorPerf" class="director-filter" style="margin:16px 0 8px 0;gap:8px;flex-wrap:wrap;display:flex"></div>
+    <div class="vigencia-banner">
+      <span>⚡</span>
+      <span>Costo Cía. aplicado: columna <strong id="vigenciaMesPerf">—</strong></span>
+    </div>
+    <div class="table-card" style="margin-top:12px">
+
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="color:var(--text-muted);font-size:13px">Fee (millones $)</span>
+        <input id="ingresosEditablePerf" type="number" placeholder="0"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:150px"
+          onchange="saveIngresosPerf(clienteDetalleActivoPerf, MES_ACTIVO_PERF, this.value)">
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="color:var(--text-muted);font-size:13px">Diferencial Programmatic (miles $)</span>
+        <input id="diferencialPerfInput" type="number" placeholder="0"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:150px"
+          onchange="saveDiferencialPerf(clienteDetalleActivoPerf, MES_ACTIVO_PERF, this.value)">
+        <span id="totalIngresosPerf" style="font-size:12px;color:var(--green);font-weight:600"></span>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Editá el FTE de cada puesto directamente en la tabla. El Diferencial Programmatic se suma al Fee para el cálculo de CMO.</p>
+      <table class="data-table">
+        <thead><tr><th>Puesto</th><th class="num">FTE %</th><th class="num">Costo Cía.</th><th class="num">Costo Mensual</th><th class="num">% del total</th></tr></thead>
+        <tbody id="tbodyPerfDetalle"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="perf-costos" class="rent-section" style="display:none">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn-action" onclick="agregarMesPerf()">+ Nuevo mes RRHH</button>
+      <button class="btn-action primary" onclick="guardarCostosPerf()">✓ Guardar y recalcular</button>
+    </div>
+    <div class="vigencia-banner">
+      <span>⚡</span>
+      <span>Columna activa: <strong id="colVigenteLabelPerf">—</strong></span>
+    </div>
+    <div class="table-card costo-cia-wrap">
+      <table id="tablaCostoCiaPerf">
+        <thead id="headCostoCiaPerf"></thead>
+        <tbody id="bodyCostoCiaPerf"></tbody>
+      </table>
+    </div>
+  </div>
+</div><!-- /page-performance -->
+
+
+<!-- ══════════════════════════════════════════ -->
+<!-- MODAL CARGA DATOS CONTROL COMERCIAL       -->
+<!-- ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalCarga" onclick="cerrarModalSiOverlay(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModalCarga()">✕</button>
+    <div class="modal-title">📥 Cargar datos del mes</div>
+    <div class="modal-sub">Completá los campos y guardá — el dashboard se actualiza automáticamente</div>
+
+    <!-- Selector de mes -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+      <span class="filter-label">Mes</span>
+      <div class="modal-mes-selector" id="modalMesSelector"></div>
+    </div>
+
+    <!-- Clientes Big Seven -->
+    <div class="modal-section">
+      <div class="modal-section-title">Clientes · Big Seven</div>
+      <div id="modalClientesForm"></div>
+    </div>
+
+    <!-- Bagó por marca -->
+    <div class="modal-section">
+      <div class="modal-section-title">Unidades de Negocio · Bagó</div>
+      <div id="modalBagoForm"></div>
+    </div>
+
+    <div class="modal-actions">
+      <div class="modal-saved-badge" id="modalSavedBadge">✅ Guardado correctamente</div>
+      <button class="btn-action" onclick="cerrarModalCarga()">Cancelar</button>
+      <button class="btn-action primary" onclick="guardarDatosComercial()">✓ Guardar y actualizar</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
 </body>
 </html>
