@@ -1289,125 +1289,103 @@ function enviarResumenEjecutivo() {
   }
 
   const periodo = DATA.periodo || 'Período actual';
-  const ag = DATA.agencia || {};
+  const ag      = DATA.agencia || {};
   const clientes = DATA.clientes || [];
 
   // ── HELPERS ──
-  const fmt   = v => v != null ? '$' + parseFloat(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' M' : '—';
-  const fmtPct = v => isNaN(parseFloat(v)) ? '—' : parseFloat(v).toFixed(1) + '%';
-  const arrow  = v => parseFloat(v) > 0 ? '▲' : '▼';
-  const bar    = (v, max=100) => { const n=Math.round(Math.min(Math.abs(v),max)/max*12); return '█'.repeat(n)+'░'.repeat(12-n); };
-  const semafB7   = v => v>35?'●verde':v>=30?'●amarillo':'●rojo';
-  const semafPerf = v => v>=25?'●verde':v>0?'●amarillo':'●rojo';
-  const semafVs   = v => v>=-5?'●verde':v>=-10?'●amarillo':'●rojo';
+  const fmt    = v => v != null ? '$' + parseFloat(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' M' : '—';
+  const fmtN   = v => v != null ? parseFloat(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) : '—';
+  const arrow  = v => parseFloat(v) >= 0 ? '▲' : '▼';
+  const bar    = (v, max=100) => { const n=Math.round(Math.min(Math.abs(parseFloat(v)||0),max)/max*8); return '█'.repeat(n)+'░'.repeat(8-n); };
+  const sfB7   = v => parseFloat(v)>35?'🟢':parseFloat(v)>=30?'🟡':'🔴';
+  const sfPerf = v => parseFloat(v)>=25?'🟢':parseFloat(v)>0?'🟡':'🔴';
 
-  // ── AGENCIA ──
+  // ── TOTAL AGENCIA ──
   const agVs     = parseFloat(ag.vs||0);
   const agVsCmb  = parseFloat(String(ag.vsCmb||'0').replace('%',''));
   const agCmbPct = parseFloat(String(ag.cmbPct||'0').replace('%',''));
   const agCons   = parseFloat(ag.consumidoAnual||0);
-  const semCons  = agCons>70?'●verde':agCons>35?'●amarillo':'●rojo';
 
   // ── BIG 7 ──
   const rowsB7 = calcRentabilidad('Total');
-  const b7Data = rowsB7.map(r => {
-    const costoOH = r.costoEq*(1+OH_EQUIPO);
-    const cmoOH   = r.cmb - costoOH;
-    const pctOH   = r.inv>0 ? (cmoOH/r.inv)*100 : 0;
-    const cd      = clientes.find(c=>c.nombre===r.nombre)||{};
-    const vsP     = parseFloat(cd.vs||0);
-    const vsCmb   = parseFloat(String(cd.vsCmb||'0').replace('%',''));
-    const fteAnt  = parseFloat(cd.fteAnt||0);
-    const fteAct  = parseFloat(cd.fteAct||0);
-    const ftePct  = fteAnt>0 ? ((fteAct-fteAnt)/fteAnt)*100 : 0;
-    return {nombre:r.nombre, pctOH, vsP, vsCmb, ftePct, cmb:r.cmb, inv:r.inv};
+
+  // Facturación
+  const facLines = clientes.map(c => {
+    const vsP = parseFloat(c.vs||0);
+    return `${c.nombre.padEnd(22)}: ${fmt(c.inv)}  |  ${arrow(vsP)} ${Math.abs(vsP).toFixed(1)}%`;
+  }).join('\n');
+
+  // CMB y CMO sin OH
+  const cmbLines = rowsB7.map(r => {
+    const cd     = clientes.find(c=>c.nombre===r.nombre)||{};
+    const cmbPct = parseFloat(String(cd.cmbPct||'0').replace('%',''));
+    const vsCmb  = parseFloat(String(cd.vsCmb||'0').replace('%',''));
+    const cmoPct = r.inv>0 ? (r.cm/r.inv)*100 : 0; // Sin OH: cm ya es cmb-costoEq sin OH
+    return `${r.nombre.padEnd(22)}: CMB ${cmbPct.toFixed(1)}%  ${arrow(vsCmb)} ${Math.abs(vsCmb).toFixed(1)}%  |  CMO ${cmoPct.toFixed(1)}% ${sfB7(cmoPct)}`;
+  }).join('\n');
+
+  // FTE último mes y total
+  const fteLines = clientes.map(c => {
+    const fteAnt = parseFloat(c.fteAnt||0);
+    const fteAct = parseFloat(c.fteAct||0);
+    const fteTot = parseFloat(c.fteTotal||0);
+    const ftePct = fteAnt>0 ? ((fteAct-fteAnt)/fteAnt)*100 : 0;
+    return `${c.nombre.padEnd(22)}: ${fteAct.toFixed(2)}  ${arrow(ftePct)} ${Math.abs(ftePct).toFixed(1)}%  |  Total: ${fteTot.toFixed(2)}`;
+  }).join('\n');
+
+  // ── PERFORMANCE con OH ──
+  const rowsPerf = calcRentabilidadPerf('Total');
+  const perfData = rowsPerf.filter(r=>r.ingresos>0).map(r => {
+    const costoOH = r.costoEq*(1+OH_PERF);
+    const cmoOH   = r.ingresos - costoOH;
+    const pctOH   = r.ingresos>0 ? (cmoOH/r.ingresos)*100 : 0;
+    return {nombre:r.nombre, cmoOH, pctOH};
   }).sort((a,b)=>b.pctOH-a.pctOH);
 
-  const mejorB7 = b7Data[0];
-  const rojosB7 = b7Data.filter(r=>r.pctOH<=30).map(r=>`${r.nombre} (${r.pctOH.toFixed(1)}%)`).join(', ')||'Ninguno';
+  const perfLines = perfData.length > 0
+    ? perfData.map(r => `${r.nombre.padEnd(22)}: ${fmt(r.cmoOH)}  |  ${r.pctOH.toFixed(1)}% ${sfPerf(r.pctOH)}`).join('\n')
+    : '  Sin datos de Fee cargados en esta sesión.';
 
-  const b7Lines = b7Data.map(r => {
-    const sf = semafB7(r.pctOH).replace('●verde','🟢').replace('●amarillo','🟡').replace('●rojo','🔴');
-    const fteTag = r.ftePct > 15 ? ' | FTE ▲' : r.ftePct < -15 ? ' | FTE ▼' : '';
-    return `  ${sf} *${r.nombre}*: CMO% ${r.pctOH.toFixed(1)}% | Inv vs Presup ${arrow(r.vsP)} ${Math.abs(r.vsP).toFixed(1)}% | CMB vs Presup ${arrow(r.vsCmb)} ${Math.abs(r.vsCmb).toFixed(1)}%${fteTag}`;
-  }).join('\n');
-
-  // Gráfico ASCII Big 7 CMO%
-  const b7Chart = b7Data.map(r => {
-    const barra = bar(r.pctOH, 60);
-    return `  ${r.nombre.padEnd(22,' ')} ${barra} ${r.pctOH.toFixed(1)}%`;
-  }).join('\n');
-
-  // ── PERFORMANCE ──
-  const rowsPerf = calcRentabilidadPerf('Total');
-  const perfData = rowsPerf
-    .filter(r => r.ingresos > 0)
-    .map(r => {
-      const costoOH = r.costoEq*(1+OH_PERF);
-      const cmoOH   = r.ingresos - costoOH;
-      const pctOH   = r.ingresos>0 ? (cmoOH/r.ingresos)*100 : 0;
-      return {nombre:r.nombre, pctOH, fee:r.ingresos, cmo:cmoOH};
-    }).sort((a,b)=>b.pctOH-a.pctOH);
-
-  const mejorPerf = perfData[0];
-  const rojosPerf = perfData.filter(r=>r.pctOH<=0).map(r=>`${r.nombre} (${r.pctOH.toFixed(1)}%)`).join(', ')||'Ninguno';
-
-  const perfLines = perfData.map(r => {
-    const sf = r.pctOH>=25?'🟢':r.pctOH>0?'🟡':'🔴';
-    return `  ${sf} *${r.nombre}*: Fee ${fmt(r.fee)} | CMO$ ${fmt(r.cmo)} | CMO% ${r.pctOH.toFixed(1)}%`;
-  }).join('\n');
-
-  const perfChart = perfData.map(r => {
-    const barra = bar(Math.max(r.pctOH,0), 50);
-    return `  ${r.nombre.padEnd(22,' ')} ${barra} ${r.pctOH.toFixed(1)}%`;
-  }).join('\n');
-
-  const perfNote = perfData.length === 0
-    ? '  Sin datos de Fee cargados para el período.'
-    : perfLines;
-
-  // ── MENSAJE FINAL ──
-  const vsAgStr  = `${arrow(agVs)} ${Math.abs(agVs).toFixed(1)}%`;
-  const cmbAgStr = `${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}%`;
-
+  // ── CONSTRUIR MENSAJE ──
   const msg = [
-    `*RESUMEN EJECUTIVO — ${periodo}*`,
+    `*RESUMEN EJECUTIVO — Enero a ${periodo}*`,
     `Ignis Media Agency · Control Comercial`,
     ``,
     `*TOTAL AGENCIA*`,
     `────────────────────────────`,
-    `Inversión:        *${fmt(ag.inv)}*  ${vsAgStr} vs Presup`,
-    `Presupuesto:      *${fmt(ag.presup)}*  (Anual: ${fmt(ag.presupAnual)})`,
-    `Consumido anual:  *${agCons.toFixed(1)}%*  ${semCons.replace('●verde','🟢').replace('●amarillo','🟡').replace('●rojo','🔴')}  ${bar(agCons)}`,
-    `CMB:              *${fmt(ag.cmb)}*  (${fmtPct(ag.cmbPct)})`,
-    `CMB vs Presup:    *${cmbAgStr}*`,
+    `Inversión:       ${fmt(ag.inv)}  ${arrow(agVs)} ${Math.abs(agVs).toFixed(1)}% vs Presup`,
+    `CMB:             ${fmt(ag.cmb)}  ${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}% vs Presup`,
+    `Consumido anual: ${agCons.toFixed(1)}%  ${bar(agCons)}`,
     ``,
-    `*CLIENTES BIG 7 — BRANDING (con OH)*`,
+    `*CLIENTES BIG 7*`,
+    ``,
+    `FACTURACIÓN (Vs Presupuesto)`,
     `────────────────────────────`,
-    `Mejor CMO%:  *${mejorB7?.nombre||'—'}* (${mejorB7?.pctOH?.toFixed(1)||'—'}%) 🏆`,
-    `En rojo (≤30%): ${rojosB7}`,
-    ``,
-    b7Lines,
-    ``,
-    `CMO% por cliente:`,
     `\`\`\``,
-    b7Chart,
+    facLines,
     `\`\`\``,
     ``,
-    `*PERFORMANCE (con OH)*`,
+    `CMB y CMO (Vs Presupuesto, Sin OH)`,
     `────────────────────────────`,
-    perfData.length > 0 ? `Mejor CMO%:  *${mejorPerf?.nombre||'—'}* (${mejorPerf?.pctOH?.toFixed(1)||'—'}%) 🏆` : '',
-    perfData.length > 0 ? `En rojo (≤0%): ${rojosPerf}` : '',
+    `\`\`\``,
+    cmbLines,
+    `\`\`\``,
     ``,
-    perfNote,
-    perfData.length > 0 ? `
-\`\`\`
-${perfChart}
-\`\`\`` : '',
+    `FTE último mes y Total`,
+    `────────────────────────────`,
+    `\`\`\``,
+    fteLines,
+    `\`\`\``,
+    ``,
+    `*PERFORMANCE — CMO $ y CMO % (Con OH)*`,
+    `────────────────────────────`,
+    `\`\`\``,
+    perfLines,
+    `\`\`\``,
     ``,
     `────────────────────────────`,
     `_Generado automáticamente · Control Comercial Ignis_`
-  ].filter(l => l !== null).join('\n');
+  ].join('\n');
 
   const SLACK_PROXY = 'https://script.google.com/macros/s/AKfycbwdEWqrT2eb9S_UN5v0y716-GUvfxvaaK5ERCqhGQ-EqSe0KQ4pMRiiqQguWTUjfx9QTg/exec';
   fetch(SLACK_PROXY, {
@@ -1417,10 +1395,11 @@ ${perfChart}
   })
   .then(r => {
     if (r.ok) alert('✅ Resumen enviado a Slack.');
-    else alert('❌ Error al enviar. Revisá la conexión.');
+    else alert('❌ Error al enviar.');
   })
   .catch(() => alert('❌ Error de conexión con Slack.'));
 }
+
 
 async function loadData() {
   // Control Comercial
