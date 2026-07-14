@@ -1436,12 +1436,11 @@ async function sendChat() {
 
   try {
     const systemCtx = buildContext();
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const CHAT_PROXY = 'https://script.google.com/macros/s/AKfycby7ph_cwsZRI5rgD7cBlTqCH3i4JjmW4rObsrVKC2zYAekxToM-_DXo995FGNb3BhoP/exec';
+    const response = await fetch(CHAT_PROXY, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
         system: systemCtx,
         messages: chatHistory
       })
