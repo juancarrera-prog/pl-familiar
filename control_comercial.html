@@ -952,10 +952,12 @@ function getVsBadge(raw) {
   if (!raw && raw !== 0) return '<span class="badge neutral">—</span>';
   const v = parseFloat(String(raw).replace('%','').replace(',','.'));
   if (isNaN(v)) return '<span class="badge neutral">—</span>';
-  const label = (v > 0 ? '+' : '') + v.toFixed(0) + '%';
-  if (v < -10) return `<span class="badge red">▼ ${label}</span>`;
-  if (v < -5)  return `<span class="badge yellow">▼ ${label}</span>`;
-  return `<span class="badge green">▲ ${label}</span>`;
+  // Si es exactamente 0: guión blanco
+  if (v === 0) return '<span class="badge neutral">— 0,0%</span>';
+  // Mayor a 0: flechita arriba, verde, con +
+  if (v > 0) return `<span class="badge green">▲ +${v.toFixed(1)}%</span>`;
+  // Menor a 0: flechita abajo, rojo, con -
+  return `<span class="badge red">▼ ${v.toFixed(1)}%</span>`;
 }
 function getProgressBar(raw) {
   if (!raw && raw !== 0) return '<span style="color:var(--text-muted)">—</span>';
