@@ -1445,8 +1445,22 @@ async function sendChat() {
         messages: chatHistory
       })
     });
-    const data = await response.json();
-    const reply = data.content?.[0]?.text || 'No pude procesar la respuesta.';
+    const raw = await response.text();
+    let reply = 'No pude procesar la respuesta.';
+    try {
+      const data = JSON.parse(raw);
+      if (data.content && data.content[0] && data.content[0].text) {
+        reply = data.content[0].text;
+      } else if (data.error) {
+        reply = 'Error: ' + (data.error.message || JSON.stringify(data.error));
+      } else if (typeof data === 'string') {
+        reply = data;
+      } else {
+        reply = 'Respuesta inesperada: ' + JSON.stringify(data).substring(0, 200);
+      }
+    } catch(parseErr) {
+      reply = raw ? raw.substring(0, 300) : 'Sin respuesta del servidor.';
+    }
 
     typingEl.remove();
     appendMsg(reply, 'assistant');
