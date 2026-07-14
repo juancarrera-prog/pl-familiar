@@ -1284,7 +1284,7 @@ async function fetchConRetry(url, intentos=3, delay=1500) {
 
 function enviarResumenEjecutivo() {
   if (!DATA || !DATA.clientes) {
-    alert('⚠️ Los datos aún no cargaron. Esperá un momento y volvé a intentar.');
+    alert('Los datos aún no cargaron. Esperá un momento y volvé a intentar.');
     return;
   }
 
@@ -1293,101 +1293,122 @@ function enviarResumenEjecutivo() {
   const clientes = DATA.clientes || [];
 
   // ── HELPERS ──
-  const fmt  = v => v != null ? '$' + parseFloat(v).toLocaleString('es-AR', {minimumFractionDigits:1, maximumFractionDigits:1}) + ' M' : '—';
-  const fmtP = v => v != null ? parseFloat(v).toFixed(1) + '%' : '—';
-  const arrow = v => parseFloat(v) >= 0 ? '⬆️' : '⬇️';
-  const semaf = (v, good, warn) => parseFloat(v) >= good ? '🟢' : parseFloat(v) >= warn ? '🟡' : '🔴';
+  const fmt   = v => v != null ? '$' + parseFloat(v).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' M' : '—';
+  const fmtPct = v => isNaN(parseFloat(v)) ? '—' : parseFloat(v).toFixed(1) + '%';
+  const arrow  = v => parseFloat(v) > 0 ? '▲' : '▼';
+  const bar    = (v, max=100) => { const n=Math.round(Math.min(Math.abs(v),max)/max*12); return '█'.repeat(n)+'░'.repeat(12-n); };
+  const semafB7   = v => v>35?'●verde':v>=30?'●amarillo':'●rojo';
+  const semafPerf = v => v>=25?'●verde':v>0?'●amarillo':'●rojo';
+  const semafVs   = v => v>=-5?'●verde':v>=-10?'●amarillo':'●rojo';
 
   // ── AGENCIA ──
-  const agVs    = parseFloat(ag.vs || 0);
-  const agVsCmb = parseFloat(String(ag.vsCmb||'0').replace('%',''));
-  const agCmbPct= parseFloat(String(ag.cmbPct||'0').replace('%',''));
-  const agCons  = parseFloat(ag.consumidoAnual || 0);
+  const agVs     = parseFloat(ag.vs||0);
+  const agVsCmb  = parseFloat(String(ag.vsCmb||'0').replace('%',''));
+  const agCmbPct = parseFloat(String(ag.cmbPct||'0').replace('%',''));
+  const agCons   = parseFloat(ag.consumidoAnual||0);
+  const semCons  = agCons>70?'●verde':agCons>35?'●amarillo':'●rojo';
 
   // ── BIG 7 ──
   const rowsB7 = calcRentabilidad('Total');
-  const b7Lines = rowsB7.map(r => {
-    const costoD = r.costoEq*(1+OH_EQUIPO);
-    const cmoD   = r.cmb - costoD;
-    const pctD   = r.inv>0 ? (cmoD/r.inv)*100 : 0;
-    const emojiCMO = pctD>35?'🟢':pctD>=30?'🟡':'🔴';
-    const clienteData = clientes.find(c=>c.nombre===r.nombre)||{};
-    const vsPresup = parseFloat(clienteData.vs||0);
-    const vsCmb = parseFloat(String(clienteData.vsCmb||'0').replace('%',''));
-    // FTE
-    const fteAnt = parseFloat(clienteData.fteAnt||0);
-    const fteAct = parseFloat(clienteData.fteAct||0);
-    const fteDelta = fteAnt>0 ? ((fteAct-fteAnt)/fteAnt)*100 : 0;
-    const fteEmoji = fteDelta > 10 ? '⚠️ FTE ⬆️' : fteDelta < -10 ? '📉 FTE ⬇️' : '';
-    return `  • ${r.nombre}: CMO% ${emojiCMO} ${pctD.toFixed(1)}% | Inv vs Presup ${arrow(vsPresup)} ${Math.abs(vsPresup).toFixed(1)}% | CMB vs Presup ${arrow(vsCmb)} ${Math.abs(vsCmb).toFixed(1)}% ${fteEmoji ? '| '+fteEmoji : ''}`;
+  const b7Data = rowsB7.map(r => {
+    const costoOH = r.costoEq*(1+OH_EQUIPO);
+    const cmoOH   = r.cmb - costoOH;
+    const pctOH   = r.inv>0 ? (cmoOH/r.inv)*100 : 0;
+    const cd      = clientes.find(c=>c.nombre===r.nombre)||{};
+    const vsP     = parseFloat(cd.vs||0);
+    const vsCmb   = parseFloat(String(cd.vsCmb||'0').replace('%',''));
+    const fteAnt  = parseFloat(cd.fteAnt||0);
+    const fteAct  = parseFloat(cd.fteAct||0);
+    const ftePct  = fteAnt>0 ? ((fteAct-fteAnt)/fteAnt)*100 : 0;
+    return {nombre:r.nombre, pctOH, vsP, vsCmb, ftePct, cmb:r.cmb, inv:r.inv};
+  }).sort((a,b)=>b.pctOH-a.pctOH);
+
+  const mejorB7 = b7Data[0];
+  const rojosB7 = b7Data.filter(r=>r.pctOH<=30).map(r=>`${r.nombre} (${r.pctOH.toFixed(1)}%)`).join(', ')||'Ninguno';
+
+  const b7Lines = b7Data.map(r => {
+    const sf = semafB7(r.pctOH).replace('●verde','🟢').replace('●amarillo','🟡').replace('●rojo','🔴');
+    const fteTag = r.ftePct > 15 ? ' | FTE ▲' : r.ftePct < -15 ? ' | FTE ▼' : '';
+    return `  ${sf} *${r.nombre}*: CMO% ${r.pctOH.toFixed(1)}% | Inv vs Presup ${arrow(r.vsP)} ${Math.abs(r.vsP).toFixed(1)}% | CMB vs Presup ${arrow(r.vsCmb)} ${Math.abs(r.vsCmb).toFixed(1)}%${fteTag}`;
   }).join('\n');
 
-  // Mejor y peor CMO Big 7
-  const sorted = [...rowsB7].map(r => {
-    const cmoD = r.cmb - r.costoEq*(1+OH_EQUIPO);
-    return {nombre:r.nombre, pct:r.inv>0?(cmoD/r.inv)*100:0};
-  }).sort((a,b)=>b.pct-a.pct);
-  const mejorB7 = sorted[0];
-  const peorB7  = sorted[sorted.length-1];
-
-  // Clientes Big7 en rojo
-  const rojosB7 = sorted.filter(r=>r.pct<=30).map(r=>`${r.nombre} (${r.pct.toFixed(1)}%)`).join(', ') || 'Ninguno';
+  // Gráfico ASCII Big 7 CMO%
+  const b7Chart = b7Data.map(r => {
+    const barra = bar(r.pctOH, 60);
+    return `  ${r.nombre.padEnd(22,' ')} ${barra} ${r.pctOH.toFixed(1)}%`;
+  }).join('\n');
 
   // ── PERFORMANCE ──
   const rowsPerf = calcRentabilidadPerf('Total');
-  const perfLines = rowsPerf.filter(r=>r.ingresos>0).map(r => {
-    const costoD = r.costoEq*(1+OH_PERF);
-    const cmoD   = r.ingresos - costoD;
-    const pctD   = r.ingresos>0 ? (cmoD/r.ingresos)*100 : 0;
-    const emojiCMO = pctD>=25?'🟢':pctD>0?'🟡':'🔴';
-    return `  • ${r.nombre}: Fee ${fmtP(r.ingresos)}  | CMO% ${emojiCMO} ${pctD.toFixed(1)}%`;
+  const perfData = rowsPerf
+    .filter(r => r.ingresos > 0)
+    .map(r => {
+      const costoOH = r.costoEq*(1+OH_PERF);
+      const cmoOH   = r.ingresos - costoOH;
+      const pctOH   = r.ingresos>0 ? (cmoOH/r.ingresos)*100 : 0;
+      return {nombre:r.nombre, pctOH, fee:r.ingresos, cmo:cmoOH};
+    }).sort((a,b)=>b.pctOH-a.pctOH);
+
+  const mejorPerf = perfData[0];
+  const rojosPerf = perfData.filter(r=>r.pctOH<=0).map(r=>`${r.nombre} (${r.pctOH.toFixed(1)}%)`).join(', ')||'Ninguno';
+
+  const perfLines = perfData.map(r => {
+    const sf = r.pctOH>=25?'🟢':r.pctOH>0?'🟡':'🔴';
+    return `  ${sf} *${r.nombre}*: Fee ${fmt(r.fee)} | CMO$ ${fmt(r.cmo)} | CMO% ${r.pctOH.toFixed(1)}%`;
   }).join('\n');
 
-  const sortedPerf = rowsPerf.filter(r=>r.ingresos>0).map(r=>{
-    const cmoD = r.ingresos - r.costoEq*(1+OH_PERF);
-    return {nombre:r.nombre, pct:r.ingresos>0?(cmoD/r.ingresos)*100:0};
-  }).sort((a,b)=>b.pct-a.pct);
-  const mejorPerf = sortedPerf[0];
-  const rojosPerf = sortedPerf.filter(r=>r.pct<=0).map(r=>`${r.nombre} (${r.pct.toFixed(1)}%)`).join(', ') || 'Ninguno';
+  const perfChart = perfData.map(r => {
+    const barra = bar(Math.max(r.pctOH,0), 50);
+    return `  ${r.nombre.padEnd(22,' ')} ${barra} ${r.pctOH.toFixed(1)}%`;
+  }).join('\n');
 
-  // ── CONSTRUIR MENSAJE ──
+  const perfNote = perfData.length === 0
+    ? '  Sin datos de Fee cargados para el período.'
+    : perfLines;
+
+  // ── MENSAJE FINAL ──
+  const vsAgStr  = `${arrow(agVs)} ${Math.abs(agVs).toFixed(1)}%`;
+  const cmbAgStr = `${arrow(agVsCmb)} ${Math.abs(agVsCmb).toFixed(1)}%`;
+
   const msg = [
-    `📊 *RESUMEN EJECUTIVO COMERCIAL — ${periodo}*`,
-    `_Informe generado automáticamente desde el Control Comercial · Ignis Media Agency_`,
+    `*RESUMEN EJECUTIVO — ${periodo}*`,
+    `Ignis Media Agency · Control Comercial`,
     ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `🏢 *TOTAL AGENCIA*`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `🕐 Período: *${periodo}*`,
-    `💰 Inversión: *${fmt(ag.inv)}* ${arrow(ag.vs)} vs Presup ${Math.abs(agVs).toFixed(1)}% ${semaf(-Math.abs(agVs),-5,-10)}`,
-    `📦 Presupuesto período: *${fmt(ag.presup)}* | Anual: *${fmt(ag.presupAnual)}*`,
-    `📈 Consumido anual: *${agCons.toFixed(1)}%* ${agCons>70?'🟢':agCons>35?'🟡':'🔴'}`,
-    `💎 CMB: *${fmt(ag.cmb)}* (${fmtP(ag.cmbPct)}) ${semaf(agCmbPct,-5,-10)}`,
-    `🎯 CMB vs Presup: *${Math.abs(agVsCmb).toFixed(1)}%* ${arrow(agVsCmb)} ${semaf(agVsCmb,-5,-10)}`,
+    `*TOTAL AGENCIA*`,
+    `────────────────────────────`,
+    `Inversión:        *${fmt(ag.inv)}*  ${vsAgStr} vs Presup`,
+    `Presupuesto:      *${fmt(ag.presup)}*  (Anual: ${fmt(ag.presupAnual)})`,
+    `Consumido anual:  *${agCons.toFixed(1)}%*  ${semCons.replace('●verde','🟢').replace('●amarillo','🟡').replace('●rojo','🔴')}  ${bar(agCons)}`,
+    `CMB:              *${fmt(ag.cmb)}*  (${fmtPct(ag.cmbPct)})`,
+    `CMB vs Presup:    *${cmbAgStr}*`,
     ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `🎨 *CLIENTES BIG 7 — BRANDING*`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `🏆 Mejor CMO%: *${mejorB7?.nombre}* (${mejorB7?.pct.toFixed(1)}%) 🟢`,
-    `⚠️ Clientes en rojo (CMO% ≤30%): *${rojosB7}*`,
+    `*CLIENTES BIG 7 — BRANDING (con OH)*`,
+    `────────────────────────────`,
+    `Mejor CMO%:  *${mejorB7?.nombre||'—'}* (${mejorB7?.pctOH?.toFixed(1)||'—'}%) 🏆`,
+    `En rojo (≤30%): ${rojosB7}`,
     ``,
-    `_Detalle por cliente (Con OH):_`,
     b7Lines,
     ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `🚀 *PERFORMANCE*`,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `🏆 Mejor CMO%: *${mejorPerf?.nombre}* (${mejorPerf?.pct.toFixed(1)}%) 🟢`,
-    `🔴 Clientes en rojo (CMO% ≤0%): *${rojosPerf}*`,
+    `CMO% por cliente:`,
+    `\`\`\``,
+    b7Chart,
+    `\`\`\``,
     ``,
-    `_Detalle por cliente (Con OH):_`,
-    perfLines,
+    `*PERFORMANCE (con OH)*`,
+    `────────────────────────────`,
+    perfData.length > 0 ? `Mejor CMO%:  *${mejorPerf?.nombre||'—'}* (${mejorPerf?.pctOH?.toFixed(1)||'—'}%) 🏆` : '',
+    perfData.length > 0 ? `En rojo (≤0%): ${rojosPerf}` : '',
     ``,
-    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `_Enviado automáticamente desde Control Comercial · Ignis_`
-  ].join('\n');
+    perfNote,
+    perfData.length > 0 ? `
+\`\`\`
+${perfChart}
+\`\`\`` : '',
+    ``,
+    `────────────────────────────`,
+    `_Generado automáticamente · Control Comercial Ignis_`
+  ].filter(l => l !== null).join('\n');
 
-  // ── ENVIAR A SLACK VÍA APPS SCRIPT (webhook seguro) ──
   const SLACK_PROXY = 'https://script.google.com/macros/s/AKfycbwdEWqrT2eb9S_UN5v0y716-GUvfxvaaK5ERCqhGQ-EqSe0KQ4pMRiiqQguWTUjfx9QTg/exec';
   fetch(SLACK_PROXY, {
     method: 'POST',
@@ -1395,11 +1416,8 @@ function enviarResumenEjecutivo() {
     body: JSON.stringify({ type: 'slack_resumen', mensaje: msg })
   })
   .then(r => {
-    if (r.ok) {
-      alert('✅ Resumen ejecutivo enviado a Slack con Juan Manuel Rey.');
-    } else {
-      alert('❌ Error al enviar. Revisá la conexión.');
-    }
+    if (r.ok) alert('✅ Resumen enviado a Slack.');
+    else alert('❌ Error al enviar. Revisá la conexión.');
   })
   .catch(() => alert('❌ Error de conexión con Slack.'));
 }
