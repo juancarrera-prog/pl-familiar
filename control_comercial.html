@@ -234,6 +234,7 @@ tbody tr:hover td { background: rgba(255,255,255,0.02); }
         Período: <span id="periodoLabel">Cargando...</span>
       </div>
       <button class="slack-btn" onclick="enviarAlertas()">📣 Enviar alertas Slack</button>
+      <button class="slack-btn" onclick="enviarResumenEjecutivo()" style="background:linear-gradient(135deg,#e8001c,#c20018);color:#fff;border-color:#e8001c">📊 Resumen Ejecutivo</button>
     </div>
   </div>
 
@@ -1279,6 +1280,129 @@ async function fetchConRetry(url, intentos=3, delay=1500) {
 }
 
 
+
+
+function enviarResumenEjecutivo() {
+  if (!DATA || !DATA.clientes) {
+    alert('⚠️ Los datos aún no cargaron. Esperá un momento y volvé a intentar.');
+    return;
+  }
+
+  const periodo = DATA.periodo || 'Período actual';
+  const ag = DATA.agencia || {};
+  const clientes = DATA.clientes || [];
+
+  // ── HELPERS ──
+  const fmt  = v => v != null ? '$' + parseFloat(v).toLocaleString('es-AR', {minimumFractionDigits:1, maximumFractionDigits:1}) + ' M' : '—';
+  const fmtP = v => v != null ? parseFloat(v).toFixed(1) + '%' : '—';
+  const arrow = v => parseFloat(v) >= 0 ? '⬆️' : '⬇️';
+  const semaf = (v, good, warn) => parseFloat(v) >= good ? '🟢' : parseFloat(v) >= warn ? '🟡' : '🔴';
+
+  // ── AGENCIA ──
+  const agVs    = parseFloat(ag.vs || 0);
+  const agVsCmb = parseFloat(String(ag.vsCmb||'0').replace('%',''));
+  const agCmbPct= parseFloat(String(ag.cmbPct||'0').replace('%',''));
+  const agCons  = parseFloat(ag.consumidoAnual || 0);
+
+  // ── BIG 7 ──
+  const rowsB7 = calcRentabilidad('Total');
+  const b7Lines = rowsB7.map(r => {
+    const costoD = r.costoEq*(1+OH_EQUIPO);
+    const cmoD   = r.cmb - costoD;
+    const pctD   = r.inv>0 ? (cmoD/r.inv)*100 : 0;
+    const emojiCMO = pctD>35?'🟢':pctD>=30?'🟡':'🔴';
+    const clienteData = clientes.find(c=>c.nombre===r.nombre)||{};
+    const vsPresup = parseFloat(clienteData.vs||0);
+    const vsCmb = parseFloat(String(clienteData.vsCmb||'0').replace('%',''));
+    // FTE
+    const fteAnt = parseFloat(clienteData.fteAnt||0);
+    const fteAct = parseFloat(clienteData.fteAct||0);
+    const fteDelta = fteAnt>0 ? ((fteAct-fteAnt)/fteAnt)*100 : 0;
+    const fteEmoji = fteDelta > 10 ? '⚠️ FTE ⬆️' : fteDelta < -10 ? '📉 FTE ⬇️' : '';
+    return `  • ${r.nombre}: CMO% ${emojiCMO} ${pctD.toFixed(1)}% | Inv vs Presup ${arrow(vsPresup)} ${Math.abs(vsPresup).toFixed(1)}% | CMB vs Presup ${arrow(vsCmb)} ${Math.abs(vsCmb).toFixed(1)}% ${fteEmoji ? '| '+fteEmoji : ''}`;
+  }).join('\n');
+
+  // Mejor y peor CMO Big 7
+  const sorted = [...rowsB7].map(r => {
+    const cmoD = r.cmb - r.costoEq*(1+OH_EQUIPO);
+    return {nombre:r.nombre, pct:r.inv>0?(cmoD/r.inv)*100:0};
+  }).sort((a,b)=>b.pct-a.pct);
+  const mejorB7 = sorted[0];
+  const peorB7  = sorted[sorted.length-1];
+
+  // Clientes Big7 en rojo
+  const rojosB7 = sorted.filter(r=>r.pct<=30).map(r=>`${r.nombre} (${r.pct.toFixed(1)}%)`).join(', ') || 'Ninguno';
+
+  // ── PERFORMANCE ──
+  const rowsPerf = calcRentabilidadPerf('Total');
+  const perfLines = rowsPerf.filter(r=>r.ingresos>0).map(r => {
+    const costoD = r.costoEq*(1+OH_PERF);
+    const cmoD   = r.ingresos - costoD;
+    const pctD   = r.ingresos>0 ? (cmoD/r.ingresos)*100 : 0;
+    const emojiCMO = pctD>=25?'🟢':pctD>0?'🟡':'🔴';
+    return `  • ${r.nombre}: Fee ${fmtP(r.ingresos)}  | CMO% ${emojiCMO} ${pctD.toFixed(1)}%`;
+  }).join('\n');
+
+  const sortedPerf = rowsPerf.filter(r=>r.ingresos>0).map(r=>{
+    const cmoD = r.ingresos - r.costoEq*(1+OH_PERF);
+    return {nombre:r.nombre, pct:r.ingresos>0?(cmoD/r.ingresos)*100:0};
+  }).sort((a,b)=>b.pct-a.pct);
+  const mejorPerf = sortedPerf[0];
+  const rojosPerf = sortedPerf.filter(r=>r.pct<=0).map(r=>`${r.nombre} (${r.pct.toFixed(1)}%)`).join(', ') || 'Ninguno';
+
+  // ── CONSTRUIR MENSAJE ──
+  const msg = [
+    `📊 *RESUMEN EJECUTIVO COMERCIAL — ${periodo}*`,
+    `_Informe generado automáticamente desde el Control Comercial · Ignis Media Agency_`,
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `🏢 *TOTAL AGENCIA*`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `🕐 Período: *${periodo}*`,
+    `💰 Inversión: *${fmt(ag.inv)}* ${arrow(ag.vs)} vs Presup ${Math.abs(agVs).toFixed(1)}% ${semaf(-Math.abs(agVs),-5,-10)}`,
+    `📦 Presupuesto período: *${fmt(ag.presup)}* | Anual: *${fmt(ag.presupAnual)}*`,
+    `📈 Consumido anual: *${agCons.toFixed(1)}%* ${agCons>70?'🟢':agCons>35?'🟡':'🔴'}`,
+    `💎 CMB: *${fmt(ag.cmb)}* (${fmtP(ag.cmbPct)}) ${semaf(agCmbPct,-5,-10)}`,
+    `🎯 CMB vs Presup: *${Math.abs(agVsCmb).toFixed(1)}%* ${arrow(agVsCmb)} ${semaf(agVsCmb,-5,-10)}`,
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `🎨 *CLIENTES BIG 7 — BRANDING*`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `🏆 Mejor CMO%: *${mejorB7?.nombre}* (${mejorB7?.pct.toFixed(1)}%) 🟢`,
+    `⚠️ Clientes en rojo (CMO% ≤30%): *${rojosB7}*`,
+    ``,
+    `_Detalle por cliente (Con OH):_`,
+    b7Lines,
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `🚀 *PERFORMANCE*`,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `🏆 Mejor CMO%: *${mejorPerf?.nombre}* (${mejorPerf?.pct.toFixed(1)}%) 🟢`,
+    `🔴 Clientes en rojo (CMO% ≤0%): *${rojosPerf}*`,
+    ``,
+    `_Detalle por cliente (Con OH):_`,
+    perfLines,
+    ``,
+    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+    `_Enviado automáticamente desde Control Comercial · Ignis_`
+  ].join('\n');
+
+  // ── ENVIAR A SLACK VÍA APPS SCRIPT (webhook seguro) ──
+  const SLACK_PROXY = 'https://script.google.com/macros/s/AKfycbwdEWqrT2eb9S_UN5v0y716-GUvfxvaaK5ERCqhGQ-EqSe0KQ4pMRiiqQguWTUjfx9QTg/exec';
+  fetch(SLACK_PROXY, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain'},
+    body: JSON.stringify({ type: 'slack_resumen', mensaje: msg })
+  })
+  .then(r => {
+    if (r.ok) {
+      alert('✅ Resumen ejecutivo enviado a Slack con Juan Manuel Rey.');
+    } else {
+      alert('❌ Error al enviar. Revisá la conexión.');
+    }
+  })
+  .catch(() => alert('❌ Error de conexión con Slack.'));
+}
 
 async function loadData() {
   // Control Comercial
