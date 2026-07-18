@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Vacaciones ❄️">
+<title>Vacaciones de Invierno 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600&display=swap');
+
+  :root {
+    --sky: #C8E6F5;
+    --sky-dark: #8EC8E8;
+    --snow: #F0F7FF;
+    --warm: #FFF3E0;
+    --sun: #FFB830;
+    --sun-light: #FFE0A0;
+    --leaf: #4CAF7D;
+    --leaf-light: #B8E6CC;
+    --berry: #E8506A;
+    --berry-light: #FFD0D8;
+    --lavender: #9B7FD4;
+    --lavender-light: #E0D4F8;
+    --peach: #FF7043;
+    --peach-light: #FFD4C2;
+    --teal: #26A69A;
+    --teal-light: #B2DFDB;
+    --text: #2C3E50;
+    --text-soft: #6B7A8D;
+    --card-bg: #FFFFFF;
+    --bg: #EBF4FB;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 90px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1B6CA8 0%, #2196F3 50%, #42A5F5 100%);
+    padding: 50px 20px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 30px;
+    background: var(--bg);
+    border-radius: 30px 30px 0 0;
+  }
+  .snowflakes {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .snowflake {
+    position: absolute;
+    color: rgba(255,255,255,0.4);
+    font-size: 18px;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(120px) rotate(360deg); opacity: 0; }
+  }
+  .header-icon { font-size: 48px; margin-bottom: 8px; }
+  .header h1 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+  .header-sub {
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+  .date-range {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 16px;
+    margin-top: 10px;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    backdrop-filter: blur(10px);
+  }
+
+  /* TABS */
+  .tabs-wrap {
+    padding: 20px 16px 8px;
+  }
+  .tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 2px solid transparent;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    color: var(--text-soft);
+  }
+  .tab.active {
+    background: #1B6CA8;
+    color: white;
+    border-color: #1B6CA8;
+  }
+  .tab:not(.active):hover { border-color: var(--sky-dark); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    padding: 16px 16px 8px;
+    color: var(--text);
+  }
+  .section-title span { color: #1B6CA8; }
+
+  /* AGENDA VIEW */
+  .agenda { padding: 0 16px; }
+  .day-block {
+    margin-bottom: 20px;
+  }
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .day-badge {
+    background: #1B6CA8;
+    color: white;
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .day-badge.special { background: var(--berry); }
+  .day-badge.gratis { background: var(--leaf); }
+  .day-badge.pendiente { background: var(--lavender); }
+  .day-name {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+  }
+  .day-weather {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+
+  /* ACTIVITY CARD */
+  .act-card {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 12px rgba(27,108,168,0.08);
+    border-left: 4px solid var(--sky-dark);
+    position: relative;
+    overflow: hidden;
+  }
+  .act-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    border-radius: 0 18px 0 80px;
+    opacity: 0.06;
+  }
+  .act-card.color-sun { border-left-color: var(--sun); }
+  .act-card.color-sun::before { background: var(--sun); }
+  .act-card.color-leaf { border-left-color: var(--leaf); }
+  .act-card.color-leaf::before { background: var(--leaf); }
+  .act-card.color-berry { border-left-color: var(--berry); }
+  .act-card.color-berry::before { background: var(--berry); }
+  .act-card.color-lavender { border-left-color: var(--lavender); }
+  .act-card.color-lavender::before { background: var(--lavender); }
+  .act-card.color-peach { border-left-color: var(--peach); }
+  .act-card.color-peach::before { background: var(--peach); }
+  .act-card.color-teal { border-left-color: var(--teal); }
+  .act-card.color-teal::before { background: var(--teal); }
+  .act-card.color-sky { border-left-color: #1B6CA8; }
+  .act-card.color-sky::before { background: #1B6CA8; }
+
+  .act-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .act-emoji {
+    font-size: 32px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .act-info { flex: 1; }
+  .act-name {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+  .act-place {
+    font-size: 12px;
+    color: var(--text-soft);
+    font-weight: 600;
+  }
+
+  .act-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+  }
+  .tag-gratis { background: var(--leaf-light); color: #2E7D50; }
+  .tag-costo { background: var(--sun-light); color: #B8680A; }
+  .tag-horario { background: var(--sky); color: #1B6CA8; }
+  .tag-distancia { background: #F0F0F0; color: var(--text-soft); }
+  .tag-interior { background: var(--lavender-light); color: #5B3FA0; }
+  .tag-exterior { background: var(--leaf-light); color: #2E7D50; }
+  .tag-reserva { background: var(--berry-light); color: #C0202A; }
+  .tag-edad { background: var(--peach-light); color: #BF360C; }
+
+  .act-desc {
+    font-size: 13px;
+    color: var(--text-soft);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .act-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .btn-maps, .btn-entradas {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    text-decoration: none;
+    transition: transform 0.15s;
+  }
+  .btn-maps:active, .btn-entradas:active { transform: scale(0.96); }
+  .btn-maps {
+    background: #E8F4FD;
+    color: #1B6CA8;
+  }
+  .btn-entradas {
+    background: var(--berry-light);
+    color: var(--berry);
+  }
+  .btn-whatsapp {
+    background: #DCF8C6;
+    color: #128C7E;
+  }
+
+  /* SPECIAL CARD - Final del Mundo */
+  .special-day-card {
+    background: linear-gradient(135deg, #1B6CA8, #42A5F5);
+    border-radius: 18px;
+    padding: 20px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(27,108,168,0.3);
+  }
+  .special-day-card .icon { font-size: 48px; margin-bottom: 8px; }
+  .special-day-card h3 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .special-day-card p { opacity: 0.9; font-size: 14px; }
+
+  /* PLACES VIEW */
+  .places { padding: 0 16px; }
+  .place-card {
+    background: white;
+    border-radius: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 12px rgba(27,108,168,0.08);
+    overflow: hidden;
+  }
+  .place-header {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .place-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .place-main { flex: 1; }
+  .place-name {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+  .place-loc {
+    font-size: 12px;
+    color: var(--text-soft);
+    font-weight: 600;
+  }
+  .place-dist {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1B6CA8;
+    background: var(--sky);
+    padding: 4px 10px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .place-body {
+    padding: 0 16px 16px;
+    border-top: 1px solid #F0F4F8;
+    margin-top: 0;
+    padding-top: 12px;
+  }
+  .place-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    align-items: flex-start;
+  }
+  .place-row-label {
+    font-weight: 700;
+    color: var(--text-soft);
+    min-width: 70px;
+    flex-shrink: 0;
+  }
+  .place-row-val { color: var(--text); flex: 1; }
+  .gratis-badge {
+    display: inline-block;
+    background: var(--leaf-light);
+    color: #2E7D50;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 8px;
+  }
+  .place-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* TIPS VIEW */
+  .tips { padding: 0 16px; }
+  .tip-card {
+    background: white;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 12px rgba(27,108,168,0.08);
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .tip-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .tip-content h4 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .tip-content p {
+    font-size: 13px;
+    color: var(--text-soft);
+    line-height: 1.5;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 1px solid #E8EFF6;
+    display: flex;
+    padding: 8px 0 20px;
+    box-shadow: 0 -4px 20px rgba(27,108,168,0.08);
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 4px;
+  }
+  .nav-icon { font-size: 22px; }
+  .nav-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: var(--text-soft);
+  }
+  .nav-item.active .nav-label { color: #1B6CA8; }
+  .nav-item.active .nav-icon { transform: translateY(-2px); }
+
+  /* VIEWS */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* SUMMARY STRIP */
+  .summary-strip {
+    display: flex;
+    gap: 10px;
+    padding: 0 16px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .summary-strip::-webkit-scrollbar { display: none; }
+  .summary-chip {
+    flex-shrink: 0;
+    background: white;
+    border-radius: 14px;
+    padding: 12px 16px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(27,108,168,0.08);
+    min-width: 90px;
+  }
+  .summary-chip .chip-num {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    color: #1B6CA8;
+    line-height: 1;
+  }
+  .summary-chip .chip-label {
+    font-size: 11px;
+    color: var(--text-soft);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="snowflakes" id="snowflakes"></div>
+  <div class="header-icon">❄️</div>
+  <h1>Vacaciones de Invierno</h1>
+  <div class="header-sub">Zona Norte · Maschwitz</div>
+  <div class="date-range">19 julio – 2 agosto 2026</div>
+</div>
+
+<!-- VIEWS -->
+<div id="view-agenda" class="view active">
+  <p class="section-title">📅 Cronograma <span>día por día</span></p>
+
+  <!-- Summary chips -->
+  <div class="summary-strip">
+    <div class="summary-chip">
+      <div class="chip-num">17</div>
+      <div class="chip-label">opciones</div>
+    </div>
+    <div class="summary-chip">
+      <div class="chip-num">8</div>
+      <div class="chip-label">gratis</div>
+    </div>
+    <div class="summary-chip">
+      <div class="chip-num">14</div>
+      <div class="chip-label">días</div>
+    </div>
+    <div class="summary-chip">
+      <div class="chip-num">~8km</div>
+      <div class="chip-label">prom. dist.</div>
+    </div>
+  </div>
+
+  <div class="agenda">
+
+    <!-- DOM 19/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge special">Dom 19/7</div>
+        <div class="day-name">Final del Mundo 🏆</div>
+        <div class="day-weather">🌥 14°C</div>
+      </div>
+      <div class="special-day-card">
+        <div class="icon">⚽</div>
+        <h3>¡Final del Mundial!</h3>
+        <p>Día de familia en casa. Almuerzo, partido y festejo juntos.</p>
+      </div>
+    </div>
+
+    <!-- LUN 20/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge">Lun 20/7</div>
+        <div class="day-name">Cerca de casa</div>
+        <div class="day-weather">🌨 12°C</div>
+      </div>
+      <div class="act-card color-leaf">
+        <div class="act-top">
+          <div class="act-emoji">🌳</div>
+          <div class="act-info">
+            <div class="act-name">Plaza del Barrio Cerrado</div>
+            <div class="act-place">Ingeniero Maschwitz · 0 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-gratis">✓ Gratis</span>
+          <span class="tag tag-horario">🕓 Libre</span>
+          <span class="tag tag-exterior">🌿 Exterior</span>
+          <span class="tag tag-edad">👶 Todas las edades</span>
+        </div>
+        <div class="act-desc">Plan tranquilo y cerca de casa. Evitamos el caos post-final del mundo. Salida sugerida: 14:30 hs.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Ingeniero+Maschwitz+plaza" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAR 21/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge special">Mar 21/7</div>
+        <div class="day-name">¡Ya tenés entradas! 🎟</div>
+        <div class="day-weather">🌨 13°C</div>
+      </div>
+      <div class="act-card color-sun">
+        <div class="act-top">
+          <div class="act-emoji">🐄</div>
+          <div class="act-info">
+            <div class="act-name">La Granja de Zenón en el TOM</div>
+            <div class="act-place">Tortugas Open Mall · ~13 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-gratis">✓ Gratis</span>
+          <span class="tag tag-horario">🕑 14:00 hs</span>
+          <span class="tag tag-interior">🏠 Interior</span>
+          <span class="tag tag-distancia">15 min</span>
+        </div>
+        <div class="act-desc">Fiesta de La Granja de Zenón en el Hall Central del TOM. Entrada libre por orden de llegada. Salir 13:35 hs para estar a tiempo.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Tortugas+Open+Mall" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+      <div class="act-card color-leaf">
+        <div class="act-top">
+          <div class="act-emoji">🎭</div>
+          <div class="act-info">
+            <div class="act-name">Show de Títeres · Maschwitz Mall</div>
+            <div class="act-place">Maschwitz Mall · ~3 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-gratis">✓ Gratis</span>
+          <span class="tag tag-horario">🕓 15:00 hs</span>
+          <span class="tag tag-interior">🏠 Interior</span>
+        </div>
+        <div class="act-desc">Alternativa si el TOM se complica. Show de títeres a las 15 hs. Sin reserva, por orden de llegada.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Maschwitz+Mall" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIE 22/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge">Mié 22/7</div>
+        <div class="day-name">Teatro al aire libre</div>
+        <div class="day-weather">🌤 15°C</div>
+      </div>
+      <div class="act-card color-teal">
+        <div class="act-top">
+          <div class="act-emoji">🎪</div>
+          <div class="act-info">
+            <div class="act-name">Cuando la Luna Trajo la Lluvia</div>
+            <div class="act-place">Puertos Escobar · ~11 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-gratis">✓ Gratis</span>
+          <span class="tag tag-horario">🕓 15:30 hs</span>
+          <span class="tag tag-exterior">🌿 Exterior</span>
+          <span class="tag tag-distancia">15-20 min</span>
+        </div>
+        <div class="act-desc">Teatro infantil en el Parque Central de Puertos. Entrada libre sin reserva. Salir 14:50 hs. Si llueve no se hace — plan B: LuPaLaLand juegos.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Puertos+Escobar+Parque+Central" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- JUE 23/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge gratis">Jue 23/7</div>
+        <div class="day-name">Magia y Burbujas ✨</div>
+        <div class="day-weather">⛅ 17°C</div>
+      </div>
+      <div class="act-card color-lavender">
+        <div class="act-top">
+          <div class="act-emoji">🫧</div>
+          <div class="act-info">
+            <div class="act-name">Show de Magia y Burbujas</div>
+            <div class="act-place">Maschwitz Mall · ~3 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-gratis">✓ Gratis</span>
+          <span class="tag tag-horario">🕓 15:00 y 16:30 hs</span>
+          <span class="tag tag-interior">🏠 Interior</span>
+          <span class="tag tag-distancia">9 min</span>
+        </div>
+        <div class="act-desc">¡Le va a encantar! Magia a las 15:00 hs y Show de Burbujas a las 16:30 hs. Salir 14:40 hs para llegar bien. Sin reserva, por orden de llegada.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Maschwitz+Mall" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+      <div class="act-card color-peach">
+        <div class="act-top">
+          <div class="act-emoji">🎡</div>
+          <div class="act-info">
+            <div class="act-name">Plaza El Dorado — Inflables</div>
+            <div class="act-place">Ing. Maschwitz · ~4 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-costo">💰 $8.000/30min</span>
+          <span class="tag tag-horario">🕒 Por la tarde</span>
+          <span class="tag tag-exterior">🌿 Exterior</span>
+          <span class="tag tag-edad">👶 0-4 años</span>
+        </div>
+        <div class="act-desc">Parque de inflables con Sector Kids especial 0-4 años. Food trucks y feria. Abre del 23/07 al 2/08. Se abona directo en el lugar.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Plaza+El+Dorado+Maschwitz" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIE 24/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge">Vie 24/7</div>
+        <div class="day-name">Teatro en San Isidro 🎵</div>
+        <div class="day-weather">🌤 18°C</div>
+      </div>
+      <div class="act-card color-berry">
+        <div class="act-top">
+          <div class="act-emoji">🎶</div>
+          <div class="act-info">
+            <div class="act-name">Cuentos y Canciones de María Elena Walsh</div>
+            <div class="act-place">Teatro Stella Maris · ~29 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-costo">💰 Consultar precio</span>
+          <span class="tag tag-horario">🕓 15:00 hs</span>
+          <span class="tag tag-interior">🏠 Interior</span>
+          <span class="tag tag-reserva">🎟 Comprar online</span>
+        </div>
+        <div class="act-desc">Nominado Premios ACE. Canciones y cuentos en vivo — perfecto para la nena. Salir 14:10 hs. Por Panamericana directo a San Isidro.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Teatro+Stella+Maris+San+Isidro" class="btn-maps">📍 Cómo llegar</a>
+          <a href="https://www.entradauno.com/" class="btn-entradas">🎟 Entradas</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAB 25/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge">Sáb 25/7</div>
+        <div class="day-name">Frozen y Princesas 👑</div>
+        <div class="day-weather">⛅ 16°C</div>
+      </div>
+      <div class="act-card color-sky">
+        <div class="act-top">
+          <div class="act-emoji">⛄</div>
+          <div class="act-info">
+            <div class="act-name">Historia de Hielo 2 — El Bosque Encantado</div>
+            <div class="act-place">Teatro Stella Maris · ~29 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-costo">💰 Consultar precio</span>
+          <span class="tag tag-horario">🕓 15:00 hs</span>
+          <span class="tag tag-interior">🏠 Interior</span>
+          <span class="tag tag-reserva">🎟 Comprar online</span>
+        </div>
+        <div class="act-desc">Musical en vivo basado en Frozen. Le van a encantar Elsa y Anna. Misma salida que el viernes.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Teatro+Stella+Maris+San+Isidro" class="btn-maps">📍 Cómo llegar</a>
+          <a href="https://www.entradauno.com/" class="btn-entradas">🎟 Entradas</a>
+        </div>
+      </div>
+      <div class="act-card color-peach">
+        <div class="act-top">
+          <div class="act-emoji">🐘</div>
+          <div class="act-info">
+            <div class="act-name">Parque de Inflables Puertos</div>
+            <div class="act-place">Puertos Escobar · ~11 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-gratis">✓ Gratis</span>
+          <span class="tag tag-horario">🕙 11:00-17:00 hs</span>
+          <span class="tag tag-exterior">🌿 Exterior</span>
+        </div>
+        <div class="act-desc">Inflables los fines de semana en Paseo 25. Solo si el clima acompaña — se suspende por lluvia.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Puertos+Escobar+Parque+Central" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- LUN 27/7 - DOM 27 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge">Dom 26-Lun 27/7</div>
+        <div class="day-name">Fin de semana libre</div>
+      </div>
+      <div class="act-card color-leaf">
+        <div class="act-top">
+          <div class="act-emoji">🐄</div>
+          <div class="act-info">
+            <div class="act-name">Granja Educativa Don Benito</div>
+            <div class="act-place">Maschwitz · ~2,5 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-gratis">✓ Menores 4 años gratis</span>
+          <span class="tag tag-horario">🕙 09:00-17:00 hs</span>
+          <span class="tag tag-exterior">🌿 Exterior</span>
+          <span class="tag tag-distancia">8-10 min</span>
+        </div>
+        <div class="act-desc">¡Le encantan los animales! Cerrada lunes y martes. Adultos $2.500. Pago directo en boletería.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Granja+Don+Benito+Maschwitz" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAR 28/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge special">Mar 28/7</div>
+        <div class="day-name">Prioridad #1 🌊</div>
+        <div class="day-weather">⛅ 16°C</div>
+      </div>
+      <div class="act-card color-teal">
+        <div class="act-top">
+          <div class="act-emoji">🐠</div>
+          <div class="act-info">
+            <div class="act-name">Música en Vivo & Figuras del Océano</div>
+            <div class="act-place">LuPaLaLand Martínez · ~30 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-costo">💰 $38.000 dupla</span>
+          <span class="tag tag-horario">🕙 10:30 hs</span>
+          <span class="tag tag-interior">🏠 Interior</span>
+          <span class="tag tag-reserva">📱 Reservar WA</span>
+        </div>
+        <div class="act-desc">Temática Moana y el océano — su película favorita. Show interactivo con música en vivo y personajes marinos. ¡RESERVAR CON ANTICIPACIÓN! Cupos limitados.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Vicente+Fidel+Lopez+32+Martinez" class="btn-maps">📍 Cómo llegar</a>
+          <a href="tel:1140955872" class="btn-entradas btn-whatsapp">📱 11-4095-5872</a>
+          <a href="tel:1153117554" class="btn-entradas btn-whatsapp">📱 11-5311-7554</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIE 29/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge">Mié 29/7</div>
+        <div class="day-name">Temaikèn 🦒</div>
+        <div class="day-weather">🌤 17-18°C</div>
+      </div>
+      <div class="act-card color-leaf">
+        <div class="act-top">
+          <div class="act-emoji">🦁</div>
+          <div class="act-info">
+            <div class="act-name">Bioparque Temaikèn</div>
+            <div class="act-place">Escobar · ~8,5 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-gratis">✓ Menores 3 años gratis</span>
+          <span class="tag tag-horario">🕙 10:00-18:00 hs</span>
+          <span class="tag tag-exterior">🌿 Exterior</span>
+          <span class="tag tag-reserva">🎟 Comprar online</span>
+        </div>
+        <div class="act-desc">Al lado de casa. Le fascinan los animales — acuario, jirafa, leones. Máx 17-18°C ese día, ideal para caminar. Comprar entradas online para evitar colas.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Bioparque+Temaiken+Escobar" class="btn-maps">📍 Cómo llegar</a>
+          <a href="https://ecommerce.temaiken.org.ar/" class="btn-entradas">🎟 Entradas online</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- JUE 30/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge special">Jue 30/7</div>
+        <div class="day-name">Prioridad #3 🌌</div>
+        <div class="day-weather">⛅ 16°C</div>
+      </div>
+      <div class="act-card color-lavender">
+        <div class="act-top">
+          <div class="act-emoji">🔮</div>
+          <div class="act-info">
+            <div class="act-name">Sensorial de Universo</div>
+            <div class="act-place">LuPaLaLand Martínez · ~30 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-costo">💰 $38.000 dupla</span>
+          <span class="tag tag-horario">🕓 16:00 hs · 30 min</span>
+          <span class="tag tag-interior">🏠 Interior</span>
+          <span class="tag tag-reserva">📱 Reservar WA</span>
+        </div>
+        <div class="act-desc">Viaje sensorial inmersivo: globos de helio, luces, música, materiales fluidos. 30 minutos — perfecto para que no se disperse. ¡Le van a encantar las burbujas y luces!</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Vicente+Fidel+Lopez+32+Martinez" class="btn-maps">📍 Cómo llegar</a>
+          <a href="tel:1140955872" class="btn-entradas btn-whatsapp">📱 11-4095-5872</a>
+        </div>
+      </div>
+      <div class="act-card color-sun">
+        <div class="act-top">
+          <div class="act-emoji">🐟</div>
+          <div class="act-info">
+            <div class="act-name">Merienda La Sirenita — Esencia</div>
+            <div class="act-place">Esencia Eventos Martínez · ~25 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-costo">💰 Consultar precio</span>
+          <span class="tag tag-horario">🕓 17:00 hs</span>
+          <span class="tag tag-interior">🏠 Interior</span>
+        </div>
+        <div class="act-desc">Merienda temática La Sirenita con show incluido. Reservar por Instagram @esencia.eventos.martinez</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Rodriguez+Pena+1565+Martinez" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIE 31/7 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge">Vie 31/7</div>
+        <div class="day-name">Tarde libre</div>
+      </div>
+      <div class="act-card color-peach">
+        <div class="act-top">
+          <div class="act-emoji">🎃</div>
+          <div class="act-info">
+            <div class="act-name">Halloween Party — Maschwitz Mall</div>
+            <div class="act-place">Maschwitz Mall · ~3 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-gratis">✓ Gratis</span>
+          <span class="tag tag-horario">🕓 15:00 hs</span>
+          <span class="tag tag-interior">🏠 Interior</span>
+        </div>
+        <div class="act-desc">Show temático Halloween en el mall. Gratis, sin reserva. Ideal si quedás cerca.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Maschwitz+Mall" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAB 1/8 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge">Sáb 1/8</div>
+        <div class="day-name">Penúltimo día 🎉</div>
+      </div>
+      <div class="act-card color-sky">
+        <div class="act-top">
+          <div class="act-emoji">🐕</div>
+          <div class="act-info">
+            <div class="act-name">Inflables fin de semana — Puertos</div>
+            <div class="act-place">Puertos Escobar · ~11 km</div>
+          </div>
+        </div>
+        <div class="act-tags">
+          <span class="tag tag-gratis">✓ Gratis</span>
+          <span class="tag tag-horario">🕙 11:00-17:00 hs</span>
+          <span class="tag tag-exterior">🌿 Exterior</span>
+        </div>
+        <div class="act-desc">Inflables gigantes en Paseo 25 los fines de semana. También hay show "Anda Calabaza" a las 15:30 hs.</div>
+        <div class="act-actions">
+          <a href="https://maps.google.com/?q=Puertos+Escobar+Parque+Central" class="btn-maps">📍 Cómo llegar</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOM 2/8 -->
+    <div class="day-block">
+      <div class="day-header">
+        <div class="day-badge">Dom 2/8</div>
+        <div class="day-name">Fin de vacaciones 🏠</div>
+        <div class="day-weather">⚠️ Caos de tránsito</div>
+      </div>
+      <div class="special-day-card" style="background: linear-gradient(135deg, #E8506A, #FF8A65);">
+        <div class="icon">🏡</div>
+        <h3>Día de vuelta a casa</h3>
+        <p>Evitar Panamericana — caos de regreso vacaciones. Plan tranquilo en el barrio o en casa.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- VIEW: LUGARES -->
+<div id="view-lugares" class="view">
+  <p class="section-title">📍 Todos los <span>lugares</span></p>
+  <div class="places">
+
+    <div class="place-card">
+      <div class="place-header">
+        <div class="place-icon" style="background:#E8F5E9;">🌳</div>
+        <div class="place-main">
+          <div class="place-name">Plaza Barrio Cerrado</div>
+          <div class="place-loc">Ingeniero Maschwitz</div>
+        </div>
+        <div class="place-dist">0 km</div>
+      </div>
+      <div class="place-body">
+        <div class="place-row"><span class="place-row-label">Horario</span><span class="place-row-val">Libre</span></div>
+        <div class="place-row"><span class="place-row-label">Costo</span><span class="place-row-val"><span class="gratis-badge">GRATIS</span></span></div>
+        <div class="place-row"><span class="place-row-label">Entorno</span><span class="place-row-val">Exterior</span></div>
+        <div class="place-row"><span class="place-row-label">Fechas</span><span class="place-row-val">Todos los días</span></div>
+      </div>
+    </div>
+
+    <div class="place-card">
+      <div class="place-header">
+        <div class="place-icon" style="background:#F3E5F5;">🫧</div>
+        <div class="place-main">
+          <div class="place-name">Maschwitz Mall · Shows</div>
+          <div class="place-loc">Ingeniero Maschwitz</div>
+        </div>
+        <div class="place-dist">~3 km</div>
+      </div>
+      <div class="place-body">
+        <div class="place-row"><span class="place-row-label">Horario</span><span class="place-row-val">15:00 y 16:30 hs</span></div>
+        <div class="place-row"><span class="place-row-label">Costo</span><span class="place-row-val"><span class="gratis-badge">GRATIS</span></span></div>
+        <div class="place-row"><span class="place-row-label">Entorno</span><span class="place-row-val">Interior</span></div>
+        <div class="place-row"><span class="place-row-label">Fechas</span><span class="place-row-val">Mar 21, Jue 23, Mar 28, Jue 30/7</span></div>
+        <div class="place-row"><span class="place-row-label">Shows</span><span class="place-row-val">Títeres · Magia · Burbujas · Cuentos · Pintura</span></div>
+        <div class="place-actions">
+          <a href="https://maps.google.com/?q=Maschwitz+Mall" class="btn-maps">📍 Maps</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="place-card">
+      <div class="place-header">
+        <div class="place-icon" style="background:#FFF8E1;">🎡</div>
+        <div class="place-main">
+          <div class="place-name">Plaza El Dorado · Inflables</div>
+          <div class="place-loc">Ingeniero Maschwitz</div>
+        </div>
+        <div class="place-dist">~4 km</div>
+      </div>
+      <div class="place-body">
+        <div class="place-row"><span class="place-row-label">Horario</span><span class="place-row-val">Por la tarde</span></div>
+        <div class="place-row"><span class="place-row-label">Costo</span><span class="place-row-val">$8.000 / 30 min (0-4 años)</span></div>
+        <div class="place-row"><span class="place-row-label">Entorno</span><span class="place-row-val">Exterior · Food trucks</span></div>
+        <div class="place-row"><span class="place-row-label">Fechas</span><span class="place-row-val">23/07 al 02/08</span></div>
+        <div class="place-actions">
+          <a href="https://maps.google.com/?q=Plaza+El+Dorado+Maschwitz" class="btn-maps">📍 Maps</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="place-card">
+      <div class="place-header">
+        <div class="place-icon" style="background:#E8F5E9;">🦁</div>
+        <div class="place-main">
+          <div class="place-name">Bioparque Temaikèn</div>
+          <div class="place-loc">Escobar</div>
+        </div>
+        <div class="place-dist">~8,5 km</div>
+      </div>
+      <div class="place-body">
+        <div class="place-row"><span class="place-row-label">Horario</span><span class="place-row-val">10:00 a 18:00 hs</span></div>
+        <div class="place-row"><span class="place-row-label">Costo</span><span class="place-row-val">Menores de 3 años: <span class="gratis-badge">GRATIS</span></span></div>
+        <div class="place-row"><span class="place-row-label">Entorno</span><span class="place-row-val">Exterior + acuario interior</span></div>
+        <div class="place-row"><span class="place-row-label">Fechas</span><span class="place-row-val">Todos los días</span></div>
+        <div class="place-actions">
+          <a href="https://maps.google.com/?q=Bioparque+Temaiken+Escobar" class="btn-maps">📍 Maps</a>
+          <a href="https://ecommerce.temaiken.org.ar/" class="btn-entradas">🎟 Entradas</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="place-card">
+      <div class="place-header">
+        <div class="place-icon" style="background:#E0F2F1;">🎪</div>
+        <div class="place-main">
+          <div class="place-name">Puertos Escobar</div>
+          <div class="place-loc">Parque Central / Paseo 25</div>
+        </div>
+        <div class="place-dist">~11 km</div>
+      </div>
+      <div class="place-body">
+        <div class="place-row"><span class="place-row-label">Horario</span><span class="place-row-val">15:30 hs (inflables finde 11-17 hs)</span></div>
+        <div class="place-row"><span class="place-row-label">Costo</span><span class="place-row-val"><span class="gratis-badge">GRATIS</span> · Se suspende por lluvia</span></div>
+        <div class="place-row"><span class="place-row-label">Entorno</span><span class="place-row-val">Exterior</span></div>
+        <div class="place-row"><span class="place-row-label">Fechas</span><span class="place-row-val">Mié 22, Jue 23, Vie 24/07 y fines de semana</span></div>
+        <div class="place-actions">
+          <a href="https://maps.google.com/?q=Puertos+Escobar+Parque+Central" class="btn-maps">📍 Maps</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="place-card">
+      <div class="place-header">
+        <div class="place-icon" style="background:#FFF8E1;">🐄</div>
+        <div class="place-main">
+          <div class="place-name">TOM · La Granja de Zenón</div>
+          <div class="place-loc">Tortugas Open Mall</div>
+        </div>
+        <div class="place-dist">~13 km</div>
+      </div>
+      <div class="place-body">
+        <div class="place-row"><span class="place-row-label">Horario</span><span class="place-row-val">Lun-Vie 14-20 hs · Finde 12-20 hs</span></div>
+        <div class="place-row"><span class="place-row-label">Costo</span><span class="place-row-val"><span class="gratis-badge">GRATIS</span> · Orden de llegada</span></div>
+        <div class="place-row"><span class="place-row-label">Entorno</span><span class="place-row-val">Interior</span></div>
+        <div class="place-row"><span class="place-row-label">Fechas</span><span class="place-row-val">18 Jul – 2 Ago</span></div>
+        <div class="place-actions">
+          <a href="https://maps.google.com/?q=Tortugas+Open+Mall" class="btn-maps">📍 Maps</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="place-card">
+      <div class="place-header">
+        <div class="place-icon" style="background:#E0F2F1;">🐠</div>
+        <div class="place-main">
+          <div class="place-name">LuPaLaLand · Shows</div>
+          <div class="place-loc">Vicente Fidel López 32, Martínez</div>
+        </div>
+        <div class="place-dist">~30 km</div>
+      </div>
+      <div class="place-body">
+        <div class="place-row"><span class="place-row-label">Horario</span><span class="place-row-val">Mañana y tarde (según show)</span></div>
+        <div class="place-row"><span class="place-row-label">Costo</span><span class="place-row-val">$38.000 dupla niño+adulto</span></div>
+        <div class="place-row"><span class="place-row-label">Entorno</span><span class="place-row-val">Interior · Ambiente controlado</span></div>
+        <div class="place-row"><span class="place-row-label">Shows</span><span class="place-row-val">🌊 Océano (28/7) · 🌌 Universo (30/7)</span></div>
+        <div class="place-row"><span class="place-row-label">⚠️ Reservar</span><span class="place-row-val">Cupos limitados — llamar con anticipación</span></div>
+        <div class="place-actions">
+          <a href="https://maps.google.com/?q=Vicente+Fidel+Lopez+32+Martinez" class="btn-maps">📍 Maps</a>
+          <a href="tel:1140955872" class="btn-entradas btn-whatsapp">📱 11-4095-5872</a>
+          <a href="tel:1153117554" class="btn-entradas btn-whatsapp">📱 11-5311-7554</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="place-card">
+      <div class="place-header">
+        <div class="place-icon" style="background:#FCE4EC;">👸</div>
+        <div class="place-main">
+          <div class="place-name">Esencia Eventos</div>
+          <div class="place-loc">Rodríguez Peña 1565, Martínez</div>
+        </div>
+        <div class="place-dist">~25 km</div>
+      </div>
+      <div class="place-body">
+        <div class="place-row"><span class="place-row-label">Horario</span><span class="place-row-val">17:00 hs</span></div>
+        <div class="place-row"><span class="place-row-label">Costo</span><span class="place-row-val">Consultar · Incluye merienda + show</span></div>
+        <div class="place-row"><span class="place-row-label">Descuento</span><span class="place-row-val">$5.000 OFF disponible</span></div>
+        <div class="place-row"><span class="place-row-label">Shows</span><span class="place-row-val">Frozen (23/7) · Princess Tea (21 y 28/7) · Sirenita (30/7) · Halloween (31/7)</span></div>
+        <div class="place-actions">
+          <a href="https://maps.google.com/?q=Rodriguez+Pena+1565+Martinez" class="btn-maps">📍 Maps</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="place-card">
+      <div class="place-header">
+        <div class="place-icon" style="background:#FCE4EC;">🎵</div>
+        <div class="place-main">
+          <div class="place-name">Teatro Stella Maris</div>
+          <div class="place-loc">San Isidro</div>
+        </div>
+        <div class="place-dist">~29 km</div>
+      </div>
+      <div class="place-body">
+        <div class="place-row"><span class="place-row-label">Horario</span><span class="place-row-val">15:00 hs</span></div>
+        <div class="place-row"><span class="place-row-label">Costo</span><span class="place-row-val">Consultar en EntradaUno</span></div>
+        <div class="place-row"><span class="place-row-label">Entorno</span><span class="place-row-val">Interior</span></div>
+        <div class="place-row"><span class="place-row-label">Shows</span><span class="place-row-val">María Elena Walsh (Vie 24/7) · Historia de Hielo 2 (Sáb 25/7)</span></div>
+        <div class="place-actions">
+          <a href="https://maps.google.com/?q=Teatro+Stella+Maris+San+Isidro" class="btn-maps">📍 Maps</a>
+          <a href="https://www.entradauno.com/" class="btn-entradas">🎟 Entradas</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="place-card">
+      <div class="place-header">
+        <div class="place-icon" style="background:#E8F5E9;">🎢</div>
+        <div class="place-main">
+          <div class="place-name">El Chingolo 869</div>
+          <div class="place-loc">Pilar</div>
+        </div>
+        <div class="place-dist">~18 km</div>
+      </div>
+      <div class="place-body">
+        <div class="place-row"><span class="place-row-label">Horario</span><span class="place-row-val">11:00 a 19:00 hs (turnos 2hs)</span></div>
+        <div class="place-row"><span class="place-row-label">Costo</span><span class="place-row-val">$20.000 chico · Adultos gratis</span></div>
+        <div class="place-row"><span class="place-row-label">Entorno</span><span class="place-row-val">Exterior · Bar para adultos</span></div>
+        <div class="place-row"><span class="place-row-label">⚠️</span><span class="place-row-val">Se suspende si llueve. Medias obligatorias.</span></div>
+        <div class="place-actions">
+          <a href="https://maps.google.com/?q=El+Chingolo+869+Pilar" class="btn-maps">📍 Maps</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- VIEW: TIPS -->
+<div id="view-tips" class="view">
+  <p class="section-title">💡 Tips <span>para disfrutarlas</span></p>
+  <div class="tips">
+    <div class="tip-card">
+      <div class="tip-icon">📱</div>
+      <div class="tip-content">
+        <h4>Reservar LuPaLaLand YA</h4>
+        <p>Los shows del Océano (28/7) y Universo (30/7) tienen cupos limitados. Llamar al 11-4095-5872 o 11-5311-7554 para reservar.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🎟</div>
+      <div class="tip-content">
+        <h4>Entradas del Teatro Stella Maris</h4>
+        <p>Comprar online en EntradaUno para los shows del 24/7 (Walsh) y 25/7 (Hielo 2). No ir sin entrada.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🌧</div>
+      <div class="tip-content">
+        <h4>Plan B para días de lluvia</h4>
+        <p>Si llueve y el plan era exterior (Puertos, Chingolo), activar plan B: Maschwitz Mall, TOM o LuPaLaLand juegos y café.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🚗</div>
+      <div class="tip-content">
+        <h4>Lunes 20/7 y Domingo 2/8</h4>
+        <p>Evitar autopistas. El 20/7 hay caos post-final del mundo. El 2/8 es el regreso masivo de vacaciones — quedarse cerca.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">⏰</div>
+      <div class="tip-content">
+        <h4>Siesta y ritmo de la nena</h4>
+        <p>Los shows de tarde (15-16 hs) son ideales. Salir siempre 30-40 min antes del inicio para llegar bien y sin apuro.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">💰</div>
+      <div class="tip-content">
+        <h4>Presupuesto estimado shows pagos</h4>
+        <p>LuPaLaLand Océano: $38.000 · LuPaLaLand Universo: $38.000 · Teatro Stella Maris: consultar · Temaikèn: consultar promos. Resto de la semana: GRATIS.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🐄</div>
+      <div class="tip-content">
+        <h4>Granja Don Benito</h4>
+        <p>Solo abre miércoles a domingos. Menores de 4 años entran gratis. Ideal para cualquier tarde suelta — queda a 2,5 km de casa.</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🧸</div>
+      <div class="tip-content">
+        <h4>Lo que más le gusta a ella</h4>
+        <p>Burbujas 🫧 · Animales 🐄 · Cantar 🎵 · Moana 🌊 · Frozen ⛄ · Princesas 👑 · Cuentos 📖 · Explorar activamente 🏃‍♀️</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="switchTab('agenda', this)">
+    <div class="nav-icon">📅</div>
+    <div class="nav-label">Agenda</div>
+  </div>
+  <div class="nav-item" onclick="switchTab('lugares', this)">
+    <div class="nav-icon">📍</div>
+    <div class="nav-label">Lugares</div>
+  </div>
+  <div class="nav-item" onclick="switchTab('tips', this)">
+    <div class="nav-icon">💡</div>
+    <div class="nav-label">Tips</div>
+  </div>
+</div>
+
+<script>
+  // Snowflakes
+  const container = document.getElementById('snowflakes');
+  for (let i = 0; i < 12; i++) {
+    const el = document.createElement('div');
+    el.className = 'snowflake';
+    el.textContent = ['❄','❅','❆'][Math.floor(Math.random()*3)];
+    el.style.left = Math.random()*100 + '%';
+    el.style.animationDuration = (2+Math.random()*3) + 's';
+    el.style.animationDelay = (Math.random()*4) + 's';
+    el.style.fontSize = (12+Math.random()*14) + 'px';
+    container.appendChild(el);
+  }
+
+  function switchTab(view, el) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('view-'+view).classList.add('active');
+    el.classList.add('active');
+    window.scrollTo(0,0);
+  }
+</script>
+</body>
+</html>
